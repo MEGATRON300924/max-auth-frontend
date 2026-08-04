@@ -4,5 +4,6 @@ const nextConfig = {
   images: {
     remotePatterns: [{ protocol: "https", hostname: "**" }],
   },
+  allowedDevOrigins: ["192.168.0.222"]
 };
 module.exports = nextConfig;

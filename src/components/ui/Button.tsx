@@ -12,11 +12,11 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variants = {
   primary:
-    "bg-brand-500 text-white shadow-glow hover:bg-brand-400 hover:shadow-glow-lg active:bg-brand-600",
+    "bg-brand-500 text-white shadow-glow hover:bg-brand-400 hover:shadow-glow-lg active:bg-brand-600 py-3 px-5",
   secondary:
-    "bg-glass border border-glass-border text-ink backdrop-blur-md hover:bg-glass-hover hover:border-white/20",
+    "bg-glass border border-glass-border text-ink backdrop-blur-md hover:bg-glass-hover hover:border-white/20 py-3 px-5",
   ghost: "text-ink-muted hover:text-ink hover:bg-white/5",
-  danger: "bg-danger/90 text-white hover:bg-danger shadow-[0_0_30px_-8px_rgba(239,68,68,0.5)]",
+  danger: "bg-danger/90 text-white hover:bg-danger shadow-[0_0_30px_-8px_rgba(239,68,68,0.5)] py-3 px-5",
 };
 
 const sizes = {

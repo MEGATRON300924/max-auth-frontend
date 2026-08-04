@@ -161,7 +161,6 @@ export default function RootLayout({
           <AuthProvider>
             {children}
             <ToastViewport />
-          </AuthViewport>
         </AuthProvider>
       </ToastProvider>
     </body>
