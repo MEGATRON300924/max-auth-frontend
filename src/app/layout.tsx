@@ -9,24 +9,50 @@ const display = Space_Grotesk({ subsets: ["latin"], variable: "--font-display", 
 const body = Inter({ subsets: ["latin"], variable: "--font-body", display: "swap" });
 const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
 
-export const metadata: Metadata = {
+export const metadata = {
   title: {
-    default: "MAX Auth — One Account. Every MAX Product.",
-    template: "%s · MAX Auth",
+    default: "MAX Auth - Your MAX AI Account",
+    template: "%s | MAX Auth"
   },
   description:
-    "MAX Auth is the identity platform for The MAX AI Ecosystem — sign in once, use MAX AI, MAX Cloud, MAX Home, MAX Music, and every other MAX product.",
-  icons: {
-    icon: "/favicon.png",
-    shortcut: "/favicon.png",
-    apple: "/favicon.png",
-  },
-};
+    "Sign in with your MAX AI Account and access The MAX AI Ecosystem with one secure identity.",
+  keywords: [
+    "MAX AI",
+    "MAX Auth",
+    "MAX AI Ecosystem",
+    "AI assistant",
+    "AI account",
+    "secure login"
+  ],
+  authors: [
+    {
+      name: "The Tron Forge Limited"
+    }
+  ],
+  creator: "The Tron Forge Limited",
+  publisher: "The Tron Forge Limited",
+  metadataBase: new URL("https://auth.max-ai.name.ng"),
 
-export const viewport: Viewport = {
-  themeColor: "#05070D",
-  width: "device-width",
-  initialScale: 1,
+  openGraph: {
+    title: "MAX Auth - Your MAX AI Account",
+    description:
+      "One account for The MAX AI Ecosystem.",
+    url: "https://auth.max-ai.name.ng",
+    siteName: "MAX Auth",
+    type: "website"
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "MAX Auth - Your MAX AI Account",
+    description:
+      "Sign in with your MAX AI Account."
+  },
+
+  robots: {
+    index: true,
+    follow: true
+  }
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
