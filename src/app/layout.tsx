@@ -24,7 +24,7 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://auth.max-ai.name.n"),
+  metadataBase: new URL("https://auth.max-ai.name.ng"),
 
   title: {
     default: "MAX Auth - Your MAX AI Account",
