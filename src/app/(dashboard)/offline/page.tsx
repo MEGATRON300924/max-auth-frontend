@@ -1,0 +1,9 @@
+"use client";
+import { useEffect, useState } from "react";
+import { Wifi, WifiOff, RefreshCw, ShieldCheck } from "lucide-react";
+import { AuthFeatureShell, GlassCard, FeatureRow, StatusPill } from "@/components/auth/AuthFeatureShell";
+
+export default function OfflinePage() {
+ const [online,setOnline]=useState(true); useEffect(()=>{ const sync=()=>setOnline(navigator.onLine); sync(); window.addEventListener("online",sync); window.addEventListener("offline",sync); return()=>{window.removeEventListener("online",sync);window.removeEventListener("offline",sync)} },[]);
+ return <AuthFeatureShell title="Offline access" description="MAX Auth can keep a minimal cached profile available when your connection drops. Sensitive authentication actions always require the server." eyebrow="MAX Experience"><div className="grid gap-5 md:grid-cols-2"><GlassCard><div className="flex items-center gap-3"><div className={`grid h-12 w-12 place-items-center rounded-2xl ${online?"bg-success/10 text-success":"bg-warning/10 text-warning"}`}>{online?<Wifi className="h-6 w-6"/>:<WifiOff className="h-6 w-6"/>}</div><div><p className="font-display text-lg font-semibold">{online?"You're online":"You're offline"}</p><p className="text-sm text-ink-muted">Live account actions depend on a secure connection.</p></div></div><div className="mt-5"><StatusPill tone={online?"success":"warning"}>{online?"Connected":"Offline mode"}</StatusPill></div></GlassCard><GlassCard><FeatureRow icon={<RefreshCw className="h-5 w-5"/>} title="Cached profile" description="Show basic account information while offline." action={<StatusPill tone="success">Ready</StatusPill>} /><FeatureRow icon={<ShieldCheck className="h-5 w-5"/>} title="Sensitive actions" description="Password, sessions, permissions and security changes require the backend." action={<StatusPill>Protected</StatusPill>} /></GlassCard></div></AuthFeatureShell>;
+}

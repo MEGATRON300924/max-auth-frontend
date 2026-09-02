@@ -1,0 +1,10 @@
+"use client";
+import { useState } from "react";
+import { Copy, Download, KeyRound, RefreshCw, ShieldCheck } from "lucide-react";
+import { AuthFeatureShell, GlassCard, FeatureRow } from "@/components/auth/AuthFeatureShell";
+
+export default function RecoveryPage() {
+ const [generated, setGenerated] = useState<string[]>([]);
+ const generate = () => setGenerated(Array.from({length:8},()=>crypto.randomUUID().replaceAll("-","").slice(0,10).toUpperCase()));
+ return <AuthFeatureShell title="Recovery codes" description="One-time backup codes can help you recover access if you lose your primary second factor." eyebrow="Security"><GlassCard><FeatureRow icon={<KeyRound className="h-5 w-5" />} title="Backup codes" description="Generate a fresh set. Generating new codes invalidates previous ones when the backend is connected." action={<button onClick={generate} className="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-3 py-2 text-xs font-semibold text-white"><RefreshCw className="h-3.5 w-3.5" /> Generate</button>} /><FeatureRow icon={<ShieldCheck className="h-5 w-5" />} title="Keep them private" description="Never share recovery codes with anyone, including MAX support." /></GlassCard>{generated.length > 0 && <GlassCard className="mt-5"><div className="flex items-center justify-between"><div><h2 className="font-display font-semibold">Your codes</h2><p className="text-xs text-warning">Demo-only until backend persistence is connected.</p></div><button onClick={() => navigator.clipboard?.writeText(generated.join("\n"))} className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs"><Copy className="h-3.5 w-3.5" /> Copy</button></div><div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">{generated.map(c=><code key={c} className="rounded-xl bg-black/20 p-3 text-center text-xs text-ink-muted">{c}</code>)}</div><button onClick={()=>window.print()} className="mt-4 inline-flex items-center gap-2 text-xs text-brand-300"><Download className="h-3.5 w-3.5" /> Print / save</button></GlassCard>}</AuthFeatureShell>;
+}
