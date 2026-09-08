@@ -29,7 +29,7 @@ export default function VoicePage() {
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-sm font-semibold text-ink">MAX Voice device management</h2>
-              <Badge variant="default">Not yet configured</Badge>
+              <Badge variant="neutral">Not yet configured</Badge>
             </div>
             <p className="mt-1 text-sm text-ink-muted">
               No speaker data is displayed until the MAX device backend is connected. The MAX AI app will handle discovery and setup through BLE, then the backend will associate the physical speaker with your MAX Account and MAX Home.
@@ -52,7 +52,7 @@ export default function VoicePage() {
                     <p className="mt-1 text-xs leading-5 text-ink-faint">{description}</p>
                   </div>
                 </div>
-                <Badge variant="default">{status}</Badge>
+                <Badge variant="neutral">{status}</Badge>
               </div>
             </CardContent>
           </Card>
