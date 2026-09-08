@@ -26,7 +26,7 @@ export default function HomePage() {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-sm font-semibold text-ink">Home services</h2>
-                <Badge variant="default">Not yet configured</Badge>
+                <Badge variant="neutral">Not yet configured</Badge>
               </div>
               <p className="mt-1 text-xs text-ink-faint">
                 Home data is intentionally empty until the MAX backend is connected. No homes, rooms, speakers, or members are being fabricated in the frontend.
@@ -47,7 +47,7 @@ export default function HomePage() {
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="text-sm font-medium text-ink">{title}</h3>
-                    <Badge variant="default">{status}</Badge>
+                    <Badge variant="neutral">{status}</Badge>
                   </div>
                   <p className="mt-1 text-xs leading-5 text-ink-faint">{description}</p>
                 </div>
