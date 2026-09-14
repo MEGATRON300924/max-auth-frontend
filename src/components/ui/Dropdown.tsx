@@ -37,13 +37,13 @@ export function Dropdown({ trigger, children, align = "right", className }: Drop
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: -4, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -4, scale: 0.98 }}
-            transition={{ duration: 0.15 }}
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.12 }}
             onClick={() => setOpen(false)}
             className={cn(
-              "absolute z-50 mt-2 min-w-[12rem] rounded-xl border border-glass-border bg-base-overlay/95 p-1.5 shadow-glass backdrop-blur-xl",
+              "absolute z-50 mt-2 min-w-[12rem] rounded-lg border border-glass-border bg-base-overlay p-1 shadow-lg",
               align === "right" ? "right-0" : "left-0",
               className
             )}
@@ -71,8 +71,8 @@ export function DropdownItem({
       role="menuitem"
       onClick={onClick}
       className={cn(
-        "flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors",
-        danger ? "text-danger hover:bg-danger-subtle" : "text-ink-muted hover:bg-white/5 hover:text-ink"
+        "flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors",
+        danger ? "text-danger hover:bg-danger-subtle" : "text-ink-muted hover:bg-glass-hover hover:text-ink"
       )}
     >
       {children}
