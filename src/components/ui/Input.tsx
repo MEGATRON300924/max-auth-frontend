@@ -22,7 +22,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full">
         {label && (
-          <label htmlFor={inputId} className="mb-1.5 block text-sm font-medium text-ink-muted">
+          <label htmlFor={inputId} className="mb-2 block text-xs font-semibold text-ink">
             {label}
           </label>
         )}
@@ -39,14 +39,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             aria-invalid={!!error}
             aria-describedby={error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined}
             className={cn(
-              "h-11 w-full rounded-xl border bg-glass px-4 text-sm text-ink placeholder:text-ink-faint",
-              "backdrop-blur-md transition-all duration-200",
-              "border-glass-border hover:border-white/20",
-              "focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-500/30",
-              "disabled:opacity-50 disabled:cursor-not-allowed",
-              icon && "pl-11",
-              isPassword && "pr-11",
-              error && "border-danger/60 focus:border-danger focus:ring-danger/30",
+              "h-10 w-full rounded-lg border bg-base-raised px-3.5 text-sm text-ink placeholder:text-ink-faint",
+              "transition-colors duration-150",
+              "border-glass-border hover:border-slate-300 dark:hover:border-slate-600",
+              "focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/15",
+              "disabled:cursor-not-allowed disabled:opacity-50",
+              icon && "pl-10",
+              isPassword && "pr-10",
+              error && "border-danger focus:border-danger focus:ring-danger/15",
               className
             )}
             {...props}
@@ -56,25 +56,17 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               type="button"
               tabIndex={-1}
               onClick={() => setShowPassword((v) => !v)}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-faint hover:text-ink-muted transition-colors"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-faint transition-colors hover:text-ink-muted"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           )}
         </div>
-        {error && (
-          <p id={`${inputId}-error`} className="mt-1.5 text-xs text-danger">
-            {error}
-          </p>
-        )}
-        {!error && hint && (
-          <p id={`${inputId}-hint`} className="mt-1.5 text-xs text-ink-faint">
-            {hint}
-          </p>
-        )}
+        {error && <p id={`${inputId}-error`} className="mt-1.5 text-xs text-danger">{error}</p>}
+        {!error && hint && <p id={`${inputId}-hint`} className="mt-1.5 text-xs text-ink-faint">{hint}</p>}
       </div>
     );
   }
 );
-Input.displayName = "Input";
+Button.displayName = "Input";
