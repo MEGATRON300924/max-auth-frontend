@@ -13,6 +13,9 @@ export function MaxIdentityGraphic({ className = "" }: { className?: string }) {
         <filter id="max-shadow" x="120" y="110" width="400" height="330" filterUnits="userSpaceOnUse">
           <feDropShadow dx="0" dy="18" stdDeviation="22" floodColor="#2563EB" floodOpacity="0.16" />
         </filter>
+        <clipPath id="max-logo-clip">
+          <circle cx="320" cy="260" r="60" />
+        </clipPath>
       </defs>
 
       <circle cx="320" cy="260" r="205" stroke="currentColor" strokeOpacity="0.06" />
@@ -33,9 +36,18 @@ export function MaxIdentityGraphic({ className = "" }: { className?: string }) {
 
       <g filter="url(#max-shadow)">
         <circle cx="320" cy="260" r="86" fill="url(#max-core)" stroke="#3B82F6" strokeWidth="2" />
-        <circle cx="320" cy="260" r="68" fill="white" fillOpacity="0.9" />
-        <path d="M282 292L301 226L320 274L339 226L358 292" stroke="#2563EB" strokeWidth="12" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M294 308H346" stroke="#60A5FA" strokeWidth="6" strokeLinecap="round" />
+        <circle cx="320" cy="260" r="68" fill="white" fillOpacity="0.96" />
+        <circle cx="320" cy="260" r="60" fill="white" />
+        <image
+          href="/logo.png"
+          x="260"
+          y="200"
+          width="120"
+          height="120"
+          preserveAspectRatio="xMidYMid slice"
+          clipPath="url(#max-logo-clip)"
+        />
+        <circle cx="320" cy="260" r="60" stroke="#3B82F6" strokeOpacity="0.14" />
       </g>
 
       <g fill="currentColor" fillOpacity="0.45">
