@@ -1,121 +1,126 @@
 import Link from "next/link";
-import { ShieldCheck, KeyRound, Smartphone, Fingerprint, Globe, Sparkles, ArrowRight, Lock } from "lucide-react";
+import { ArrowRight, Check, Fingerprint, KeyRound, ShieldCheck, Smartphone } from "lucide-react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
-import { AuroraBackground } from "@/components/layout/AuroraBackground";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
+import { MaxIdentityGraphic } from "@/components/illustrations/MaxIdentityGraphic";
+import { ProductMark } from "@/components/illustrations/ProductMark";
 
 const products = [
-  { name: "MAX AI", desc: "Conversational intelligence, everywhere you work." },
-  { name: "MAX Cloud", desc: "Storage and sync across every device." },
-  { name: "MAX Home", desc: "One control center for a smarter home." },
-  { name: "MAX Music", desc: "Your library, tuned to how you listen." },
-  { name: "MAX Browser", desc: "Fast, private, built around you." },
-  { name: "MAX Studio", desc: "Creative tools for makers and teams." },
-  { name: "MAX Security", desc: "Protection that watches your whole account." },
-  { name: "MAX Pay", desc: "Payments, simplified across the ecosystem." },
+  ["MAX AI", "Your intelligent assistant and the brain of the ecosystem."],
+  ["MAX Cloud", "Files, data and sync across your devices."],
+  ["MAX Home", "A single control layer for your connected home."],
+  ["MAX Music", "Your music experience, connected to your account."],
+  ["MAX Browser", "A private browser built around your MAX identity."],
+  ["MAX Studio", "Creative tools for building and making."],
+  ["MAX Security", "Account protection across the ecosystem."],
+  ["MAX Pay", "A simpler way to manage ecosystem payments."],
 ];
 
-const securityFeatures = [
-  { icon: Lock, title: "Argon2id password hashing", desc: "Your password is never stored in plain text — only a memory-hard, industry-standard hash." },
-  { icon: KeyRound, title: "Rotating session tokens", desc: "Every session refresh issues a brand-new token pair, so a stolen token has a short shelf life." },
-  { icon: Smartphone, title: "Full device visibility", desc: "See every device signed in to your account, and revoke any of them in one tap." },
-  { icon: Fingerprint, title: "Built for passkeys & 2FA", desc: "The architecture is ready for passwordless sign-in as soon as you want to turn it on." },
+const security = [
+  [KeyRound, "Protected credentials", "Passwords are protected with memory-hard hashing and never exposed to applications."],
+  [Smartphone, "Device control", "Review active devices and sessions and revoke access when you need to."],
+  [Fingerprint, "Passkey ready", "The identity layer is designed for modern passwordless authentication."],
+  [ShieldCheck, "One security boundary", "Secure the account once instead of repeating security settings in every MAX product."],
 ];
 
 export default function LandingPage() {
   return (
-    <div className="relative min-h-screen overflow-x-hidden">
+    <div className="min-h-screen overflow-x-hidden bg-base text-ink">
       <SiteHeader />
 
-      <section className="relative px-4 pb-24 pt-20 sm:px-6 sm:pt-28 lg:px-8">
-        <AuroraBackground />
-        <div className="relative mx-auto max-w-4xl text-center">
-          <div className="mb-6 inline-flex animate-fade-up items-center gap-2 rounded-full border border-glass-border bg-glass px-4 py-1.5 text-xs font-medium text-ink-muted backdrop-blur-md">
-            <Sparkles className="h-3.5 w-3.5 text-brand-400" />
-            One identity for the entire MAX AI Ecosystem
-          </div>
-          <h1 className="animate-fade-up font-display text-4xl font-semibold leading-[1.1] tracking-tight text-ink sm:text-6xl" style={{ animationDelay: "80ms" }}>
-            Sign in once.
-            <br />
-            <span className="bg-gradient-to-r from-brand-400 via-aurora-violet to-aurora-magenta bg-clip-text text-transparent">Unlock everything.</span>
-          </h1>
-          <p className="mx-auto mt-6 max-w-xl animate-fade-up text-base text-ink-muted sm:text-lg" style={{ animationDelay: "160ms" }}>
-            Your MAX Account is the single, secure identity behind MAX AI, MAX Cloud, MAX Home, MAX Music, and every other product in the ecosystem — built from the ground up, not bolted on.
-          </p>
-          <div className="mt-9 flex animate-fade-up flex-col items-center justify-center gap-3 sm:flex-row" style={{ animationDelay: "240ms" }}>
-            <Link href="/create-account" className="w-full sm:w-auto">
-              <Button size="lg" className="w-full sm:w-auto">
-                Create your MAX Account <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-            <Link href="/sign-in" className="w-full sm:w-auto">
-              <Button size="lg" variant="secondary" className="w-full sm:w-auto">Sign in</Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <section id="products" className="relative px-4 py-20 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="mx-auto mb-12 max-w-2xl text-center">
-            <h2 className="font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">Every product. One account.</h2>
-            <p className="mt-3 text-ink-muted">Register once with MAX Auth, and you&apos;re signed in everywhere across the ecosystem.</p>
-          </div>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {products.map((p) => (
-              <Card key={p.name} hover className="p-5">
-                <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500/20 to-aurora-magenta/20 text-brand-300">
-                  <Sparkles className="h-4.5 w-4.5" />
-                </div>
-                <h3 className="font-display text-sm font-semibold text-ink">{p.name}</h3>
-                <p className="mt-1.5 text-xs leading-relaxed text-ink-muted">{p.desc}</p>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="security" className="relative px-4 py-20 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="mx-auto mb-12 max-w-2xl text-center">
-            <Badge variant="info" className="mb-4"><ShieldCheck className="h-3.5 w-3.5" /> Security-first</Badge>
-            <h2 className="font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">Built to protect one account that matters a lot.</h2>
-            <p className="mt-3 text-ink-muted">Because your MAX Account unlocks everything, we built the identity layer to a higher standard than any single app would need on its own.</p>
-          </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {securityFeatures.map((f) => (
-              <Card key={f.title} className="flex gap-4 p-6">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500/15 text-brand-300">
-                  <f.icon className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="font-display text-sm font-semibold text-ink">{f.title}</h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">{f.desc}</p>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="developers" className="relative px-4 py-20 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-5xl">
-          <Card className="relative overflow-hidden p-8 sm:p-12">
-            <AuroraBackground variant="subtle" />
-            <div className="relative flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <Badge variant="neutral" className="mb-4"><Globe className="h-3.5 w-3.5" /> Coming to third-party apps</Badge>
-                <h2 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">&ldquo;Continue with MAX AI&rdquo;</h2>
-                <p className="mt-3 max-w-md text-sm text-ink-muted">We&apos;re building the same one-click identity that powers the MAX ecosystem into an OAuth layer any developer will be able to add to their own app.</p>
+      <main>
+        <section className="relative border-b border-glass-border px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+          <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.05fr_.95fr] lg:gap-20">
+            <div className="max-w-2xl">
+              <Badge variant="info" className="mb-6"><ShieldCheck className="h-3.5 w-3.5" /> MAX identity platform</Badge>
+              <h1 className="font-display text-4xl font-bold leading-[1.08] tracking-[-0.035em] sm:text-6xl">
+                One account for
+                <span className="block text-brand-600 dark:text-brand-400">everything MAX.</span>
+              </h1>
+              <p className="mt-6 max-w-xl text-base leading-7 text-ink-muted sm:text-lg">
+                MAX Auth is the secure identity behind The MAX AI Ecosystem. Sign in once, manage your security in one place, and move between MAX products without creating separate accounts.
+              </p>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Link href="/create-account"><Button size="lg">Create your MAX Account <ArrowRight className="h-4 w-4" /></Button></Link>
+                <Link href="/sign-in"><Button size="lg" variant="secondary">Sign in</Button></Link>
               </div>
-              <Button variant="secondary" size="lg" disabled className="shrink-0">Developer portal — coming soon</Button>
+              <div className="mt-7 flex flex-wrap gap-x-6 gap-y-2 text-xs font-medium text-ink-faint">
+                <span className="inline-flex items-center gap-2"><Check className="h-3.5 w-3.5 text-success" /> One account</span>
+                <span className="inline-flex items-center gap-2"><Check className="h-3.5 w-3.5 text-success" /> Secure sessions</span>
+                <span className="inline-flex items-center gap-2"><Check className="h-3.5 w-3.5 text-success" /> Developer ready</span>
+              </div>
             </div>
-          </Card>
-        </div>
-      </section>
+
+            <div className="relative mx-auto w-full max-w-[560px]">
+              <div className="absolute inset-12 rounded-full bg-brand-500/10 blur-3xl" />
+              <div className="relative rounded-3xl border border-glass-border bg-base-raised p-4 shadow-[0_24px_80px_-35px_rgba(37,99,235,.35)] sm:p-7">
+                <div className="flex items-center justify-between border-b border-glass-border pb-4">
+                  <div><p className="text-xs font-semibold text-ink-faint">MAX AUTH</p><p className="mt-1 text-sm font-bold">Identity overview</p></div>
+                  <span className="flex items-center gap-2 text-xs font-semibold text-success"><span className="h-2 w-2 rounded-full bg-success" /> Protected</span>
+                </div>
+                <MaxIdentityGraphic className="my-4 h-auto w-full text-ink" />
+                <div className="grid grid-cols-3 gap-2 border-t border-glass-border pt-4">
+                  <div><p className="text-[10px] uppercase tracking-wider text-ink-faint">Devices</p><p className="mt-1 text-lg font-bold">04</p></div>
+                  <div><p className="text-[10px] uppercase tracking-wider text-ink-faint">Sessions</p><p className="mt-1 text-lg font-bold">02</p></div>
+                  <div><p className="text-[10px] uppercase tracking-wider text-ink-faint">2FA</p><p className="mt-1 text-lg font-bold">Ready</p></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="products" className="px-4 py-20 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-10 max-w-2xl">
+              <p className="text-xs font-bold uppercase tracking-[.18em] text-brand-600 dark:text-brand-400">The ecosystem</p>
+              <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">Your identity follows you.</h2>
+              <p className="mt-3 text-sm leading-6 text-ink-muted">One MAX Account connects the products you use without turning every screen into another sign-in flow.</p>
+            </div>
+            <div className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-glass-border bg-glass-border sm:grid-cols-2 lg:grid-cols-4">
+              {products.map(([name, desc]) => (
+                <div key={name} className="group bg-base-raised p-6 transition-colors hover:bg-glass-hover">
+                  <div className="mb-8 flex h-11 w-11 items-center justify-center rounded-xl border border-glass-border bg-base text-brand-600 dark:text-brand-400">
+                    <ProductMark name={name} className="h-5 w-5" />
+                  </div>
+                  <h3 className="font-display text-sm font-bold">{name}</h3>
+                  <p className="mt-2 text-xs leading-5 text-ink-muted">{desc}</p>
+                  <div className="mt-6 h-px w-8 bg-brand-500 transition-all group-hover:w-14" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="security" className="border-y border-glass-border bg-base-raised px-4 py-20 sm:px-6 lg:px-8">
+          <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[.8fr_1.2fr] lg:items-start">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[.18em] text-brand-600 dark:text-brand-400">Security</p>
+              <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">The account is the boundary.</h2>
+              <p className="mt-4 text-sm leading-6 text-ink-muted">MAX Auth keeps identity, sessions and security controls together so every MAX product can focus on what it actually does.</p>
+            </div>
+            <div className="grid gap-px overflow-hidden rounded-2xl border border-glass-border bg-glass-border sm:grid-cols-2">
+              {security.map(([Icon, title, desc]) => {
+                const SecurityIcon = Icon as typeof ShieldCheck;
+                return <div key={title as string} className="bg-base-raised p-6"><SecurityIcon className="h-5 w-5 text-brand-600 dark:text-brand-400" /><h3 className="mt-5 text-sm font-bold">{title as string}</h3><p className="mt-2 text-xs leading-5 text-ink-muted">{desc as string}</p></div>;
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section id="developers" className="px-4 py-20 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl rounded-2xl border border-glass-border bg-slate-950 p-8 text-white sm:p-12 dark:bg-black">
+            <div className="max-w-2xl">
+              <p className="text-xs font-bold uppercase tracking-[.18em] text-blue-300">For developers</p>
+              <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">Continue with MAX AI.</h2>
+              <p className="mt-4 text-sm leading-6 text-slate-300">OAuth and PKCE make it possible for third-party applications to use the same MAX identity layer without receiving your password.</p>
+              <Button variant="secondary" size="lg" disabled className="mt-7 border-white/15 bg-white/5 text-white hover:bg-white/10">Developer portal — coming soon</Button>
+            </div>
+          </div>
+        </section>
+      </main>
 
       <SiteFooter />
     </div>
