@@ -12,34 +12,30 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variants = {
   primary:
-    "bg-brand-500 text-white shadow-glow hover:bg-brand-400 hover:shadow-glow-lg active:bg-brand-600 py-3 px-5",
+    "bg-brand-600 text-white border border-brand-600 hover:bg-brand-700 hover:border-brand-700 shadow-none",
   secondary:
-    "bg-glass border border-glass-border text-ink backdrop-blur-md hover:bg-glass-hover hover:border-white/20 py-3 px-5",
-  ghost: "text-ink-muted hover:text-ink hover:bg-white/5",
-  danger: "bg-danger/90 text-white hover:bg-danger shadow-[0_0_30px_-8px_rgba(239,68,68,0.5)] py-3 px-5",
+    "bg-base-raised border border-glass-border text-ink hover:bg-glass-hover hover:border-slate-300 dark:hover:border-slate-600",
+  ghost: "text-ink-muted hover:bg-glass-hover hover:text-ink",
+  danger: "bg-danger text-white border border-danger hover:bg-red-700",
 };
 
 const sizes = {
-  sm: "h-9 px-3.5 text-sm gap-1.5",
-  md: "h-11 px-5 text-sm gap-2",
-  lg: "h-13 px-7 text-base gap-2.5",
+  sm: "h-9 px-3.5 text-xs gap-1.5",
+  md: "h-10 px-4 text-sm gap-2",
+  lg: "h-11 px-5 text-sm gap-2.5",
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  (
-    { className, variant = "primary", size = "md", isLoading, disabled, children, ...props },
-    ref
-  ) => {
+  ({ className, variant = "primary", size = "md", isLoading, disabled, children, ...props }, ref) => {
     return (
       <button
         ref={ref}
         disabled={disabled || isLoading}
         className={cn(
-          "inline-flex items-center justify-center rounded-xl font-medium tracking-tight",
-          "transition-all duration-200 ease-out",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-base",
-          "disabled:opacity-50 disabled:pointer-events-none",
-          "active:scale-[0.98]",
+          "inline-flex items-center justify-center rounded-lg font-semibold tracking-tight",
+          "transition-colors duration-150",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-base",
+          "disabled:cursor-not-allowed disabled:opacity-50",
           variants[variant],
           sizes[size],
           className
