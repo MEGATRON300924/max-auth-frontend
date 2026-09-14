@@ -19,10 +19,7 @@ const mono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://auth.max-ai.name.ng"),
-  title: {
-    default: "MAX Auth - Your MAX AI Account",
-    template: "%s | MAX Auth",
-  },
+  title: { default: "MAX Auth - Your MAX AI Account", template: "%s | MAX Auth" },
   description:
     "MAX Auth is the secure identity platform for The MAX AI Ecosystem. Sign in once and access MAX AI products with one account.",
   keywords: [
@@ -40,11 +37,7 @@ export const metadata: Metadata = {
   creator: "Zion Opaaje",
   publisher: "The Tron Forge Limited",
   alternates: { canonical: "https://auth.max-ai.name.ng" },
-  icons: {
-    icon: "/favicon.png",
-    shortcut: "/favicon.png",
-    apple: "/favicon.png",
-  },
+  icons: { icon: "/favicon.png", shortcut: "/favicon.png", apple: "/favicon.png" },
   openGraph: {
     title: "MAX Auth - Your MAX AI Account",
     description: "One secure identity for The MAX AI Ecosystem.",
@@ -60,11 +53,7 @@ export const metadata: Metadata = {
     description: "Sign in with your MAX AI Account and access The MAX AI Ecosystem.",
     images: ["/logo.png"],
   },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: { index: true, follow: true },
-  },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
 };
 
 export const viewport: Viewport = {
@@ -95,17 +84,24 @@ function StructuredData() {
     ],
   };
 
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-    />
-  );
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />;
 }
+
+const themeBootScript = `
+(function () {
+  try {
+    var saved = localStorage.getItem('max-auth-theme');
+    var dark = saved ? saved === 'dark' : true;
+    if (dark) document.documentElement.classList.add('dark');
+  } catch (_) {}
+})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${jakarta.variable} ${mono.variable}`}>
+    <html lang="en" className={`${jakarta.variable} ${mono.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
+      </head>
       <body>
         <StructuredData />
         <ToastProvider>
