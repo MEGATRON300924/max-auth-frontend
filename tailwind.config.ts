@@ -7,14 +7,14 @@ const config: Config = {
     extend: {
       colors: {
         base: {
-          DEFAULT: "#05070D",
-          raised: "#0A0E18",
-          overlay: "#0D1220",
+          DEFAULT: "rgb(var(--base) / <alpha-value>)",
+          raised: "rgb(var(--base-raised) / <alpha-value>)",
+          overlay: "rgb(var(--base-overlay) / <alpha-value>)",
         },
         glass: {
-          DEFAULT: "rgba(255,255,255,0.06)",
-          border: "rgba(255,255,255,0.10)",
-          hover: "rgba(255,255,255,0.09)",
+          DEFAULT: "rgb(var(--surface) / <alpha-value>)",
+          border: "rgb(var(--border) / <alpha-value>)",
+          hover: "rgb(var(--surface-hover) / <alpha-value>)",
         },
         brand: {
           50: "#EFF6FF",
@@ -30,18 +30,18 @@ const config: Config = {
         },
         aurora: {
           blue: "#3B82F6",
-          violet: "#8B5CF6",
-          magenta: "#D946EF",
+          violet: "#6366F1",
+          magenta: "#8B5CF6",
           amber: "#F59E0B",
         },
-        success: { DEFAULT: "#22C55E", subtle: "rgba(34,197,94,0.12)" },
-        warning: { DEFAULT: "#F59E0B", subtle: "rgba(245,158,11,0.12)" },
-        danger: { DEFAULT: "#EF4444", subtle: "rgba(239,68,68,0.12)" },
-        info: { DEFAULT: "#3B82F6", subtle: "rgba(59,130,246,0.12)" },
+        success: { DEFAULT: "#16A34A", subtle: "rgb(var(--success-subtle) / <alpha-value>)" },
+        warning: { DEFAULT: "#D97706", subtle: "rgb(var(--warning-subtle) / <alpha-value>)" },
+        danger: { DEFAULT: "#DC2626", subtle: "rgb(var(--danger-subtle) / <alpha-value>)" },
+        info: { DEFAULT: "#2563EB", subtle: "rgb(var(--info-subtle) / <alpha-value>)" },
         ink: {
-          DEFAULT: "#F5F7FA",
-          muted: "#A3ADC2",
-          faint: "#6B7386",
+          DEFAULT: "rgb(var(--ink) / <alpha-value>)",
+          muted: "rgb(var(--ink-muted) / <alpha-value>)",
+          faint: "rgb(var(--ink-faint) / <alpha-value>)",
         },
       },
       fontFamily: {
@@ -50,24 +50,19 @@ const config: Config = {
         mono: ["var(--font-mono)", "monospace"],
       },
       borderRadius: {
-        xl: "1rem",
-        "2xl": "1.25rem",
-        "3xl": "1.75rem",
+        xl: "0.75rem",
+        "2xl": "1rem",
+        "3xl": "1.25rem",
       },
       boxShadow: {
-        glow: "0 0 40px -8px rgba(59,130,246,0.45)",
-        "glow-lg": "0 0 80px -16px rgba(59,130,246,0.55)",
-        glass: "0 8px 32px rgba(0,0,0,0.35)",
+        glow: "0 8px 24px -12px rgba(37,99,235,0.35)",
+        "glow-lg": "0 12px 32px -14px rgba(37,99,235,0.4)",
+        glass: "0 8px 24px rgba(15,23,42,0.08)",
       },
       backdropBlur: { xs: "2px" },
       keyframes: {
-        drift: {
-          "0%, 100%": { transform: "translate(0, 0) scale(1)" },
-          "33%": { transform: "translate(3%, -4%) scale(1.05)" },
-          "66%": { transform: "translate(-2%, 3%) scale(0.98)" },
-        },
         "fade-up": {
-          "0%": { opacity: "0", transform: "translateY(8px)" },
+          "0%": { opacity: "0", transform: "translateY(6px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
         shimmer: {
@@ -76,9 +71,7 @@ const config: Config = {
         },
       },
       animation: {
-        drift: "drift 22s ease-in-out infinite",
-        "drift-slow": "drift 34s ease-in-out infinite reverse",
-        "fade-up": "fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both",
+        "fade-up": "fade-up 0.35s ease-out both",
         shimmer: "shimmer 2s linear infinite",
       },
     },
