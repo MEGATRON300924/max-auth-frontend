@@ -12,6 +12,7 @@ export default function AuthorizePage() {
   const [params, setParams] = useState<URLSearchParams | null>(null);
   const [approving, setApproving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
   useEffect(() => setParams(new URLSearchParams(window.location.search)), []);
 
   const clientName = params?.get("client_name") || "MAX application";
@@ -25,22 +26,63 @@ export default function AuthorizePage() {
 
   const approve = async () => {
     if (!clientId || !redirectUri) return;
-    setApproving(true); setError(null);
-    try { const result = await authApi.approveOAuth({ clientId, redirectUri, scopes: scopes.join(" "), codeChallenge, codeChallengeMethod, state }); window.location.assign(result.redirectUri); }
-    catch (err) { setError(err instanceof Error ? err.message : "Unable to authorize this application."); setApproving(false); }
+    setApproving(true);
+    setError(null);
+    try {
+      const result = await authApi.approveOAuth({ clientId, redirectUri, scopes: scopes.join(" "), codeChallenge, codeChallengeMethod, state });
+      window.location.assign(result.redirectUri);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to authorize this application.");
+      setApproving(false);
+    }
   };
 
-  if (!params || isLoading) return <main className="min-h-screen bg-base px-4 py-10 text-ink" />;
+  if (!params || isLoading) return <main className="min-h-screen bg-base" />;
 
-  return <main className="min-h-screen bg-base px-4 py-10 text-ink sm:px-6"><div className="mx-auto max-w-xl"><div className="mb-6 text-center"><div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl border border-white/10 bg-white/5"><ShieldCheck className="h-7 w-7 text-brand-300" /></div><p className="mt-4 text-xs font-semibold uppercase tracking-[.2em] text-brand-300">MAX Auth</p><h1 className="mt-2 font-display text-3xl font-semibold">Continue with MAX</h1><p className="mt-2 text-sm text-ink-muted">Sign in once and securely continue to your MAX application.</p></div>
-    <AuthFeatureShell eyebrow="Authorization" title={clientName} description="Review the information this application is requesting before continuing."><GlassCard>
-      {!user ? <div className="space-y-4"><p className="text-sm text-ink-muted">You need to sign in to your MAX Account before granting access.</p><Link href={`/sign-in?returnTo=${encodeURIComponent(returnTo)}`} className="block rounded-xl bg-brand-500 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-brand-400">Continue with MAX</Link></div> : <>
-        <div className="flex items-center gap-3"><div className="grid h-12 w-12 place-items-center rounded-xl bg-brand-500/10 text-brand-300"><Lock className="h-5 w-5" /></div><div><p className="font-medium">{user.displayName || user.username}</p><p className="text-xs text-ink-muted">{user.email}</p></div></div>
-        <div className="mt-5 space-y-2">{scopes.map((scope) => <div key={scope} className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/[.025] p-3 text-sm"><Check className="h-4 w-4 text-success" />{scope === "profile:read" ? "Your basic MAX profile" : scope === "email:read" ? "Your verified email address" : scope}</div>)}</div>
-        <div className="mt-5 flex items-center gap-2"><StatusPill tone="success">Secure MAX authorization</StatusPill><span className="text-xs text-ink-faint">Your password is never shared with the application.</span></div>
-        {error && <p className="mt-4 text-sm text-danger">{error}</p>}
-        <div className="mt-6 grid grid-cols-2 gap-3"><button onClick={() => window.location.assign(redirectUri)} className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold hover:bg-white/10">Cancel</button><button disabled={approving} onClick={approve} className="rounded-xl bg-brand-500 px-4 py-3 text-sm font-semibold text-white hover:bg-brand-400 disabled:opacity-60">{approving ? "Connecting…" : "Allow access"}</button></div>
-      </>}
-    </GlassCard></AuthFeatureShell>
-  </div></main>;
+  return (
+    <main className="min-h-screen bg-base px-4 py-10 text-ink sm:px-6">
+      <div className="mx-auto max-w-xl">
+        <div className="mb-7 text-center">
+          <div className="mx-auto grid h-12 w-12 place-items-center rounded-xl border border-glass-border bg-base-raised">
+            <ShieldCheck className="h-6 w-6 text-brand-600 dark:text-brand-400" />
+          </div>
+          <p className="mt-4 text-[11px] font-bold uppercase tracking-[.18em] text-brand-600 dark:text-brand-400">MAX Auth</p>
+          <h1 className="mt-2 font-display text-3xl font-bold tracking-tight">Continue with MAX</h1>
+          <p className="mt-2 text-sm text-ink-muted">Sign in once and securely continue to your MAX application.</p>
+        </div>
+
+        <AuthFeatureShell eyebrow="Authorization" title={clientName} description="Review the information this application is requesting before continuing.">
+          <GlassCard>
+            {!user ? (
+              <div className="space-y-4">
+                <p className="text-sm leading-6 text-ink-muted">You need to sign in to your MAX Account before granting access.</p>
+                <Link href={`/sign-in?returnTo=${encodeURIComponent(returnTo)}`} className="block rounded-lg bg-brand-600 px-4 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-brand-700">Continue with MAX</Link>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center gap-3">
+                  <div className="grid h-11 w-11 place-items-center rounded-lg border border-glass-border bg-glass text-brand-600 dark:text-brand-400"><Lock className="h-5 w-5" /></div>
+                  <div><p className="font-semibold text-ink">{user.displayName || user.username}</p><p className="text-xs text-ink-muted">{user.email}</p></div>
+                </div>
+                <div className="mt-5 space-y-2">
+                  {scopes.map((scope) => (
+                    <div key={scope} className="flex items-center gap-3 rounded-lg border border-glass-border bg-base p-3 text-sm font-medium">
+                      <Check className="h-4 w-4 shrink-0 text-success" />
+                      {scope === "profile:read" ? "Your basic MAX profile" : scope === "email:read" ? "Your verified email address" : scope}
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-5 flex flex-wrap items-center gap-2"><StatusPill tone="success">Secure MAX authorization</StatusPill><span className="text-xs text-ink-faint">Your password is never shared with the application.</span></div>
+                {error && <p className="mt-4 text-sm text-danger">{error}</p>}
+                <div className="mt-6 grid grid-cols-2 gap-3">
+                  <button onClick={() => window.location.assign(redirectUri)} className="rounded-lg border border-glass-border bg-base-raised px-4 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-glass-hover">Cancel</button>
+                  <button disabled={approving} onClick={approve} className="rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:opacity-60">{approving ? "Connecting…" : "Allow access"}</button>
+                </div>
+              </>
+            )}
+          </GlassCard>
+        </AuthFeatureShell>
+      </div>
+    </main>
+  );
 }
