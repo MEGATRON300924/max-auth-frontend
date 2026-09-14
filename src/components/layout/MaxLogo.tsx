@@ -14,20 +14,13 @@ export function MaxLogo({ size = 32, showWordmark = true, href = "/", className 
     <span className={cn("inline-flex items-center gap-2.5", className)}>
       <Image src="/logo.png" alt="MAX AI" width={size} height={size} className="rounded-full" priority />
       {showWordmark && (
-        <span className="font-display text-lg font-semibold tracking-tight text-ink">
-          MAX{" "}
-          <span className="bg-gradient-to-r from-brand-400 via-aurora-violet to-aurora-magenta bg-clip-text text-transparent">
-            Auth
-          </span>
+        <span className="font-display text-lg font-bold tracking-tight text-ink">
+          MAX <span className="text-brand-600 dark:text-brand-400">Auth</span>
         </span>
       )}
     </span>
   );
 
   if (!href) return content;
-  return (
-    <Link href={href} className="inline-flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 rounded-lg">
-      {content}
-    </Link>
-  );
+  return <Link href={href} className="inline-flex rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400">{content}</Link>;
 }
