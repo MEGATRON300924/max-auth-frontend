@@ -69,4 +69,4 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     );
   }
 );
-Button.displayName = "Input";
+Input.displayName = "Input";
