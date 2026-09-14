@@ -30,18 +30,28 @@ export function DashboardHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-glass-border bg-base/70 px-4 backdrop-blur-xl sm:px-6">
-        <button className="rounded-lg p-2 text-ink lg:hidden" onClick={() => setMobileOpen(true)} aria-label="Open navigation menu">
-          <Menu className="h-5 w-5" />
-        </button>
-        <div className="hidden lg:block" />
+      <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-glass-border bg-base-raised px-4 sm:px-6">
+        <div className="flex items-center gap-3">
+          <button
+            className="rounded-lg border border-glass-border bg-base-raised p-2 text-ink lg:hidden"
+            onClick={() => setMobileOpen(true)}
+            aria-label="Open navigation menu"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+          <div className="hidden lg:block">
+            <p className="text-xs font-medium text-ink-faint">MAX Account</p>
+            <p className="text-sm font-semibold text-ink">Identity & security</p>
+          </div>
+        </div>
+
         <Dropdown
           trigger={
-            <button className="flex items-center gap-2.5 rounded-xl border border-glass-border bg-glass px-2.5 py-1.5 text-sm transition-colors hover:bg-glass-hover">
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-aurora-magenta text-xs font-semibold text-white">
+            <button className="flex items-center gap-2 rounded-lg border border-glass-border bg-base-raised px-2 py-1.5 text-sm transition-colors hover:bg-glass-hover">
+              <span className="flex h-7 w-7 items-center justify-center rounded-md bg-brand-600 text-[11px] font-bold text-white">
                 {getInitials(displayName)}
               </span>
-              <span className="hidden max-w-[10rem] truncate font-medium text-ink sm:inline">{displayName}</span>
+              <span className="hidden max-w-[10rem] truncate font-semibold text-ink sm:inline">{displayName}</span>
               <ChevronDown className="h-3.5 w-3.5 text-ink-faint" />
             </button>
           }
@@ -62,11 +72,27 @@ export function DashboardHeader() {
       <AnimatePresence>
         {mobileOpen && (
           <div className="fixed inset-0 z-50 lg:hidden">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
-            <motion.div initial={{ x: -280 }} animate={{ x: 0 }} exit={{ x: -280 }} transition={{ type: "spring", stiffness: 380, damping: 34 }} className="absolute left-0 top-0 h-full">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-slate-950/45"
+              onClick={() => setMobileOpen(false)}
+            />
+            <motion.div
+              initial={{ x: -280 }}
+              animate={{ x: 0 }}
+              exit={{ x: -280 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+              className="absolute left-0 top-0 h-full shadow-xl"
+            >
               <DashboardSidebar className="w-72" />
             </motion.div>
-            <button onClick={() => setMobileOpen(false)} aria-label="Close navigation menu" className="absolute right-4 top-4 rounded-lg bg-glass p-2 text-ink">
+            <button
+              onClick={() => setMobileOpen(false)}
+              aria-label="Close navigation menu"
+              className="absolute right-4 top-4 rounded-lg border border-white/10 bg-slate-900 p-2 text-white"
+            >
               <X className="h-5 w-5" />
             </button>
           </div>
