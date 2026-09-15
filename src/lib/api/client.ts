@@ -63,7 +63,6 @@ function silentRefresh(): Promise<string | null> {
   if (!refreshPromise) {
     refreshPromise = rawRequest<{ accessToken: string }>("/auth/refresh", {
       method: "POST",
-      needsCsrf: true,
       skipAuth: true,
     })
       .then((data) => {
