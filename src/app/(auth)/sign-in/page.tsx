@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { ArrowLeft, Mail, Lock, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
@@ -12,12 +11,25 @@ import { ApiError } from "@/lib/api/ApiError";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 
 const LAST_ACCOUNT_KEY = "max-auth:last-account";
+const RETURN_TO_KEY = "max-auth:oauth-return-to";
 type SignInStep = "choose" | "credentials";
+
+function getSafeReturnTo() {
+  if (typeof window === "undefined") return "/dashboard";
+  const returnTo = new URLSearchParams(window.location.search).get("returnTo");
+  if (!returnTo) return "/dashboard";
+  try {
+    const url = new URL(returnTo, window.location.origin);
+    if (url.origin !== window.location.origin) return "/dashboard";
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return "/dashboard";
+  }
+}
 
 export default function SignInPage() {
   const { login, isAuthenticated } = useAuth();
   const { showToast } = useToast();
-  const router = useRouter();
   const [step, setStep] = useState<SignInStep>("choose");
   const [identifier, setIdentifier] = useState("");
   const [rememberedAccount, setRememberedAccount] = useState<string | null>(null);
@@ -27,9 +39,22 @@ export default function SignInPage() {
   const [error, setError] = useState<string | null>(null);
 
   const destination = useMemo(() => {
-    if (typeof window === "undefined") return "/dashboard";
-    const returnTo = new URLSearchParams(window.location.search).get("returnTo");
-    return returnTo && returnTo.startsWith("/") ? returnTo : "/dashboard";
+    const current = getSafeReturnTo();
+    if (current !== "/dashboard") return current;
+    try {
+      return window.sessionStorage.getItem(RETURN_TO_KEY) || "/dashboard";
+    } catch {
+      return "/dashboard";
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      const current = getSafeReturnTo();
+      if (current !== "/dashboard") window.sessionStorage.setItem(RETURN_TO_KEY, current);
+    } catch {
+      // Return destination preservation is optional.
+    }
   }, []);
 
   useEffect(() => {
@@ -63,11 +88,9 @@ export default function SignInPage() {
     event.preventDefault();
     setError(null);
     setIsLoading(true);
-
     try {
       const account = identifier.trim();
       await login(account, password);
-
       try {
         if (rememberMe) {
           window.localStorage.setItem(LAST_ACCOUNT_KEY, account);
@@ -79,7 +102,11 @@ export default function SignInPage() {
       } catch {
         // Authentication succeeded; remembering the identifier is optional.
       }
-
+      try {
+        window.sessionStorage.removeItem(RETURN_TO_KEY);
+      } catch {
+        // Return-destination cleanup is optional.
+      }
       showToast({ title: "Welcome back", variant: "success" });
       window.location.assign(destination);
     } catch (err) {
