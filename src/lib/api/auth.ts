@@ -5,8 +5,8 @@ import type { MaxUser } from "@/types/api";
 export interface AuthPayload { user: MaxUser; accessToken: string; }
 
 export const authApi = {
-  async register(input: { username: string; email: string; password: string; displayName?: string }) { const data = await apiClient.post<AuthPayload>("/auth/register", input, { skipAuth: true }); tokenStore.set(data.accessToken); return data; },
-  async login(identifier: string, password: string) { const data = await apiClient.post<AuthPayload>("/auth/login", { identifier, password }, { skipAuth: true }); tokenStore.set(data.accessToken); return data; },
+  async register(input: { username: string; email: string; password: string; displayName?: string; rememberMe?: boolean }) { const data = await apiClient.post<AuthPayload>("/auth/register", input, { skipAuth: true }); tokenStore.set(data.accessToken); return data; },
+  async login(identifier: string, password: string, rememberMe = true) { const data = await apiClient.post<AuthPayload>("/auth/login", { identifier, password, rememberMe }, { skipAuth: true }); tokenStore.set(data.accessToken); return data; },
   async google(credential: string) { const data = await apiClient.post<AuthPayload>("/auth/google", { credential }, { skipAuth: true }); tokenStore.set(data.accessToken); return data; },
   async logout() { try { await apiClient.post("/auth/logout", undefined, { needsCsrf: true, skipAuth: true }); } finally { tokenStore.set(null); } },
   me() { return apiClient.get<{ user: MaxUser }>("/auth/me"); },
