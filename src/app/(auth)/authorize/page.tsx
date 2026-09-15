@@ -43,8 +43,8 @@ export default function AuthorizePage() {
     <main className="min-h-screen bg-base px-4 py-10 text-ink sm:px-6">
       <div className="mx-auto max-w-xl">
         <div className="mb-7 text-center">
-          <div className="mx-auto grid h-12 w-12 place-items-center rounded-xl border border-glass-border bg-base-raised">
-            <ShieldCheck className="h-6 w-6 text-brand-600 dark:text-brand-400" />
+          <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl border border-glass-border bg-base-raised p-2">
+            <img src="/logo.png" alt="MAX AI" className="h-full w-full rounded-xl object-contain" />
           </div>
           <p className="mt-4 text-[11px] font-bold uppercase tracking-[.18em] text-brand-600 dark:text-brand-400">MAX Auth</p>
           <h1 className="mt-2 font-display text-3xl font-bold tracking-tight">Continue with MAX</h1>
@@ -56,8 +56,8 @@ export default function AuthorizePage() {
             {!user ? (
               <div className="space-y-4">
                 <div className="rounded-2xl border border-glass-border bg-base-raised p-4 text-center">
-                  <div className="mx-auto grid h-14 w-14 place-items-center rounded-full border border-glass-border bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300">
-                    <span className="text-xl font-bold">M</span>
+                  <div className="mx-auto grid h-14 w-14 place-items-center rounded-full border border-glass-border bg-base p-2">
+                    <img src="/logo.png" alt="MAX AI" className="h-full w-full rounded-full object-contain" />
                   </div>
                   <p className="mt-3 font-semibold text-ink">Sign in with MAX</p>
                   <p className="mt-1 text-sm text-ink-muted">Choose an existing MAX Account or use another account.</p>
@@ -69,7 +69,7 @@ export default function AuthorizePage() {
                 <div className="rounded-2xl border border-glass-border bg-base-raised p-4">
                   <p className="text-xs font-semibold uppercase tracking-[.14em] text-ink-faint">Signed in as</p>
                   <div className="mt-3 flex items-center gap-3">
-                    {user.avatarUrl ? <img src={user.avatarUrl} alt="" className="h-12 w-12 rounded-full object-cover" /> : <div className="grid h-12 w-12 place-items-center rounded-full bg-brand-100 text-lg font-bold text-brand-700 dark:bg-brand-950 dark:text-brand-300">{(user.displayName || user.username || "M").charAt(0).toUpperCase()}</div>}
+                    {user.avatarUrl ? <img src={user.avatarUrl} alt="" className="h-12 w-12 rounded-full object-cover" /> : <img src="/logo.png" alt="MAX AI" className="h-12 w-12 rounded-full object-contain" />}
                     <div className="min-w-0"><p className="truncate font-semibold text-ink">{user.displayName || user.username}</p><p className="truncate text-sm text-ink-muted">{user.email}</p></div>
                   </div>
                   <Link href={`/sign-in?returnTo=${encodeURIComponent(returnTo)}`} className="mt-4 block text-sm font-medium text-brand-600 hover:underline dark:text-brand-400">Use another MAX Account</Link>
