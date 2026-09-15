@@ -21,7 +21,19 @@ import {
 import { MaxLogo } from "./MaxLogo";
 import { cn } from "@/lib/utils/cn";
 
-const groups = [
+type SidebarItem = {
+  href: string;
+  label: string;
+  icon: typeof Home;
+  external?: boolean;
+};
+
+type SidebarGroup = {
+  label: string;
+  items: SidebarItem[];
+};
+
+const groups: SidebarGroup[] = [
   {
     label: "Account",
     items: [
@@ -46,7 +58,14 @@ const groups = [
   },
   {
     label: "Developer",
-    items: [{ href: "https://developers.max-ai.name.ng", label: "Developer platform", icon: Code2, external: true }],
+    items: [
+      {
+        href: "https://developers.max-ai.name.ng",
+        label: "Developer platform",
+        icon: Code2,
+        external: true,
+      },
+    ],
   },
 ];
 
@@ -79,10 +98,26 @@ export function DashboardSidebar({ className }: { className?: string }) {
                 );
 
                 if (external) {
-                  return <a key={`${href}-${label}`} href={href} className={className}><Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.8} aria-hidden="true" /><span>{label}</span><ExternalLink className="ml-auto h-3.5 w-3.5 opacity-60" aria-hidden="true" /></a>;
+                  return (
+                    <a key={`${href}-${label}`} href={href} className={className}>
+                      <Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.8} aria-hidden="true" />
+                      <span>{label}</span>
+                      <ExternalLink className="ml-auto h-3.5 w-3.5 opacity-60" aria-hidden="true" />
+                    </a>
+                  );
                 }
 
-                return <Link key={`${href}-${label}`} href={href} aria-current={active ? "page" : undefined} className={className}><Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.8} aria-hidden="true" /><span>{label}</span></Link>;
+                return (
+                  <Link
+                    key={`${href}-${label}`}
+                    href={href}
+                    aria-current={active ? "page" : undefined}
+                    className={className}
+                  >
+                    <Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.8} aria-hidden="true" />
+                    <span>{label}</span>
+                  </Link>
+                );
               })}
             </div>
           </div>
