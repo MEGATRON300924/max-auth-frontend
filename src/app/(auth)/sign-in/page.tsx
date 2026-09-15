@@ -12,7 +12,13 @@ import { ApiError } from "@/lib/api/ApiError";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 
 const LAST_ACCOUNT_KEY = "max-auth:last-account";
+const RETURN_TO_KEY = "max-auth:return-to";
 type SignInStep = "choose" | "credentials";
+
+function safeReturnTo(value: string | null): string | null {
+  if (!value || !value.startsWith("/") || value.startsWith("//")) return null;
+  return value;
+}
 
 export default function SignInPage() {
   const { login, isAuthenticated } = useAuth();
@@ -28,11 +34,25 @@ export default function SignInPage() {
 
   const destination = useMemo(() => {
     if (typeof window === "undefined") return "/dashboard";
-    const returnTo = new URLSearchParams(window.location.search).get("returnTo");
-    return returnTo && returnTo.startsWith("/") ? returnTo : "/dashboard";
+
+    const fromQuery = safeReturnTo(new URLSearchParams(window.location.search).get("returnTo"));
+    if (fromQuery) {
+      try { window.sessionStorage.setItem(RETURN_TO_KEY, fromQuery); } catch {}
+      return fromQuery;
+    }
+
+    try {
+      return safeReturnTo(window.sessionStorage.getItem(RETURN_TO_KEY)) || "/dashboard";
+    } catch {
+      return "/dashboard";
+    }
   }, []);
 
-  useEffect(() => { if (isAuthenticated) router.replace(destination); }, [destination, isAuthenticated, router]);
+  useEffect(() => {
+    if (isAuthenticated) {
+      window.location.replace(destination);
+    }
+  }, [destination, isAuthenticated]);
 
   useEffect(() => {
     try {
@@ -54,9 +74,10 @@ export default function SignInPage() {
       try {
         if (rememberMe) { window.localStorage.setItem(LAST_ACCOUNT_KEY, account); setRememberedAccount(account); }
         else { window.localStorage.removeItem(LAST_ACCOUNT_KEY); setRememberedAccount(null); }
+        window.sessionStorage.removeItem(RETURN_TO_KEY);
       } catch {}
       showToast({ title: "Welcome back", variant: "success" });
-      router.replace(destination);
+      window.location.replace(destination);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Something went wrong. Please try again.");
     } finally { setIsLoading(false); }
