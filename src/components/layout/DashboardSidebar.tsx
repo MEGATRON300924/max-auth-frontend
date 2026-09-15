@@ -16,6 +16,7 @@ import {
   House,
   Link2,
   Code2,
+  ExternalLink,
 } from "lucide-react";
 import { MaxLogo } from "./MaxLogo";
 import { cn } from "@/lib/utils/cn";
@@ -45,7 +46,7 @@ const groups = [
   },
   {
     label: "Developer",
-    items: [{ href: "/developer", label: "Developer platform", icon: Code2 }],
+    items: [{ href: "https://developers.max-ai.name.ng", label: "Developer platform", icon: Code2, external: true }],
   },
 ];
 
@@ -66,26 +67,22 @@ export function DashboardSidebar({ className }: { className?: string }) {
           <div key={group.label} className="mb-7 last:mb-0">
             <p className="mb-2 px-4 text-xs font-medium text-ink-muted">{group.label}</p>
             <div className="space-y-1">
-              {group.items.map(({ href, label, icon: Icon }) => {
-                const active = href === "/dashboard"
+              {group.items.map(({ href, label, icon: Icon, external }) => {
+                const active = !external && (href === "/dashboard"
                   ? pathname === "/dashboard"
-                  : pathname === href || pathname.startsWith(`${href}/`);
-                return (
-                  <Link
-                    key={`${href}-${label}`}
-                    href={href}
-                    aria-current={active ? "page" : undefined}
-                    className={cn(
-                      "flex min-h-11 items-center gap-3 rounded-full px-4 text-sm font-medium transition-colors",
-                      active
-                        ? "bg-brand-100 text-brand-800 dark:bg-brand-500/15 dark:text-brand-200"
-                        : "text-ink-muted hover:bg-base-raised hover:text-ink"
-                    )}
-                  >
-                    <Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.8} aria-hidden="true" />
-                    <span>{label}</span>
-                  </Link>
+                  : pathname === href || pathname.startsWith(`${href}/`));
+                const className = cn(
+                  "flex min-h-11 items-center gap-3 rounded-full px-4 text-sm font-medium transition-colors",
+                  active
+                    ? "bg-brand-100 text-brand-800 dark:bg-brand-500/15 dark:text-brand-200"
+                    : "text-ink-muted hover:bg-base-raised hover:text-ink"
                 );
+
+                if (external) {
+                  return <a key={`${href}-${label}`} href={href} className={className}><Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.8} aria-hidden="true" /><span>{label}</span><ExternalLink className="ml-auto h-3.5 w-3.5 opacity-60" aria-hidden="true" /></a>;
+                }
+
+                return <Link key={`${href}-${label}`} href={href} aria-current={active ? "page" : undefined} className={className}><Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.8} aria-hidden="true" /><span>{label}</span></Link>;
               })}
             </div>
           </div>
