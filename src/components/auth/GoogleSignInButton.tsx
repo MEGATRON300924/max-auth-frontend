@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Script from "next/script";
+import { useRouter } from "next/navigation";
 import { Alert } from "@/components/ui/Alert";
 import { useAuth } from "@/lib/auth/useAuth";
 
@@ -10,13 +11,19 @@ declare global { interface Window { google?: { accounts: { id: GoogleAccountsId 
 
 export function GoogleSignInButton() {
   const { googleLogin } = useAuth();
+  const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
+  const destination = () => {
+    const returnTo = new URLSearchParams(window.location.search).get("returnTo");
+    return returnTo && returnTo.startsWith("/") ? returnTo : "/dashboard";
+  };
+
   const render = () => {
     if (!clientId || !window.google || !containerRef.current) return;
-    window.google.accounts.id.initialize({ client_id: clientId, callback: async ({ credential }) => { setError(null); try { await googleLogin(credential); } catch (err) { setError(err instanceof Error ? err.message : "Google Sign-In failed"); } } });
+    window.google.accounts.id.initialize({ client_id: clientId, callback: async ({ credential }) => { setError(null); try { await googleLogin(credential); router.replace(destination()); } catch (err) { setError(err instanceof Error ? err.message : "Google Sign-In failed"); } } });
     containerRef.current.innerHTML = "";
     window.google.accounts.id.renderButton(containerRef.current, { theme: "outline", size: "large", width: 420, text: "continue_with" });
   };
