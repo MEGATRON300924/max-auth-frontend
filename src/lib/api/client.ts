@@ -2,7 +2,10 @@ import { ApiError } from "./ApiError";
 import { tokenStore } from "./tokenStore";
 import type { ApiResponse } from "@/types/api";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://auth.max-ai.name.ng/api/v1";
+// MAX Auth UI lives on auth.max-ai.name.ng; the API is served from api.max-ai.name.ng.
+// Keep the production fallback aligned with that deployment split so a missing
+// Vercel NEXT_PUBLIC_API_URL cannot silently send authentication requests to the UI host.
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.max-ai.name.ng/api/v1";
 
 let csrfToken: string | null = null;
 let refreshPromise: Promise<string | null> | null = null;
