@@ -16,5 +16,5 @@ export const authApi = {
   resetPassword(token: string, newPassword: string) { return apiClient.post<{ message: string }>("/auth/password/reset", { token, newPassword }, { skipAuth: true }); },
   changePassword(currentPassword: string, newPassword: string) { return apiClient.post<{ message: string }>("/auth/password/change", { currentPassword, newPassword }); },
   deleteAccount(password: string) { return apiClient.delete<{ message: string }>("/auth/account", { body: { password } }); },
-  approveOAuth(input: { clientId: string; redirectUri: string; scopes: string; codeChallenge?: string; codeChallengeMethod?: string; state?: string }) { return apiClient.post<{ redirectUri: string }>("/oauth/authorize/approve", input); },
+  approveOAuth(input: { clientId: string; redirectUri: string; scopes: string; codeChallenge?: string; codeChallengeMethod?: string; state?: string; requestToken?: string }) { return apiClient.post<{ redirectUri: string }>("/oauth/authorize/approve", input); },
 };
