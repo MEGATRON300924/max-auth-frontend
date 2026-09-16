@@ -10,6 +10,20 @@ import { ApiError } from "@/lib/api/ApiError";
 
 const scopes = ["openid", "profile", "email"];
 
+function errorDescription(err: unknown, fallback: string) {
+  if (!(err instanceof ApiError)) return fallback;
+  const parts = [`${err.message} (${err.code}, HTTP ${err.status})`];
+  if (err.requestId) parts.push(`Request ID: ${err.requestId}`);
+  if (err.details && typeof err.details === "object") {
+    try {
+      parts.push(JSON.stringify(err.details));
+    } catch {
+      // Keep the primary API error if details cannot be serialized.
+    }
+  }
+  return parts.join(" • ");
+}
+
 export default function DeveloperPage() {
   const { showToast } = useToast();
   const clients = useAsyncData(() => oauthApi.listClients().then((r) => r.clients));
@@ -36,7 +50,7 @@ export default function DeveloperPage() {
       clients.refetch();
       showToast({ title: "Application registered", description: "Public PKCE client registered successfully.", variant: "success" });
     } catch (err) {
-      showToast({ title: "Couldn't register application", description: err instanceof ApiError ? err.message : "Please try again.", variant: "error" });
+      showToast({ title: "Couldn't register application", description: errorDescription(err, "Please try again."), variant: "error" });
     } finally {
       setCreating(false);
     }
@@ -49,7 +63,7 @@ export default function DeveloperPage() {
       clients.refetch();
       showToast({ title: "Application revoked", variant: "success" });
     } catch (err) {
-      showToast({ title: "Couldn't revoke application", description: err instanceof ApiError ? err.message : "Please try again.", variant: "error" });
+      showToast({ title: "Couldn't revoke application", description: errorDescription(err, "Please try again."), variant: "error" });
     }
   }
 
@@ -64,7 +78,7 @@ export default function DeveloperPage() {
       <GlassCard>
         <div className="flex items-center justify-between gap-3"><div><h2 className="font-display text-lg font-semibold">Applications</h2><p className="text-sm text-ink-muted">OAuth clients registered to your MAX account.</p></div><StatusPill tone="success">Developer mode</StatusPill></div>
         <div className="mt-5 space-y-2">
-          {clients.isLoading ? <div className="h-20 animate-pulse rounded-2xl bg-white/5" /> : clients.data?.length ? clients.data.map((client) => <div key={client.id} className="rounded-2xl border border-white/8 bg-black/10 p-4"><div className="flex items-center gap-4"><div className="grid h-11 w-11 place-items-center rounded-xl bg-brand-500/10 text-brand-300"><KeyRound className="h-5 w-5" /></div><div className="min-w-0 flex-1"><p className="font-medium">{client.name}</p><p className="truncate font-mono text-xs text-ink-faint">{client.clientId}</p></div><StatusPill tone={client.isActive ? "success" : "neutral"}>{client.isActive ? "Active" : "Revoked"}</StatusPill>{client.isActive && <button onClick={() => revoke(client.id)} aria-label={`Revoke ${client.name}`} className="rounded-lg p-2 text-ink-faint hover:bg-danger/10 hover:text-danger"><Trash2 className="h-4 w-4" /></button>}</div><div className="mt-3 text-xs text-ink-faint">Redirect: <span className="font-mono">{client.redirectUris[0] ?? "—"}</span></div></div>) : <p className="rounded-2xl border border-dashed border-white/10 p-5 text-sm text-ink-muted">No applications registered yet.</p>}
+          {clients.isLoading ? <div className="h-20 animate-pulse rounded-2xl bg-white/5" /> : clients.error ? <div className="rounded-2xl border border-danger/20 bg-danger/5 p-5 text-sm text-danger"><p className="font-medium">Couldn’t load your applications.</p><p className="mt-1 break-words text-xs opacity-80">{clients.error}</p></div> : clients.data?.length ? clients.data.map((client) => <div key={client.id} className="rounded-2xl border border-white/8 bg-black/10 p-4"><div className="flex items-center gap-4"><div className="grid h-11 w-11 place-items-center rounded-xl bg-brand-500/10 text-brand-300"><KeyRound className="h-5 w-5" /></div><div className="min-w-0 flex-1"><p className="font-medium">{client.name}</p><p className="truncate font-mono text-xs text-ink-faint">{client.clientId}</p></div><StatusPill tone={client.isActive ? "success" : "neutral"}>{client.isActive ? "Active" : "Revoked"}</StatusPill>{client.isActive && <button onClick={() => revoke(client.id)} aria-label={`Revoke ${client.name}`} className="rounded-lg p-2 text-ink-faint hover:bg-danger/10 hover:text-danger"><Trash2 className="h-4 w-4" /></button>}</div><div className="mt-3 text-xs text-ink-faint">Redirect: <span className="font-mono">{client.redirectUris[0] ?? "—"}</span></div></div>) : <p className="rounded-2xl border border-dashed border-white/10 p-5 text-sm text-ink-muted">No applications registered yet.</p>}
         </div>
 
         <div className="mt-5 grid gap-2 sm:grid-cols-2"><input value={name} onChange={(e) => setName(e.target.value)} placeholder="Application name" className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm outline-none placeholder:text-ink-faint focus:border-brand-400/50" /><input value={redirectUri} onChange={(e) => setRedirectUri(e.target.value)} placeholder="https://example.com/callback" className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm outline-none placeholder:text-ink-faint focus:border-brand-400/50" /></div>
