@@ -16,6 +16,7 @@ const scopeLabel = (scope: string) => {
     case "email": return "Your email address";
     case "memory:read": return "Your MAX Memory approved for this app";
     case "offline_access": return "Keep you signed in with a refresh token";
+    case "account:read": return "Your MAX account information";
     default: return scope.replace(/[:_]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
   }
 };
@@ -88,6 +89,15 @@ export default function AuthorizePage() {
     }
   };
 
+  const cancel = () => {
+    if (!request) return;
+    const callback = new URL(request.redirectUri);
+    callback.searchParams.set("error", "access_denied");
+    callback.searchParams.set("error_description", "The user cancelled the MAX sign-in request.");
+    callback.searchParams.set("state", request.state);
+    window.location.assign(callback.toString());
+  };
+
   if (!params || isLoading) return <main className="min-h-screen bg-[#f8f9fa] dark:bg-[#202124]" />;
   if (!request) return <main className="min-h-screen bg-[#f8f9fa] px-4 py-8 text-[#202124] dark:bg-[#202124] dark:text-[#e8eaed] sm:py-12"><div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-[450px] items-center justify-center"><section className="w-full rounded-[16px] border border-[#dadce0] bg-white px-7 py-9 text-center shadow-sm dark:border-[#5f6368] dark:bg-[#292a2d] sm:px-10 sm:py-10"><img src="/logo.png" alt="MAX" className="mx-auto h-12 w-12 object-contain" /><h1 className="mt-5 text-[22px] font-normal">This sign-in request is no longer valid</h1><p className="mt-3 text-sm leading-6 text-[#5f6368] dark:text-[#bdc1c6]">Please return to the application and start the sign-in process again.</p></section></div></main>;
 
@@ -100,7 +110,7 @@ export default function AuthorizePage() {
       <div className="mt-7 border-t border-[#dadce0] pt-6"><p className="text-sm font-medium">{clientName} will be able to:</p><div className="mt-4 space-y-3">{scopes.map((scope) => <div key={scope} className="flex items-start gap-3 text-sm text-[#3c4043] dark:text-[#e8eaed]"><Check className="mt-0.5 h-4 w-4 shrink-0 text-[#1e8e3e] dark:text-[#81c995]" /><span>{scopeLabel(scope)}</span></div>)}</div></div>
       <div className="mt-7 flex items-start gap-3 rounded-[8px] bg-[#f8f9fa] p-3 text-xs leading-5 text-[#5f6368] dark:bg-[#303134] dark:text-[#bdc1c6]"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" /><span>You can review or remove this access later from your MAX Account settings.</span></div>
       {error && <p className="mt-4 text-sm text-[#d93025] dark:text-[#f28b82]">{error}</p>}
-      <div className="mt-7 flex items-center justify-between gap-4"><Link href={request.redirectUri} className="inline-flex items-center gap-1.5 text-sm font-medium text-[#0b57d0] hover:underline dark:text-[#8ab4f8]"><ArrowLeft className="h-4 w-4" />Cancel</Link><button type="button" onClick={approve} disabled={approving} className="rounded-[8px] bg-[#0b57d0] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#0842a0] disabled:cursor-wait disabled:opacity-60 dark:bg-[#a8c7fa] dark:text-[#062e6f] dark:hover:bg-[#8ab4f8]">{approving ? "Continuing…" : "Continue"}</button></div>
+      <div className="mt-7 flex items-center justify-between gap-4"><button type="button" onClick={cancel} className="inline-flex items-center gap-1.5 text-sm font-medium text-[#0b57d0] hover:underline dark:text-[#8ab4f8]"><ArrowLeft className="h-4 w-4" />Cancel</button><button type="button" onClick={approve} disabled={approving} className="rounded-[8px] bg-[#0b57d0] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#0842a0] disabled:cursor-wait disabled:opacity-60 dark:bg-[#a8c7fa] dark:text-[#062e6f] dark:hover:bg-[#8ab4f8]">{approving ? "Continuing…" : "Continue"}</button></div>
     </div>}
   </section></div></main>;
 }
