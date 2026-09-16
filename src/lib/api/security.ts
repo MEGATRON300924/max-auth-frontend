@@ -1,12 +1,14 @@
 import { apiClient } from "./client";
-import type { AuditLogEntry, ConnectedAccount, OAuthClient, OAuthConsent } from "@/types/api";
+import type { AuditLogEntry, ConnectedAccount, OAuthClient, OAuthConsent, OAuthClientConfig } from "@/types/api";
 
 export const securityApi = { auditLogs() { return apiClient.get<{ logs: AuditLogEntry[] }>("/security/audit-logs"); } };
 export const connectedAccountsApi = { list() { return apiClient.get<{ accounts: ConnectedAccount[] }>("/connected-accounts"); }, unlink(accountId: string) { return apiClient.delete<{ message: string }>(`/connected-accounts/${accountId}`); } };
 export const oauthApi = {
   listClients() { return apiClient.get<{ clients: OAuthClient[] }>("/oauth/clients"); },
-  createClient(data: { name: string; redirectUris: string[]; scopes: string[]; isConfidential?: boolean }) { return apiClient.post<{ client: OAuthClient; clientSecret: string }>("/oauth/clients", data); },
+  createClient(data: { name: string; redirectUris: string[]; scopes: string[]; isConfidential?: boolean }) { return apiClient.post<{ client: OAuthClient; clientSecret?: string }>("/oauth/clients", data); },
   updateClient(clientId: string, data: { name?: string; redirectUris?: string[]; scopes?: string[] }) { return apiClient.patch<{ client: OAuthClient }>(`/oauth/clients/${clientId}`, data); },
+  getClientConfig(clientId: string) { return apiClient.get<{ config: OAuthClientConfig }>(`/oauth/clients/${clientId}/config`); },
+  updateClientConfig(clientId: string, data: OAuthClientConfig) { return apiClient.put<{ config: OAuthClientConfig }>(`/oauth/clients/${clientId}/config`, data); },
   rotateClientSecret(clientId: string) { return apiClient.post<{ clientId: string; clientSecret: string }>(`/oauth/clients/${clientId}/rotate-secret`, {}); },
   revokeClient(clientId: string) { return apiClient.delete<{ client: OAuthClient }>(`/oauth/clients/${clientId}`); },
   listConsents() { return apiClient.get<{ consents: OAuthConsent[] }>("/oauth/consents"); },
