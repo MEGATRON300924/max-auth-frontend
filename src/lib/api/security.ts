@@ -9,6 +9,7 @@ export const oauthApi = {
   updateClient(clientId: string, data: { name?: string; redirectUris?: string[]; scopes?: OAuthPermission[] }) { return apiClient.patch<{ client: OAuthClient }>(`/oauth/clients/${clientId}`, data); },
   getClientConfig(clientId: string) { return apiClient.get<{ config: OAuthClientConfig }>(`/oauth/clients/${clientId}/config`); },
   updateClientConfig(clientId: string, data: OAuthClientConfig) { return apiClient.put<{ config: OAuthClientConfig }>(`/oauth/clients/${clientId}/config`, data); },
+  verifyManifest(clientId: string) { return apiClient.post<{ verified: boolean; checks: Record<string, boolean> }>(`/oauth/clients/${clientId}/verify-manifest`, {}); },
   rotateClientSecret(clientId: string) { return apiClient.post<{ clientId: string; clientSecret: string }>(`/oauth/clients/${clientId}/rotate-secret`, {}); },
   revokeClient(clientId: string) { return apiClient.delete<{ client: OAuthClient }>(`/oauth/clients/${clientId}`); },
   listConsents() { return apiClient.get<{ consents: OAuthConsent[] }>("/oauth/consents"); },
@@ -16,13 +17,4 @@ export const oauthApi = {
 };
 
 export interface OAuthClientTestResult { valid: boolean; clientId: string; client?: { clientId: string; name: string; websiteUrl: string | null; logoUrl: string | null; applicationType: string | null; verificationStatus: string }; checks: { key: string; label: string; ok: boolean; detail: string }[]; allowedScopes?: string[]; redirectUris?: string[]; }
-
-export async function testOAuthClient(clientId: string, redirectUri: string, scopes: OAuthPermission[]) {
-  const params = new URLSearchParams({ client_id: clientId });
-  if (redirectUri.trim()) params.set("redirect_uri", redirectUri.trim());
-  if (scopes.length) params.set("scope", scopes.join(" "));
-  const response = await fetch(`https://auth.max-ai.name.ng/api/v1/oauth/client-tester?${params.toString()}`, { method: "GET", credentials: "include", headers: { Accept: "application/json" } });
-  const body = await response.json();
-  if (!response.ok) throw new Error(body?.error?.message || "Client test failed");
-  return body.data as OAuthClientTestResult;
-}
+export async function testOAuthClient(clientId: string, redirectUri: string, scopes: OAuthPermission[]) { const params = new URLSearchParams({ client_id: clientId }); if (redirectUri.trim()) params.set("redirect_uri", redirectUri.trim()); if (scopes.length) params.set("scope", scopes.join(" ")); const response = await fetch(`https://auth.max-ai.name.ng/api/v1/oauth/client-tester?${params.toString()}`, { method: "GET", credentials: "include", headers: { Accept: "application/json" } }); const body = await response.json(); if (!response.ok) throw new Error(body?.error?.message || "Client test failed"); return body.data as OAuthClientTestResult; }
