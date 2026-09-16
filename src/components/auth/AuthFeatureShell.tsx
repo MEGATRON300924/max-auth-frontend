@@ -1,60 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ShieldCheck, Sparkles } from "lucide-react";
+import { ExternalLink, ShieldCheck, Sparkles } from "lucide-react";
 import type { ReactNode } from "react";
 
-export function AuthFeatureShell({
-  title,
-  description,
-  eyebrow = "MAX Account",
-  children,
-}: {
-  title: string;
-  description: string;
-  eyebrow?: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="relative overflow-hidden rounded-2xl border border-glass-border bg-base-raised p-5 shadow-none sm:p-8">
-      <div className="relative">
-        <div className="mb-8 flex items-start justify-between gap-4">
-          <div>
-            <div className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-brand-600 dark:text-brand-400">
-              <Sparkles className="h-3.5 w-3.5" /> {eyebrow}
-            </div>
-            <h1 className="font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl">{title}</h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-ink-muted">{description}</p>
-          </div>
-          <div className="hidden rounded-lg border border-glass-border bg-glass p-3 sm:block">
-            <ShieldCheck className="h-5 w-5 text-brand-600 dark:text-brand-400" />
-          </div>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
+export function AuthFeatureShell({ title, description, eyebrow = "MAX Account", children }: { title: string; description: string; eyebrow?: string; children: ReactNode }) {
+  return <div className="relative overflow-hidden rounded-2xl border border-glass-border bg-base-raised p-5 shadow-none sm:p-8"><div className="relative"><div className="mb-8 flex items-start justify-between gap-4"><div><div className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-brand-600 dark:text-brand-400"><Sparkles className="h-3.5 w-3.5" /> {eyebrow}</div><h1 className="font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl">{title}</h1><p className="mt-2 max-w-2xl text-sm leading-6 text-ink-muted">{description}</p></div><div className="hidden items-center gap-2 sm:flex">{eyebrow === "MAX Developers" ? <a href="https://developers.max-ai.name.ng" className="inline-flex items-center gap-2 rounded-xl border border-glass-border bg-glass px-3 py-2 text-xs font-semibold text-ink-muted hover:text-ink" title="Open MAX AI for Developers"><ExternalLink className="h-3.5 w-3.5" /> Login to MAX AI for Developers</a> : null}<div className="rounded-lg border border-glass-border bg-glass p-3"><ShieldCheck className="h-5 w-5 text-brand-600 dark:text-brand-400" /></div></div></div>{children}</div></div>;
 }
 
-export function GlassCard({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`rounded-xl border border-glass-border bg-base-raised p-5 ${className}`}>{children}</div>;
-}
-
-export function StatusPill({ children, tone = "neutral" }: { children: ReactNode; tone?: "success" | "warning" | "neutral" }) {
-  const classes = tone === "success"
-    ? "border-success/20 bg-success-subtle text-success"
-    : tone === "warning"
-      ? "border-warning/20 bg-warning-subtle text-warning"
-      : "border-glass-border bg-glass text-ink-muted";
-  return <span className={`inline-flex items-center rounded-md border px-2 py-1 text-[11px] font-semibold ${classes}`}>{children}</span>;
-}
-
-export function FeatureRow({ icon, title, description, action }: { icon: ReactNode; title: string; description: string; action?: ReactNode }) {
-  return (
-    <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-4 border-b border-glass-border py-4 last:border-0">
-      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-glass-border bg-glass text-brand-600 dark:text-brand-400">{icon}</div>
-      <div className="min-w-0 flex-1"><p className="font-semibold text-ink">{title}</p><p className="mt-0.5 text-sm text-ink-muted">{description}</p></div>
-      {action}
-    </motion.div>
-  );
-}
+export function GlassCard({ children, className = "" }: { children: ReactNode; className?: string }) { return <div className={`rounded-xl border border-glass-border bg-base-raised p-5 ${className}`}>{children}</div>; }
+export function StatusPill({ children, tone = "neutral" }: { children: ReactNode; tone?: "success" | "warning" | "neutral" }) { const classes = tone === "success" ? "border-success/20 bg-success-subtle text-success" : tone === "warning" ? "border-warning/20 bg-warning-subtle text-warning" : "border-glass-border bg-glass text-ink-muted"; return <span className={`inline-flex items-center rounded-md border px-2 py-1 text-[11px] font-semibold ${classes}`}>{children}</span>; }
+export function FeatureRow({ icon, title, description, action }: { icon: ReactNode; title: string; description: string; action?: ReactNode }) { return <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-4 border-b border-glass-border py-4 last:border-0"><div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-glass-border bg-glass text-brand-600 dark:text-brand-400">{icon}</div><div className="min-w-0 flex-1"><p className="font-semibold text-ink">{title}</p><p className="mt-0.5 text-sm text-ink-muted">{description}</p></div>{action}</motion.div>; }
