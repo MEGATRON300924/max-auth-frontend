@@ -40,6 +40,8 @@ async function rawRequest<T>(path: string, opts: RequestOptions = {}): Promise<T
     body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
   });
 
+  const requestId = res.headers.get("x-request-id") ?? undefined;
+
   let json: ApiResponse<T> | undefined;
   try {
     json = await res.json();
@@ -56,7 +58,7 @@ async function rawRequest<T>(path: string, opts: RequestOptions = {}): Promise<T
     if (newToken) return rawRequest<T>(path, { ...opts, _retried: true });
   }
 
-  throw new ApiError(message, code, res.status, details);
+  throw new ApiError(message, code, res.status, details, requestId);
 }
 
 function silentRefresh(): Promise<string | null> {
