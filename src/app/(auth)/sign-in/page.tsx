@@ -27,6 +27,19 @@ function getSafeReturnTo() {
   }
 }
 
+function getClientName() {
+  if (typeof window === "undefined") return null;
+  const returnTo = new URLSearchParams(window.location.search).get("returnTo");
+  if (!returnTo) return null;
+  try {
+    const url = new URL(returnTo, window.location.origin);
+    if (url.origin !== window.location.origin || url.pathname !== "/authorize") return null;
+    return url.searchParams.get("client_name") || null;
+  } catch {
+    return null;
+  }
+}
+
 export default function SignInPage() {
   const { login, isAuthenticated } = useAuth();
   const { showToast } = useToast();
@@ -46,6 +59,11 @@ export default function SignInPage() {
     } catch {
       return "/dashboard";
     }
+  }, []);
+
+  useEffect(() => {
+    const clientName = getClientName();
+    document.title = clientName ? `Sign in with ${clientName}` : "Sign in with MAX Account";
   }, []);
 
   useEffect(() => {
@@ -116,41 +134,54 @@ export default function SignInPage() {
     }
   };
 
+  const clientName = getClientName();
+  const signInTitle = clientName ? `Sign in with ${clientName}` : "Sign in with MAX Account";
+  const signInDescription = clientName ? `Use your MAX Account to continue to ${clientName}.` : "Use your MAX Account to continue to MAX services and apps.";
+
   return (
-    <main className="min-h-screen bg-base px-4 py-8 text-ink sm:px-6 sm:py-12">
-      <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-[460px] flex-col items-center justify-center">
-        <Link href="/" aria-label="MAX home" className="mb-8 inline-flex items-center"><img src="/logo.png" alt="MAX AI" className="h-11 w-11 rounded-xl object-contain" /></Link>
-        <section className="w-full rounded-[28px] border border-glass-border bg-base-raised p-6 shadow-sm sm:p-8">
+    <main className="min-h-screen bg-[#f8f9fa] px-4 py-8 text-[#202124] dark:bg-[#202124] dark:text-[#e8eaed] sm:py-12">
+      <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-[450px] items-center justify-center">
+        <section className="w-full rounded-[16px] border border-[#dadce0] bg-white px-7 py-9 shadow-sm dark:border-[#5f6368] dark:bg-[#292a2d] sm:px-10 sm:py-10">
+          <div className="text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-[#dadce0] bg-white dark:border-[#5f6368]">
+              <img src="/logo.png" alt="MAX" className="h-9 w-9 object-contain" />
+            </div>
+            <h1 className="mt-5 text-[24px] font-normal tracking-[-0.01em]">{step === "choose" ? signInTitle : "Enter your password"}</h1>
+            <p className="mt-2 text-[15px] leading-6 text-[#5f6368] dark:text-[#bdc1c6]">{step === "choose" ? signInDescription : "Verify your MAX Account to continue securely."}</p>
+          </div>
+
           {step === "choose" ? (
-            <div>
-              <div className="text-center"><h1 className="font-display text-[28px] font-semibold tracking-[-0.03em] text-ink sm:text-[30px]">Choose a MAX Account</h1><p className="mx-auto mt-2 max-w-[350px] text-sm leading-6 text-ink-muted">Sign in with your MAX Account to continue to MAX services and apps.</p></div>
-              <div className="mt-8 space-y-3">
+            <div className="mt-8">
+              <div className="space-y-2">
                 {rememberedAccount ? (
-                  <button type="button" onClick={() => beginWithAccount(rememberedAccount)} className="group flex w-full items-center gap-3 rounded-2xl border border-glass-border bg-base px-4 py-3.5 text-left transition-colors hover:bg-base-raised-strong"><div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-brand-100 p-2 dark:bg-brand-500/15"><img src="/logo.png" alt="" className="h-full w-full rounded-full object-contain" /></div><div className="min-w-0 flex-1"><p className="text-xs font-medium text-ink-faint">Last used</p><p className="mt-0.5 truncate text-sm font-semibold text-ink">{rememberedAccount}</p></div><span className="text-sm font-semibold text-brand-600 transition-transform group-hover:translate-x-0.5 dark:text-brand-400">Continue</span></button>
+                  <button type="button" onClick={() => beginWithAccount(rememberedAccount)} className="group flex w-full items-center gap-3 rounded-[8px] border border-[#dadce0] bg-white px-3 py-3 text-left transition-colors hover:bg-[#f8f9fa] dark:border-[#5f6368] dark:bg-transparent dark:hover:bg-[#303134]">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f1f3f4] dark:bg-[#3c4043]"><img src="/logo.png" alt="" className="h-7 w-7 rounded-full object-contain" /></div>
+                    <div className="min-w-0 flex-1"><p className="truncate text-sm font-medium">{rememberedAccount}</p><p className="mt-0.5 text-sm text-[#5f6368] dark:text-[#bdc1c6]">Last used</p></div>
+                    <span className="text-sm font-medium text-[#0b57d0] dark:text-[#8ab4f8]">Continue</span>
+                  </button>
                 ) : (
-                  <button type="button" onClick={useAnotherAccount} className="flex w-full items-center gap-3 rounded-2xl border border-glass-border bg-base px-4 py-3.5 text-left transition-colors hover:bg-base-raised-strong"><div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-brand-100 dark:bg-brand-500/15"><UserRound className="h-5 w-5 text-brand-700 dark:text-brand-300" /></div><div className="min-w-0 flex-1"><p className="text-sm font-semibold text-ink">Use your MAX Account</p><p className="mt-0.5 text-sm text-ink-muted">Enter your email or username</p></div><span className="text-lg text-ink-faint">›</span></button>
+                  <button type="button" onClick={useAnotherAccount} className="flex w-full items-center gap-3 rounded-[8px] border border-[#dadce0] bg-white px-3 py-3 text-left transition-colors hover:bg-[#f8f9fa] dark:border-[#5f6368] dark:bg-transparent dark:hover:bg-[#303134]"><div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f1f3f4] dark:bg-[#3c4043]"><UserRound className="h-5 w-5 text-[#5f6368] dark:text-[#bdc1c6]" /></div><div className="min-w-0 flex-1"><p className="text-sm font-medium">Use a MAX Account</p><p className="mt-0.5 text-sm text-[#5f6368] dark:text-[#bdc1c6]">Enter your email or username</p></div><span className="text-lg text-[#5f6368]">›</span></button>
                 )}
-                {rememberedAccount && <button type="button" onClick={useAnotherAccount} className="flex w-full items-center justify-center gap-2 rounded-2xl border border-transparent px-4 py-3 text-sm font-semibold text-brand-600 transition-colors hover:bg-brand-50 dark:text-brand-400 dark:hover:bg-brand-500/10"><UserRound className="h-4 w-4" />Use another MAX Account</button>}
+                {rememberedAccount && <button type="button" onClick={useAnotherAccount} className="w-full rounded-[8px] px-3 py-2.5 text-sm font-medium text-[#0b57d0] hover:bg-[#f1f3f4] dark:text-[#8ab4f8] dark:hover:bg-[#303134]">Use another MAX Account</button>}
               </div>
-              <div className="my-7 flex items-center gap-3"><div className="h-px flex-1 bg-glass-border" /><span className="text-xs font-medium text-ink-faint">OR</span><div className="h-px flex-1 bg-glass-border" /></div>
+
+              <div className="my-7 flex items-center gap-3"><div className="h-px flex-1 bg-[#dadce0] dark:bg-[#5f6368]" /><span className="text-xs text-[#5f6368] dark:text-[#bdc1c6]">OR</span><div className="h-px flex-1 bg-[#dadce0] dark:bg-[#5f6368]" /></div>
               <GoogleSignInButton />
-              <p className="mt-7 text-center text-sm text-ink-muted">Don&apos;t have a MAX Account? <Link href="/create-account" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">Create one</Link></p>
+              <p className="mt-7 text-center text-sm text-[#5f6368] dark:text-[#bdc1c6]">Don&apos;t have a MAX Account? <Link href="/create-account" className="font-medium text-[#0b57d0] hover:underline dark:text-[#8ab4f8]">Create one</Link></p>
             </div>
           ) : (
-            <div>
-              <button type="button" onClick={() => { setError(null); setPassword(""); setStep("choose"); }} className="mb-7 inline-flex items-center gap-2 text-sm font-medium text-ink-muted transition-colors hover:text-ink"><ArrowLeft className="h-4 w-4" />Back</button>
-              <div className="text-center"><h1 className="font-display text-[28px] font-semibold tracking-[-0.03em] text-ink">Sign in to MAX</h1><p className="mt-2 text-sm leading-6 text-ink-muted">Enter your MAX Account password to continue.</p></div>
-              <form onSubmit={handleSubmit} className="mt-8 space-y-5" noValidate>
+            <div className="mt-8">
+              <button type="button" onClick={() => { setError(null); setPassword(""); setStep("choose"); }} className="mb-7 inline-flex items-center gap-2 text-sm font-medium text-[#5f6368] hover:text-[#202124] dark:text-[#bdc1c6] dark:hover:text-[#e8eaed]"><ArrowLeft className="h-4 w-4" />Back</button>
+              <div className="mb-5 rounded-[8px] border border-[#dadce0] px-3 py-2.5 dark:border-[#5f6368]"><p className="truncate text-sm font-medium">{identifier}</p></div>
+              <form onSubmit={handleSubmit} className="space-y-5" noValidate>
                 {error && <Alert variant="danger">{error}</Alert>}
-                <label className="block"><span className="mb-2 block text-sm font-medium text-ink">Email or username</span><span className="relative block"><Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faint" /><input type="text" autoComplete="username" value={identifier} onChange={(event) => setIdentifier(event.target.value)} className="h-12 w-full rounded-xl border border-glass-border bg-base px-11 text-sm text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-brand-500 focus:ring-2 focus:ring-brand-500/15" placeholder="Email or username" required autoFocus={!identifier} /></span></label>
-                <div><label className="block"><span className="mb-2 block text-sm font-medium text-ink">Password</span><span className="relative block"><Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faint" /><input type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} className="h-12 w-full rounded-xl border border-glass-border bg-base px-11 text-sm text-ink outline-none transition-colors placeholder:text-ink-faint focus:border-brand-500 focus:ring-2 focus:ring-brand-500/15" placeholder="Password" required autoFocus={!!identifier} /></span></label><div className="mt-3 flex items-center justify-between gap-4"><label className="flex items-center gap-2 text-sm text-ink-muted"><input type="checkbox" checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} className="h-4 w-4 rounded border-glass-border bg-base text-brand-600 focus:ring-brand-500" />Remember this account</label><Link href="/forgot-password" className="text-sm font-medium text-brand-600 hover:underline dark:text-brand-400">Forgot password?</Link></div></div>
+                <label className="block"><span className="mb-2 block text-sm font-medium">Password</span><span className="relative block"><Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5f6368]" /><input type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} className="h-12 w-full rounded-[8px] border border-[#dadce0] bg-white px-11 text-sm outline-none transition-colors placeholder:text-[#5f6368] focus:border-[#0b57d0] focus:ring-1 focus:ring-[#0b57d0] dark:border-[#5f6368] dark:bg-transparent" placeholder="Password" required autoFocus /></span></label>
+                <div className="flex items-center justify-between gap-4"><label className="flex items-center gap-2 text-sm text-[#5f6368] dark:text-[#bdc1c6]"><input type="checkbox" checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} className="h-4 w-4 rounded border-[#dadce0] text-[#0b57d0] focus:ring-[#0b57d0]" />Remember this account</label><Link href="/forgot-password" className="text-sm font-medium text-[#0b57d0] hover:underline dark:text-[#8ab4f8]">Forgot password?</Link></div>
                 <Button type="submit" size="lg" className="w-full" isLoading={isLoading}>Sign in</Button>
               </form>
-              <p className="mt-7 text-center text-sm text-ink-muted">Need a MAX Account? <Link href="/create-account" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">Create one</Link></p>
             </div>
           )}
         </section>
-        <p className="mt-6 text-center text-xs leading-5 text-ink-faint">One MAX Account for your MAX services. Your password is handled only by MAX Auth.</p>
       </div>
     </main>
   );
