@@ -13,7 +13,7 @@ export const authApi = {
   sendVerificationEmail() { return apiClient.post<{ message: string }>("/auth/email/send-verification"); },
   verifyEmail(token: string) { return apiClient.post<{ message: string }>("/auth/email/verify", { token }, { skipAuth: true }); },
   forgotPassword(email: string) { return apiClient.post<{ message: string }>("/auth/password/forgot", { email }, { skipAuth: true }); },
-  resetPassword(token: string, newPassword: string) { return apiClient.post<AuthPayload>("/auth/password/reset", { token, newPassword }, { skipAuth: true }); },
+  resetPassword(token: string, newPassword: string) { return apiClient.post<{ message: string }>("/auth/password/reset", { token, newPassword }, { skipAuth: true }); },
   changePassword(currentPassword: string, newPassword: string) { return apiClient.post<{ message: string }>("/auth/password/change", { currentPassword, newPassword }); },
   deleteAccount(password: string) { return apiClient.delete<{ message: string }>("/auth/account", { body: { password } }); },
   approveOAuth(input: { clientId: string; redirectUri: string; scopes: string; codeChallenge?: string; codeChallengeMethod?: string; state?: string; requestToken: string }) { return apiClient.post<{ redirectUri: string }>("/oauth/authorize/approve", input); },
