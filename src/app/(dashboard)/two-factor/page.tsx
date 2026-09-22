@@ -40,7 +40,7 @@ export default function TwoFactorPage() {
     setError(null); setNotice(null); setBusy(true);
     try {
       const result = await mfaApi.setup(password);
-      setSetup(result); setPassword(""); setCode("");
+      setSetup(result); setCode("");
       setNotice("Your authenticator secret is ready. Add it to your authenticator app, then enter the current 6-digit code below.");
     } catch (err) { setError(err instanceof ApiError ? err.message : "Couldn't start authenticator setup."); }
     finally { setBusy(false); }
@@ -119,7 +119,7 @@ export default function TwoFactorPage() {
                 <button type="button" onClick={() => setShowSecret(v => !v)} className="rounded-lg p-2 text-ink-muted hover:bg-glass-hover" aria-label={showSecret ? "Hide setup key" : "Show setup key"}>{showSecret ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>
                 <button type="button" onClick={() => copy(setup.secret, "Setup key copied")} className="rounded-lg p-2 text-ink-muted hover:bg-glass-hover" aria-label="Copy setup key"><Copy className="h-4 w-4" /></button>
               </div>
-              <p className="mt-3 text-xs leading-5 text-ink-faint">In your authenticator, choose “Add account” → “Enter setup key manually”. Account: your MAX email · Issuer: MAX Account · 6 digits · 30 seconds.</p>
+              <p className="mt-3 text-xs leading-5 text-ink-faint">In your authenticator, choose “Add account” → “Enter setup key manually”. Account: your MAX email · Issuer: MAX Account · 6 digits · 30 seconds.</p><button type="button" onClick={() => copy(setup.otpauthUrl, "Authenticator URI copied")} className="mt-3 text-xs font-semibold text-brand-500 hover:underline">Copy authenticator URI</button>
             </div>
             <div className="rounded-xl border border-brand-500/20 bg-brand-500/5 p-4">
               <p className="text-sm font-semibold text-ink">Verify the authenticator</p>
