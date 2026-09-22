@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, Globe2, Link2, Music2, MessageCircle, Github, Camera, X, Shield } from "lucide-react";
+import { CheckCircle2, Globe2, Link2, Music2, MessageCircle, Github, Camera, X, Shield, Sparkles } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -28,8 +28,8 @@ export default function ConnectedAppsPage() {
 
   const linked = new Set((accounts.data ?? []).map((a) => a.provider));
   const connect = (name: string) => {
-    setNotice(`${name} OAuth is ready for integration, but the provider backend handshake is not enabled yet.`);
-    showToast({ title: `${name} connection is not active yet`, variant: "error" });
+    setNotice(`${name} is prepared as a future connected service. Its secure provider handshake will be enabled when that integration is ready.`);
+    showToast({ title: `${name} integration is coming`, description: "Your MAX Account already handles MAX service sign-in.", variant: "info" });
   };
 
   const unlink = async (id: string) => {
@@ -39,11 +39,29 @@ export default function ConnectedAppsPage() {
 
   return <div className="space-y-6">
     <PageHeader title="Connected Apps" description="Control the services connected to your MAX Account and the permissions they receive." />
+    <Card className="border-brand-400/20 bg-brand-500/[.04]">
+      <CardContent className="flex items-start gap-4 p-5">
+        <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-brand-500/10 text-brand-400">
+          <Sparkles className="h-5 w-5" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-sm font-semibold text-ink">MAX connection complete</p>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-success/10 px-2.5 py-1 text-[11px] font-medium text-success">
+              <CheckCircle2 className="h-3.5 w-3.5" /> Connected
+            </span>
+          </div>
+          <p className="mt-1 text-xs leading-5 text-ink-muted">
+            Your MAX Account is the single sign-in for the MAX ecosystem. When MAX AI and the other MAX services are ready, they will use this same account automatically — no separate sign-in for each service.
+          </p>
+        </div>
+      </CardContent>
+    </Card>
     {notice && <div className="rounded-2xl border border-warning/20 bg-warning/5 p-4 text-sm text-ink-muted">{notice}</div>}
     <Card><CardContent className="divide-y divide-glass-border p-0">
       {providers.map((p) => { const account = accounts.data?.find((a) => a.provider === p.id); const Icon = p.icon; return <div key={p.id} className="flex items-center gap-4 p-5"><div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white/5 text-ink-muted"><Icon className="h-5 w-5" /></div><div className="min-w-0 flex-1"><p className="text-sm font-semibold text-ink">{p.name}</p><p className="text-xs text-ink-faint">{p.description}</p></div>{account ? <><span className="inline-flex items-center gap-1.5 text-xs font-medium text-success"><CheckCircle2 className="h-4 w-4" /> Connected</span><Button variant="ghost" size="sm" onClick={() => unlink(account.id)}>Unlink</Button></> : <Button variant="secondary" size="sm" onClick={() => connect(p.name)}>Connect</Button>}</div>; })}
     </CardContent></Card>
-    <div className="flex gap-3 rounded-2xl border border-brand-400/15 bg-brand-500/5 p-4"><Link2 className="mt-0.5 h-5 w-5 shrink-0 text-brand-300" /><p className="text-xs leading-5 text-ink-muted">Connecting a provider never automatically grants a third-party app access to your MAX Account. Partner permissions are controlled separately through OAuth consent.</p></div>
-    <div className="flex gap-3 rounded-2xl border border-white/10 bg-white/[.025] p-4"><Shield className="mt-0.5 h-5 w-5 shrink-0 text-success" /><p className="text-xs leading-5 text-ink-muted">Provider connection buttons are intentionally gated until the backend OAuth handshakes are configured. This prevents the frontend from pretending a secure connection exists.</p></div>
+    <div className="flex gap-3 rounded-2xl border border-brand-400/15 bg-brand-500/5 p-4"><Link2 className="mt-0.5 h-5 w-5 shrink-0 text-brand-300" /><p className="text-xs leading-5 text-ink-muted">Your MAX Account is already connected across the MAX ecosystem. Third-party providers such as Spotify are separate connections and will only receive the permissions you approve.</p></div>
+    <div className="flex gap-3 rounded-2xl border border-white/10 bg-white/[.025] p-4"><Shield className="mt-0.5 h-5 w-5 shrink-0 text-success" /><p className="text-xs leading-5 text-ink-muted">MAX services will use your existing MAX Account session. Third-party connections such as Spotify will use their own secure OAuth consent flow and will not require another MAX Account sign-in.</p></div>
   </div>;
 }
