@@ -37,13 +37,15 @@ export default function ConnectedAppsPage() {
   const [unlinkId, setUnlinkId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const google = useMemo(() => accounts.data?.find((a) => a.provider === "GOOGLE") ?? null, [accounts.data]);\n  const googleCalendarConnected = Boolean(google?.scope?.includes("https://www.googleapis.com/auth/calendar.events"));
+  const google = useMemo(() => accounts.data?.find((a) => a.provider === "GOOGLE") ?? null, [accounts.data]);
+  const googleCalendarConnected = Boolean(google?.scope?.includes("https://www.googleapis.com/auth/calendar.events"));
   const spotify = useMemo(() => accounts.data?.find((a) => a.provider === "SPOTIFY") ?? null, [accounts.data]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const result = params.get("spotify");
-    const googleConnect = params.get("connect") === "google";\n    const googleCalendarResult = params.get("google_calendar");
+    const googleConnect = params.get("connect") === "google";
+    const googleCalendarResult = params.get("google_calendar");
     if (result === "connected") {
       showToast({ title: "Spotify connected", description: "Your Spotify account is now linked to MAX.", variant: "success" });
       accounts.refetch();
@@ -52,7 +54,15 @@ export default function ConnectedAppsPage() {
       showToast({ title: "Spotify connection failed", description: "Spotify could not be connected. You can safely try again.", variant: "error" });
       window.history.replaceState({}, "", "/connected-apps");
     }
-    if (googleCalendarResult === "connected") {\n      showToast({ title: "Google Calendar connected", description: "MAX can now use the Google Calendar permissions you approved.", variant: "success" });\n      accounts.refetch();\n      window.history.replaceState({}, "", "/connected-apps");\n    } else if (googleCalendarResult === "error") {\n      showToast({ title: "Google Calendar connection failed", description: "Google Calendar could not be connected. You can safely try again.", variant: "error" });\n      window.history.replaceState({}, "", "/connected-apps");\n    }\n    if (googleConnect) {
+    if (googleCalendarResult === "connected") {
+      showToast({ title: "Google Calendar connected", description: "MAX can now use the Google Calendar permissions you approved.", variant: "success" });
+      accounts.refetch();
+      window.history.replaceState({}, "", "/connected-apps");
+    } else if (googleCalendarResult === "error") {
+      showToast({ title: "Google Calendar connection failed", description: "Google Calendar could not be connected. You can safely try again.", variant: "error" });
+      window.history.replaceState({}, "", "/connected-apps");
+    }
+    if (googleConnect) {
       window.history.replaceState({}, "", "/connected-apps");
       showToast({ title: "Connect Google", description: "Choose your Google account below to link it to MAX.", variant: "success" });
       setTimeout(() => document.getElementById("google-connect")?.scrollIntoView({ behavior: "smooth", block: "center" }), 100);
@@ -131,12 +141,12 @@ export default function ConnectedAppsPage() {
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-ink" id="google-connect">Google</p>
               <p className="text-xs text-ink-faint">Use your Google identity to sign in to MAX and connect Google services with permissions you approve.</p>
-              {google && <div className="mt-2 text-[11px] text-ink-faint">Connected {new Date(google.linkedAt).toLocaleDateString()}</div>}
+              {google && <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-ink-faint"><span>Connected {new Date(google.linkedAt).toLocaleDateString()}</span>{googleCalendarConnected && <Badge variant="success">Calendar connected</Badge>}</div>}
             </div>
             {google ? (
               <div className="flex flex-wrap items-center gap-2">
                 <Badge variant="success"><CheckCircle2 className="mr-1 h-3.5 w-3.5" />Connected</Badge>
-                <Button size="sm" variant="ghost" onClick={() => setUnlinkId(google.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button>
+                {googleCalendarConnected ? <Badge variant="success"><CheckCircle2 className="mr-1 h-3.5 w-3.5" />Calendar ready</Badge> : <Button size="sm" variant="secondary" onClick={async () => { try { const { authorizationUrl } = await connectedAccountsApi.googleCalendarConnect(); window.location.assign(authorizationUrl); } catch (err) { showToast({ title: "Couldn't start Google Calendar", description: err instanceof ApiError ? err.message : "Please try again.", variant: "error" }); } }} disabled={busy}><Link2 className="h-3.5 w-3.5" /> Connect Calendar</Button>}<Button size="sm" variant="ghost" onClick={() => setUnlinkId(google.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button>
               </div>
             ) : (
               <GoogleConnectButton onConnected={async () => { await accounts.refetch(); showToast({ title: "Google connected", description: "Your Google identity is now linked to your MAX Account.", variant: "success" }); }} />
