@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, Link2, Music2, RefreshCw, Shield, Unlink, Clock3, Sparkles } from "lucide-react";
+import { CheckCircle2, Link2, Music2, RefreshCw, Shield, Unlink, Clock3, Sparkles, Globe2 } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -12,11 +12,14 @@ import { useToast } from "@/lib/hooks/useToast";
 import { connectedAccountsApi } from "@/lib/api/security";
 import { ApiError } from "@/lib/api/ApiError";
 import type { ConnectedProvider } from "@/types/api";
+import { GoogleConnectButton } from "@/components/auth/GoogleConnectButton";
 
 const futureProviders: { id: ConnectedProvider; name: string; description: string }[] = [
   { id: "DISCORD", name: "Discord", description: "Connect your Discord identity when the integration is released." },
   { id: "GITHUB", name: "GitHub", description: "Connect your developer identity when the integration is released." },
   { id: "X", name: "X", description: "Connect your X identity when the integration is released." },
+  { id: "INSTAGRAM", name: "Instagram", description: "Connect your Instagram identity when the integration is released." },
+  { id: "SNAPCHAT", name: "Snapchat", description: "Connect your Snapchat identity when the integration is released." },
 ];
 
 function expiryLabel(value: string | null) {
@@ -34,6 +37,7 @@ export default function ConnectedAppsPage() {
   const [unlinkId, setUnlinkId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
+  const google = useMemo(() => accounts.data?.find((a) => a.provider === "GOOGLE") ?? null, [accounts.data]);
   const spotify = useMemo(() => accounts.data?.find((a) => a.provider === "SPOTIFY") ?? null, [accounts.data]);
 
   useEffect(() => {
@@ -117,6 +121,24 @@ export default function ConnectedAppsPage() {
       <Card>
         <CardContent className="divide-y divide-glass-border p-0">
           <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#4285F4]/10 text-[#4285F4]"><Globe2 className="h-5 w-5" /></div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-ink">Google</p>
+              <p className="text-xs text-ink-faint">Use your Google identity to sign in to MAX and keep it connected to your MAX Account.</p>
+              {google && <div className="mt-2 text-[11px] text-ink-faint">Connected {new Date(google.linkedAt).toLocaleDateString()}</div>}
+            </div>
+            {google ? (
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge variant="success"><CheckCircle2 className="mr-1 h-3.5 w-3.5" />Connected</Badge>
+                <Button size="sm" variant="ghost" onClick={() => setUnlinkId(google.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button>
+              </div>
+            ) : (
+              <GoogleConnectButton onConnected={async () => { await accounts.refetch(); showToast({ title: "Google connected", description: "Your Google identity is now linked to your MAX Account.", variant: "success" }); }} />
+            )}
+          </div>
+
+          <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
+          <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
             <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#1ed760]/10 text-[#1ed760]"><Music2 className="h-5 w-5" /></div>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-ink">Spotify</p>
@@ -146,10 +168,10 @@ export default function ConnectedAppsPage() {
         <p className="text-xs leading-5 text-ink-muted">Spotify credentials are handled by MAX Auth. The Connected Apps page never receives Spotify access or refresh tokens.</p>
       </div>
 
-      <Modal open={Boolean(unlinkId)} onClose={() => !busy && setUnlinkId(null)} title="Unlink Spotify?" description="This removes Spotify from your MAX Account. You can connect it again later.">
+      <Modal open={Boolean(unlinkId)} onClose={() => !busy && setUnlinkId(null)} title="Unlink account?" description="This removes the selected third-party connection from your MAX Account. You can connect it again later.">
         <div className="flex justify-end gap-3">
           <Button variant="secondary" onClick={() => setUnlinkId(null)} disabled={busy}>Cancel</Button>
-          <Button variant="danger" onClick={unlink} isLoading={busy}>Unlink Spotify</Button>
+          <Button variant="danger" onClick={unlink} isLoading={busy}>Unlink account</Button>
         </div>
       </Modal>
     </div>
