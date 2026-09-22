@@ -44,7 +44,7 @@ password change, account deletion, device management (list/trust/revoke), sessio
 (list/revoke/revoke-all), login history, audit log, connected-accounts list/unlink, and OAuth
 client registration/management ("Continue with MAX AI" developer side).
 
-**Architecture-ready, not implemented (per the brief — UI shows "Coming soon"):** 2FA, passkeys,
+**Architecture-ready, not implemented:** passkeys,
 recovery codes, live provider OAuth buttons (Google/X/Instagram/Snapchat/Spotify/Discord/GitHub),
 and the interactive "Continue with MAX AI" consent/authorize screen (client registration works;
 the actual authorize flow isn't built on the backend yet either, by design).
