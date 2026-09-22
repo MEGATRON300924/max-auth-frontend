@@ -21,7 +21,7 @@ export function GoogleSignInButton() {
   const [mfaRequired, setMfaRequired] = useState(false);
   const [recovery, setRecovery] = useState(false);
   const [loading, setLoading] = useState(false);
-  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "181249615928-afrsbbcfjl3jutf8kmq1e8kv4b7u0sva.apps.googleusercontent.com";
 
   const destination = () => {
     const returnTo = new URLSearchParams(window.location.search).get("returnTo");
