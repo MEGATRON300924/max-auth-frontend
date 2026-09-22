@@ -43,6 +43,7 @@ export default function ConnectedAppsPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const result = params.get("spotify");
+    const googleConnect = params.get("connect") === "google";
     if (result === "connected") {
       showToast({ title: "Spotify connected", description: "Your Spotify account is now linked to MAX.", variant: "success" });
       accounts.refetch();
@@ -50,6 +51,11 @@ export default function ConnectedAppsPage() {
     } else if (result === "error") {
       showToast({ title: "Spotify connection failed", description: "Spotify could not be connected. You can safely try again.", variant: "error" });
       window.history.replaceState({}, "", "/connected-apps");
+    }
+    if (googleConnect) {
+      window.history.replaceState({}, "", "/connected-apps");
+      showToast({ title: "Connect Google", description: "Choose your Google account below to link it to MAX.", variant: "success" });
+      setTimeout(() => document.getElementById("google-connect")?.scrollIntoView({ behavior: "smooth", block: "center" }), 100);
     }
     if (params.get("connect") === "spotify") {
       window.history.replaceState({}, "", "/connected-apps");
@@ -123,7 +129,7 @@ export default function ConnectedAppsPage() {
           <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
             <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#4285F4]/10 text-[#4285F4]"><Globe2 className="h-5 w-5" /></div>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-ink">Google</p>
+              <p className="text-sm font-semibold text-ink" id="google-connect">Google</p>
               <p className="text-xs text-ink-faint">Use your Google identity to sign in to MAX and keep it connected to your MAX Account.</p>
               {google && <div className="mt-2 text-[11px] text-ink-faint">Connected {new Date(google.linkedAt).toLocaleDateString()}</div>}
             </div>
