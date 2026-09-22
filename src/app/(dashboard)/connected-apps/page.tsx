@@ -53,6 +53,15 @@ export default function ConnectedAppsPage() {
     }
   };
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("connect") !== "spotify") return;
+
+    window.history.replaceState({}, "", "/connected-apps");
+
+    void connect("SPOTIFY", "Spotify");
+  }, []);
+
   const unlink = async (id: string) => {
     try { await connectedAccountsApi.unlink(id); showToast({ title: "Account unlinked", variant: "success" }); accounts.refetch(); }
     catch (err) { showToast({ title: "Couldn't unlink account", description: err instanceof ApiError ? err.message : undefined, variant: "error" }); }
