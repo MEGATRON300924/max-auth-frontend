@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { ShieldCheck, Lock, Fingerprint, KeyRound, Trash2 } from "lucide-react";
+import { ShieldCheck, Lock, Fingerprint, KeyRound, Trash2, ChevronRight } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -21,6 +21,7 @@ import { securityApi } from "@/lib/api/security";
 import { ApiError } from "@/lib/api/ApiError";
 import { getPasswordStrength } from "@/lib/utils/validators";
 import { formatDateTime } from "@/lib/utils/formatters";
+import Link from "next/link";
 
 function humanizeAction(action: string): string {
   return action.toLowerCase().split("_").map((w) => w[0].toUpperCase() + w.slice(1)).join(" ");
@@ -130,16 +131,16 @@ export default function SecurityPage() {
             <CardTitle>Advanced protection</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between rounded-xl border border-glass-border p-4">
+            <Link href="/two-factor" className="flex items-center justify-between rounded-xl border border-glass-border p-4 transition-colors hover:bg-glass-hover">
               <div className="flex items-center gap-3">
                 <KeyRound className="h-4.5 w-4.5 text-ink-faint" />
                 <div>
                   <p className="text-sm font-medium text-ink">Two-factor authentication</p>
-                  <p className="text-xs text-ink-faint">Add a second step at sign-in</p>
+                  <p className="text-xs text-ink-faint">Authenticator app and recovery codes</p>
                 </div>
               </div>
-              <Badge variant="neutral">Coming soon</Badge>
-            </div>
+              <div className="flex items-center gap-2"><Badge variant="success">Manage</Badge><ChevronRight className="h-4 w-4 text-ink-faint" /></div>
+            </Link>
             <div className="flex items-center justify-between rounded-xl border border-glass-border p-4">
               <div className="flex items-center gap-3">
                 <Fingerprint className="h-4.5 w-4.5 text-ink-faint" />
