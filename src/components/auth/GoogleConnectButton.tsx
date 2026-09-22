@@ -34,7 +34,7 @@ export function GoogleConnectButton({ onConnected }: { onConnected: () => Promis
   const containerRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "181249615928-afrsbbcfjl3jutf8kmq1e8kv4b7u0sva.apps.googleusercontent.com";
 
   const render = () => {
     if (!clientId || !window.google || !containerRef.current) return;
