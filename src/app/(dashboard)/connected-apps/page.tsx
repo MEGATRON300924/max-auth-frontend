@@ -37,13 +37,13 @@ export default function ConnectedAppsPage() {
   const [unlinkId, setUnlinkId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const google = useMemo(() => accounts.data?.find((a) => a.provider === "GOOGLE") ?? null, [accounts.data]);
+  const google = useMemo(() => accounts.data?.find((a) => a.provider === "GOOGLE") ?? null, [accounts.data]);\n  const googleCalendarConnected = Boolean(google?.scope?.includes("https://www.googleapis.com/auth/calendar.events"));
   const spotify = useMemo(() => accounts.data?.find((a) => a.provider === "SPOTIFY") ?? null, [accounts.data]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const result = params.get("spotify");
-    const googleConnect = params.get("connect") === "google";
+    const googleConnect = params.get("connect") === "google";\n    const googleCalendarResult = params.get("google_calendar");
     if (result === "connected") {
       showToast({ title: "Spotify connected", description: "Your Spotify account is now linked to MAX.", variant: "success" });
       accounts.refetch();
@@ -52,7 +52,7 @@ export default function ConnectedAppsPage() {
       showToast({ title: "Spotify connection failed", description: "Spotify could not be connected. You can safely try again.", variant: "error" });
       window.history.replaceState({}, "", "/connected-apps");
     }
-    if (googleConnect) {
+    if (googleCalendarResult === "connected") {\n      showToast({ title: "Google Calendar connected", description: "MAX can now use the Google Calendar permissions you approved.", variant: "success" });\n      accounts.refetch();\n      window.history.replaceState({}, "", "/connected-apps");\n    } else if (googleCalendarResult === "error") {\n      showToast({ title: "Google Calendar connection failed", description: "Google Calendar could not be connected. You can safely try again.", variant: "error" });\n      window.history.replaceState({}, "", "/connected-apps");\n    }\n    if (googleConnect) {
       window.history.replaceState({}, "", "/connected-apps");
       showToast({ title: "Connect Google", description: "Choose your Google account below to link it to MAX.", variant: "success" });
       setTimeout(() => document.getElementById("google-connect")?.scrollIntoView({ behavior: "smooth", block: "center" }), 100);
@@ -130,7 +130,7 @@ export default function ConnectedAppsPage() {
             <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#4285F4]/10 text-[#4285F4]"><Globe2 className="h-5 w-5" /></div>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-ink" id="google-connect">Google</p>
-              <p className="text-xs text-ink-faint">Use your Google identity to sign in to MAX and keep it connected to your MAX Account.</p>
+              <p className="text-xs text-ink-faint">Use your Google identity to sign in to MAX and connect Google services with permissions you approve.</p>
               {google && <div className="mt-2 text-[11px] text-ink-faint">Connected {new Date(google.linkedAt).toLocaleDateString()}</div>}
             </div>
             {google ? (
@@ -170,7 +170,7 @@ export default function ConnectedAppsPage() {
 
       <div className="flex gap-3 rounded-2xl border border-success/15 bg-success/5 p-4">
         <Shield className="mt-0.5 h-5 w-5 shrink-0 text-success" />
-        <p className="text-xs leading-5 text-ink-muted">Spotify credentials are handled by MAX Auth. The Connected Apps page never receives Spotify access or refresh tokens.</p>
+        <p className="text-xs leading-5 text-ink-muted">Google and Spotify credentials are handled by MAX Auth. Connected Apps never receives third-party access or refresh tokens.</p>
       </div>
 
       <Modal open={Boolean(unlinkId)} onClose={() => !busy && setUnlinkId(null)} title="Unlink account?" description="This removes the selected third-party connection from your MAX Account. You can connect it again later.">
