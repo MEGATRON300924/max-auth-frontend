@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { ArrowLeft, Mail, Lock, UserRound } from "lucide-react";
+import { ArrowLeft, Lock, UserRound, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
 import { useAuth } from "@/lib/auth/useAuth";
@@ -47,6 +47,9 @@ export default function SignInPage() {
   const [identifier, setIdentifier] = useState("");
   const [rememberedAccount, setRememberedAccount] = useState<string | null>(null);
   const [password, setPassword] = useState("");
+  const [mfaCode, setMfaCode] = useState("");
+  const [mfaRequired, setMfaRequired] = useState(false);
+  const [useRecoveryCode, setUseRecoveryCode] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,11 +57,7 @@ export default function SignInPage() {
   const destination = useMemo(() => {
     const current = getSafeReturnTo();
     if (current !== "/dashboard") return current;
-    try {
-      return window.sessionStorage.getItem(RETURN_TO_KEY) || "/dashboard";
-    } catch {
-      return "/dashboard";
-    }
+    try { return window.sessionStorage.getItem(RETURN_TO_KEY) || "/dashboard"; } catch { return "/dashboard"; }
   }, []);
 
   useEffect(() => {
@@ -70,68 +69,52 @@ export default function SignInPage() {
     try {
       const current = getSafeReturnTo();
       if (current !== "/dashboard") window.sessionStorage.setItem(RETURN_TO_KEY, current);
-    } catch {
-      // Return destination preservation is optional.
-    }
+    } catch {}
   }, []);
 
-  useEffect(() => {
-    if (isAuthenticated) window.location.assign(destination);
-  }, [destination, isAuthenticated]);
+  useEffect(() => { if (isAuthenticated) window.location.assign(destination); }, [destination, isAuthenticated]);
 
   useEffect(() => {
     try {
       const saved = window.localStorage.getItem(LAST_ACCOUNT_KEY);
       if (saved) setRememberedAccount(saved);
-    } catch {
-      // Account remembering is optional.
-    }
+    } catch {}
   }, []);
 
   const beginWithAccount = (account: string) => {
-    setIdentifier(account);
-    setPassword("");
-    setError(null);
-    setStep("credentials");
+    setIdentifier(account); setPassword(""); setMfaCode(""); setMfaRequired(false); setUseRecoveryCode(false); setError(null); setStep("credentials");
   };
-
   const useAnotherAccount = () => {
-    setIdentifier("");
-    setPassword("");
-    setError(null);
-    setStep("credentials");
+    setIdentifier(""); setPassword(""); setMfaCode(""); setMfaRequired(false); setUseRecoveryCode(false); setError(null); setStep("credentials");
   };
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setError(null);
+    if (mfaRequired && (useRecoveryCode ? mfaCode.trim().length < 8 : !/^\d{6}$/.test(mfaCode))) {
+      setError(useRecoveryCode ? "Enter one of your recovery codes." : "Enter the 6-digit code from your authenticator app.");
+      return;
+    }
     setIsLoading(true);
     try {
       const account = identifier.trim();
-      await login(account, password);
+      await login(account, password, rememberMe, mfaRequired ? mfaCode.trim() : undefined);
       try {
-        if (rememberMe) {
-          window.localStorage.setItem(LAST_ACCOUNT_KEY, account);
-          setRememberedAccount(account);
-        } else {
-          window.localStorage.removeItem(LAST_ACCOUNT_KEY);
-          setRememberedAccount(null);
-        }
-      } catch {
-        // Authentication succeeded; remembering the identifier is optional.
-      }
-      try {
+        if (rememberMe) { window.localStorage.setItem(LAST_ACCOUNT_KEY, account); setRememberedAccount(account); }
+        else { window.localStorage.removeItem(LAST_ACCOUNT_KEY); setRememberedAccount(null); }
         window.sessionStorage.removeItem(RETURN_TO_KEY);
-      } catch {
-        // Return-destination cleanup is optional.
-      }
+      } catch {}
       showToast({ title: "Welcome back", variant: "success" });
       window.location.assign(destination);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Something went wrong. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
+      if (err instanceof ApiError && err.code === "MFA_REQUIRED") {
+        setMfaRequired(true);
+        setMfaCode("");
+        setError(null);
+      } else {
+        setError(err instanceof ApiError ? err.message : "Something went wrong. Please try again.");
+      }
+    } finally { setIsLoading(false); }
   };
 
   const clientName = getClientName();
@@ -143,11 +126,11 @@ export default function SignInPage() {
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-[450px] items-center justify-center">
         <section className="w-full rounded-[16px] border border-[#dadce0] bg-white px-7 py-9 shadow-sm dark:border-[#5f6368] dark:bg-[#292a2d] sm:px-10 sm:py-10">
           <div className="text-center">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-[#dadce0] bg-white dark:border-[#5f6368]">
-              <img src="/logo.png" alt="MAX" className="h-9 w-9 object-contain" />
-            </div>
-            <h1 className="mt-5 text-[24px] font-normal tracking-[-0.01em]">{step === "choose" ? signInTitle : "Enter your password"}</h1>
-            <p className="mt-2 text-[15px] leading-6 text-[#5f6368] dark:text-[#bdc1c6]">{step === "choose" ? signInDescription : "Verify your MAX Account to continue securely."}</p>
+            <div className="mx-auto flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-[#dadce0] bg-white dark:border-[#5f6368]"><img src="/logo.png" alt="MAX" className="h-9 w-9 object-contain" /></div>
+            <h1 className="mt-5 text-[24px] font-normal tracking-[-0.01em]">{step === "choose" ? signInTitle : mfaRequired ? "Verify it’s you" : "Enter your password"}</h1>
+            <p className="mt-2 text-[15px] leading-6 text-[#5f6368] dark:text-[#bdc1c6]">
+              {step === "choose" ? signInDescription : mfaRequired ? (useRecoveryCode ? "Enter a recovery code to finish signing in." : "Enter the 6-digit code from your authenticator app.") : "Verify your MAX Account to continue securely."}
+            </p>
           </div>
 
           {step === "choose" ? (
@@ -164,21 +147,28 @@ export default function SignInPage() {
                 )}
                 {rememberedAccount && <button type="button" onClick={useAnotherAccount} className="w-full rounded-[8px] px-3 py-2.5 text-sm font-medium text-[#0b57d0] hover:bg-[#f1f3f4] dark:text-[#8ab4f8] dark:hover:bg-[#303134]">Use another MAX Account</button>}
               </div>
-
               <div className="my-7 flex items-center gap-3"><div className="h-px flex-1 bg-[#dadce0] dark:bg-[#5f6368]" /><span className="text-xs text-[#5f6368] dark:text-[#bdc1c6]">OR</span><div className="h-px flex-1 bg-[#dadce0] dark:bg-[#5f6368]" /></div>
               <GoogleSignInButton />
               <p className="mt-7 text-center text-sm text-[#5f6368] dark:text-[#bdc1c6]">Don&apos;t have a MAX Account? <Link href="/create-account" className="font-medium text-[#0b57d0] hover:underline dark:text-[#8ab4f8]">Create one</Link></p>
             </div>
           ) : (
             <div className="mt-8">
-              <button type="button" onClick={() => { setError(null); setPassword(""); setStep("choose"); }} className="mb-7 inline-flex items-center gap-2 text-sm font-medium text-[#5f6368] hover:text-[#202124] dark:text-[#bdc1c6] dark:hover:text-[#e8eaed]"><ArrowLeft className="h-4 w-4" />Back</button>
+              <button type="button" onClick={() => { setError(null); setPassword(""); setMfaCode(""); setMfaRequired(false); setUseRecoveryCode(false); setStep("choose"); }} className="mb-7 inline-flex items-center gap-2 text-sm font-medium text-[#5f6368] hover:text-[#202124] dark:text-[#bdc1c6] dark:hover:text-[#e8eaed]"><ArrowLeft className="h-4 w-4" />Back</button>
               <div className="mb-5 rounded-[8px] border border-[#dadce0] px-3 py-2.5 dark:border-[#5f6368]"><p className="truncate text-sm font-medium">{identifier}</p></div>
               <form onSubmit={handleSubmit} className="space-y-5" noValidate>
                 {error && <Alert variant="danger">{error}</Alert>}
-                <label className="block"><span className="mb-2 block text-sm font-medium">Password</span><span className="relative block"><Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5f6368]" /><input type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} className="h-12 w-full rounded-[8px] border border-[#dadce0] bg-white px-11 text-sm outline-none transition-colors placeholder:text-[#5f6368] focus:border-[#0b57d0] focus:ring-1 focus:ring-[#0b57d0] dark:border-[#5f6368] dark:bg-transparent" placeholder="Password" required autoFocus /></span></label>
-                <div className="flex items-center justify-between gap-4"><label className="flex items-center gap-2 text-sm text-[#5f6368] dark:text-[#bdc1c6]"><input type="checkbox" checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} className="h-4 w-4 rounded border-[#dadce0] text-[#0b57d0] focus:ring-[#0b57d0]" />Remember this account</label><Link href="/forgot-password" className="text-sm font-medium text-[#0b57d0] hover:underline dark:text-[#8ab4f8]">Forgot password?</Link></div>
-                <Button type="submit" size="lg" className="w-full" isLoading={isLoading}>Sign in</Button>
+                {!mfaRequired ? (
+                  <>
+                    <label className="block"><span className="mb-2 block text-sm font-medium">Password</span><span className="relative block"><Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5f6368]" /><input type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} className="h-12 w-full rounded-[8px] border border-[#dadce0] bg-white px-11 text-sm outline-none transition-colors focus:border-[#0b57d0] focus:ring-1 focus:ring-[#0b57d0] dark:border-[#5f6368] dark:bg-transparent" placeholder="Password" required autoFocus /></span></label>
+                    <div className="flex items-center justify-between gap-4"><label className="flex items-center gap-2 text-sm text-[#5f6368] dark:text-[#bdc1c6]"><input type="checkbox" checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} className="h-4 w-4 rounded border-[#dadce0] text-[#0b57d0] focus:ring-[#0b57d0]" />Remember this account</label><Link href="/forgot-password" className="text-sm font-medium text-[#0b57d0] hover:underline dark:text-[#8ab4f8]">Forgot password?</Link></div>
+                  </>
+                ) : (
+                  <label className="block"><span className="mb-2 flex items-center gap-2 text-sm font-medium"><ShieldCheck className="h-4 w-4 text-[#0b57d0] dark:text-[#8ab4f8]" />{useRecoveryCode ? "Recovery code" : "Authenticator code"}</span><input value={mfaCode} onChange={(event) => setMfaCode(useRecoveryCode ? event.target.value : event.target.value.replace(/\D/g, "").slice(0, 6))} inputMode={useRecoveryCode ? "text" : "numeric"} autoComplete="one-time-code" maxLength={useRecoveryCode ? 32 : 6} className="h-12 w-full rounded-[8px] border border-[#dadce0] bg-white px-4 text-center font-mono text-base tracking-[.22em] outline-none focus:border-[#0b57d0] focus:ring-1 focus:ring-[#0b57d0] dark:border-[#5f6368] dark:bg-transparent" placeholder={useRecoveryCode ? "XXXX-XXXX-XXXX" : "123456"} required autoFocus /></label>
+                )}
+                <Button type="submit" size="lg" className="w-full" isLoading={isLoading}>{mfaRequired ? "Verify and sign in" : "Sign in"}</Button>
+                {mfaRequired && <div className="text-center"><button type="button" onClick={() => { setUseRecoveryCode((value) => !value); setMfaCode(""); setError(null); }} className="text-sm font-medium text-[#0b57d0] hover:underline dark:text-[#8ab4f8]">{useRecoveryCode ? "Use authenticator app instead" : "Use a recovery code instead"}</button></div>}
               </form>
+              {mfaRequired && <p className="mt-5 text-center text-xs leading-5 text-[#5f6368] dark:text-[#bdc1c6]">Your recovery codes are single-use. If you use one here, it will be consumed.</p>}
             </div>
           )}
         </section>
