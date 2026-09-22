@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CheckCircle2, Globe2, Link2, Music2, MessageCircle, Github, Camera, X, Shield, Sparkles } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { Card, CardContent } from "@/components/ui/Card";
@@ -26,10 +26,31 @@ export default function ConnectedAppsPage() {
   const accounts = useAsyncData(() => connectedAccountsApi.list().then((r) => r.accounts));
   const [notice, setNotice] = useState<string | null>(null);
 
-  const linked = new Set((accounts.data ?? []).map((a) => a.provider));
-  const connect = (name: string) => {
-    setNotice(`${name} is prepared as a future connected service. Its secure provider handshake will be enabled when that integration is ready.`);
-    showToast({ title: `${name} integration is coming`, description: "Your MAX Account already handles MAX service sign-in.", variant: "info" });
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const spotify = params.get("spotify");
+    if (spotify === "connected") {
+      showToast({ title: "Spotify connected", description: "Your Spotify account is now linked to MAX.", variant: "success" });
+      accounts.refetch();
+      window.history.replaceState({}, "", "/connected-apps");
+    } else if (spotify === "error") {
+      showToast({ title: "Spotify connection failed", description: "Spotify could not be connected. Please try again.", variant: "error" });
+      window.history.replaceState({}, "", "/connected-apps");
+    }
+  }, []);
+
+  const connect = async (provider: ConnectedProvider, name: string) => {
+    if (provider !== "SPOTIFY") {
+      setNotice(name + " is prepared as a future connected service. Its secure provider handshake will be enabled when that integration is ready.");
+      showToast({ title: name + " integration is coming", description: "Your MAX Account already handles MAX service sign-in.", variant: "info" });
+      return;
+    }
+    try {
+      const { authorizationUrl } = await connectedAccountsApi.spotifyConnect();
+      window.location.assign(authorizationUrl);
+    } catch (err) {
+      showToast({ title: "Couldn't start Spotify connection", description: err instanceof ApiError ? err.message : "Please try again.", variant: "error" });
+    }
   };
 
   const unlink = async (id: string) => {
@@ -59,7 +80,7 @@ export default function ConnectedAppsPage() {
     </Card>
     {notice && <div className="rounded-2xl border border-warning/20 bg-warning/5 p-4 text-sm text-ink-muted">{notice}</div>}
     <Card><CardContent className="divide-y divide-glass-border p-0">
-      {providers.map((p) => { const account = accounts.data?.find((a) => a.provider === p.id); const Icon = p.icon; return <div key={p.id} className="flex items-center gap-4 p-5"><div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white/5 text-ink-muted"><Icon className="h-5 w-5" /></div><div className="min-w-0 flex-1"><p className="text-sm font-semibold text-ink">{p.name}</p><p className="text-xs text-ink-faint">{p.description}</p></div>{account ? <><span className="inline-flex items-center gap-1.5 text-xs font-medium text-success"><CheckCircle2 className="h-4 w-4" /> Connected</span><Button variant="ghost" size="sm" onClick={() => unlink(account.id)}>Unlink</Button></> : <Button variant="secondary" size="sm" onClick={() => connect(p.name)}>Connect</Button>}</div>; })}
+      {providers.map((p) => { const account = accounts.data?.find((a) => a.provider === p.id); const Icon = p.icon; return <div key={p.id} className="flex items-center gap-4 p-5"><div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white/5 text-ink-muted"><Icon className="h-5 w-5" /></div><div className="min-w-0 flex-1"><p className="text-sm font-semibold text-ink">{p.name}</p><p className="text-xs text-ink-faint">{p.description}</p></div>{account ? <><span className="inline-flex items-center gap-1.5 text-xs font-medium text-success"><CheckCircle2 className="h-4 w-4" /> Connected</span><Button variant="ghost" size="sm" onClick={() => unlink(account.id)}>Unlink</Button></> : <Button variant="secondary" size="sm" onClick={() => connect(p.id, p.name)}>Connect</Button>}</div>; })}
     </CardContent></Card>
     <div className="flex gap-3 rounded-2xl border border-brand-400/15 bg-brand-500/5 p-4"><Link2 className="mt-0.5 h-5 w-5 shrink-0 text-brand-300" /><p className="text-xs leading-5 text-ink-muted">Your MAX Account is already connected across the MAX ecosystem. Third-party providers such as Spotify are separate connections and will only receive the permissions you approve.</p></div>
     <div className="flex gap-3 rounded-2xl border border-white/10 bg-white/[.025] p-4"><Shield className="mt-0.5 h-5 w-5 shrink-0 text-success" /><p className="text-xs leading-5 text-ink-muted">MAX services will use your existing MAX Account session. Third-party connections such as Spotify will use their own secure OAuth consent flow and will not require another MAX Account sign-in.</p></div>
