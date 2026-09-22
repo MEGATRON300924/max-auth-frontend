@@ -1,97 +1,157 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { CheckCircle2, Globe2, Link2, Music2, MessageCircle, Github, Camera, X, Shield, Sparkles } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { CheckCircle2, Link2, Music2, RefreshCw, Shield, Unlink, Clock3, Sparkles } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { Modal } from "@/components/ui/Modal";
 import { useAsyncData } from "@/lib/hooks/useAsyncData";
 import { useToast } from "@/lib/hooks/useToast";
 import { connectedAccountsApi } from "@/lib/api/security";
 import { ApiError } from "@/lib/api/ApiError";
 import type { ConnectedProvider } from "@/types/api";
 
-const providers: { id: ConnectedProvider; name: string; icon: typeof Github; description: string }[] = [
-  { id: "GOOGLE", name: "Google", icon: Globe2, description: "Use your Google identity with MAX." },
-  { id: "X", name: "X", icon: X, description: "Connect your X account." },
-  { id: "INSTAGRAM", name: "Instagram", icon: Camera, description: "Connect your Instagram identity." },
-  { id: "SNAPCHAT", name: "Snapchat", icon: Camera, description: "Connect your Snapchat identity." },
-  { id: "SPOTIFY", name: "Spotify", icon: Music2, description: "Connect your music profile." },
-  { id: "DISCORD", name: "Discord", icon: MessageCircle, description: "Connect your Discord identity." },
-  { id: "GITHUB", name: "GitHub", icon: Github, description: "Connect your developer identity." },
+const futureProviders: { id: ConnectedProvider; name: string; description: string }[] = [
+  { id: "DISCORD", name: "Discord", description: "Connect your Discord identity when the integration is released." },
+  { id: "GITHUB", name: "GitHub", description: "Connect your developer identity when the integration is released." },
+  { id: "X", name: "X", description: "Connect your X identity when the integration is released." },
 ];
+
+function expiryLabel(value: string | null) {
+  if (!value) return "Token status unavailable";
+  const ms = new Date(value).getTime() - Date.now();
+  if (ms <= 0) return "Access token expired";
+  const minutes = Math.ceil(ms / 60000);
+  return minutes < 60 ? `Access token refreshes in about ${minutes} min` : `Access token refreshes in about ${Math.ceil(minutes / 60)} hr`;
+}
 
 export default function ConnectedAppsPage() {
   const { showToast } = useToast();
   const accounts = useAsyncData(() => connectedAccountsApi.list().then((r) => r.accounts));
   const [notice, setNotice] = useState<string | null>(null);
+  const [unlinkId, setUnlinkId] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const spotify = useMemo(() => accounts.data?.find((a) => a.provider === "SPOTIFY") ?? null, [accounts.data]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const spotify = params.get("spotify");
-    if (spotify === "connected") {
+    const result = params.get("spotify");
+    if (result === "connected") {
       showToast({ title: "Spotify connected", description: "Your Spotify account is now linked to MAX.", variant: "success" });
       accounts.refetch();
       window.history.replaceState({}, "", "/connected-apps");
-    } else if (spotify === "error") {
-      showToast({ title: "Spotify connection failed", description: "Spotify could not be connected. Please try again.", variant: "error" });
+    } else if (result === "error") {
+      showToast({ title: "Spotify connection failed", description: "Spotify could not be connected. You can safely try again.", variant: "error" });
       window.history.replaceState({}, "", "/connected-apps");
+    }
+    if (params.get("connect") === "spotify") {
+      window.history.replaceState({}, "", "/connected-apps");
+      void connectSpotify();
     }
   }, []);
 
-  const connect = async (provider: ConnectedProvider, name: string) => {
-    if (provider !== "SPOTIFY") {
-      setNotice(name + " is prepared as a future connected service. Its secure provider handshake will be enabled when that integration is ready.");
-      showToast({ title: name + " integration is coming", description: "Your MAX Account already handles MAX service sign-in.", variant: "info" });
-      return;
-    }
+  async function connectSpotify() {
     try {
       const { authorizationUrl } = await connectedAccountsApi.spotifyConnect();
       window.location.assign(authorizationUrl);
     } catch (err) {
       showToast({ title: "Couldn't start Spotify connection", description: err instanceof ApiError ? err.message : "Please try again.", variant: "error" });
     }
-  };
+  }
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("connect") !== "spotify") return;
+  async function refreshSpotify() {
+    setBusy(true);
+    try {
+      await connectedAccountsApi.spotifyRefresh();
+      await accounts.refetch();
+      showToast({ title: "Spotify connection refreshed", variant: "success" });
+    } catch (err) {
+      showToast({
+        title: "Spotify needs attention",
+        description: err instanceof ApiError ? err.message : "Please reconnect Spotify.",
+        variant: "error",
+      });
+      await accounts.refetch();
+    } finally {
+      setBusy(false);
+    }
+  }
 
-    window.history.replaceState({}, "", "/connected-apps");
+  async function unlink() {
+    if (!unlinkId) return;
+    setBusy(true);
+    try {
+      await connectedAccountsApi.unlink(unlinkId);
+      setUnlinkId(null);
+      await accounts.refetch();
+      showToast({ title: "Account unlinked", description: "The third-party connection has been removed from MAX.", variant: "success" });
+    } catch (err) {
+      showToast({ title: "Couldn't unlink account", description: err instanceof ApiError ? err.message : "Please try again.", variant: "error" });
+    } finally {
+      setBusy(false);
+    }
+  }
 
-    void connect("SPOTIFY", "Spotify");
-  }, []);
+  return (
+    <div className="space-y-6">
+      <PageHeader title="Connected Apps" description="Control third-party services connected to your MAX Account." />
 
-  const unlink = async (id: string) => {
-    try { await connectedAccountsApi.unlink(id); showToast({ title: "Account unlinked", variant: "success" }); accounts.refetch(); }
-    catch (err) { showToast({ title: "Couldn't unlink account", description: err instanceof ApiError ? err.message : undefined, variant: "error" }); }
-  };
-
-  return <div className="space-y-6">
-    <PageHeader title="Connected Apps" description="Control the services connected to your MAX Account and the permissions they receive." />
-    <Card className="border-brand-400/20 bg-brand-500/[.04]">
-      <CardContent className="flex items-start gap-4 p-5">
-        <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-brand-500/10 text-brand-400">
-          <Sparkles className="h-5 w-5" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <p className="text-sm font-semibold text-ink">MAX connection complete</p>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-success/10 px-2.5 py-1 text-[11px] font-medium text-success">
-              <CheckCircle2 className="h-3.5 w-3.5" /> Connected
-            </span>
+      <Card className="border-brand-400/20 bg-brand-500/[.04]">
+        <CardContent className="flex items-start gap-4 p-5">
+          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-brand-500/10 text-brand-400"><Sparkles className="h-5 w-5" /></div>
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-sm font-semibold text-ink">Your MAX Account is the identity layer</p>
+              <Badge variant="success"><CheckCircle2 className="mr-1 h-3.5 w-3.5" />Ready</Badge>
+            </div>
+            <p className="mt-1 text-xs leading-5 text-ink-muted">MAX services use your MAX Account. Third-party apps such as Spotify are separate OAuth connections and only receive the permissions you approve.</p>
           </div>
-          <p className="mt-1 text-xs leading-5 text-ink-muted">
-            Your MAX Account is the single sign-in for the MAX ecosystem. When MAX AI and the other MAX services are ready, they will use this same account automatically — no separate sign-in for each service.
-          </p>
+        </CardContent>
+      </Card>
+
+      {notice && <div className="rounded-2xl border border-warning/20 bg-warning/5 p-4 text-sm text-ink-muted">{notice}</div>}
+
+      <Card>
+        <CardContent className="divide-y divide-glass-border p-0">
+          <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#1ed760]/10 text-[#1ed760]"><Music2 className="h-5 w-5" /></div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-ink">Spotify</p>
+              <p className="text-xs text-ink-faint">Music profile and Spotify permissions approved through Spotify OAuth.</p>
+              {spotify && <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-ink-faint"><span className="inline-flex items-center gap-1"><Clock3 className="h-3.5 w-3.5" />{expiryLabel(spotify.tokenExpiresAt)}</span><span>Linked {new Date(spotify.linkedAt).toLocaleDateString()}</span></div>}
+            </div>
+            {spotify ? (
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" variant="secondary" onClick={refreshSpotify} isLoading={busy}><RefreshCw className="h-3.5 w-3.5" /> Refresh</Button>
+                <Button size="sm" variant="ghost" onClick={() => setUnlinkId(spotify.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button>
+              </div>
+            ) : <Button size="sm" onClick={connectSpotify}><Link2 className="h-3.5 w-3.5" /> Connect Spotify</Button>}
+          </div>
+
+          {futureProviders.map((p) => (
+            <div key={p.id} className="flex items-center gap-4 p-5 opacity-80">
+              <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white/5 text-ink-muted"><Link2 className="h-5 w-5" /></div>
+              <div className="min-w-0 flex-1"><p className="text-sm font-semibold text-ink">{p.name}</p><p className="text-xs text-ink-faint">{p.description}</p></div>
+              <Badge variant="neutral">Coming soon</Badge>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <div className="flex gap-3 rounded-2xl border border-success/15 bg-success/5 p-4">
+        <Shield className="mt-0.5 h-5 w-5 shrink-0 text-success" />
+        <p className="text-xs leading-5 text-ink-muted">Spotify credentials are handled by MAX Auth. The Connected Apps page never receives Spotify access or refresh tokens.</p>
+      </div>
+
+      <Modal open={Boolean(unlinkId)} onClose={() => !busy && setUnlinkId(null)} title="Unlink Spotify?" description="This removes Spotify from your MAX Account. You can connect it again later.">
+        <div className="flex justify-end gap-3">
+          <Button variant="secondary" onClick={() => setUnlinkId(null)} disabled={busy}>Cancel</Button>
+          <Button variant="danger" onClick={unlink} isLoading={busy}>Unlink Spotify</Button>
         </div>
-      </CardContent>
-    </Card>
-    {notice && <div className="rounded-2xl border border-warning/20 bg-warning/5 p-4 text-sm text-ink-muted">{notice}</div>}
-    <Card><CardContent className="divide-y divide-glass-border p-0">
-      {providers.map((p) => { const account = accounts.data?.find((a) => a.provider === p.id); const Icon = p.icon; return <div key={p.id} className="flex items-center gap-4 p-5"><div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white/5 text-ink-muted"><Icon className="h-5 w-5" /></div><div className="min-w-0 flex-1"><p className="text-sm font-semibold text-ink">{p.name}</p><p className="text-xs text-ink-faint">{p.description}</p></div>{account ? <><span className="inline-flex items-center gap-1.5 text-xs font-medium text-success"><CheckCircle2 className="h-4 w-4" /> Connected</span><Button variant="ghost" size="sm" onClick={() => unlink(account.id)}>Unlink</Button></> : <Button variant="secondary" size="sm" onClick={() => connect(p.id, p.name)}>Connect</Button>}</div>; })}
-    </CardContent></Card>
-    <div className="flex gap-3 rounded-2xl border border-brand-400/15 bg-brand-500/5 p-4"><Link2 className="mt-0.5 h-5 w-5 shrink-0 text-brand-300" /><p className="text-xs leading-5 text-ink-muted">Your MAX Account is already connected across the MAX ecosystem. Third-party providers such as Spotify are separate connections and will only receive the permissions you approve.</p></div>
-    <div className="flex gap-3 rounded-2xl border border-white/10 bg-white/[.025] p-4"><Shield className="mt-0.5 h-5 w-5 shrink-0 text-success" /><p className="text-xs leading-5 text-ink-muted">MAX services will use your existing MAX Account session. Third-party connections such as Spotify will use their own secure OAuth consent flow and will not require another MAX Account sign-in.</p></div>
-  </div>;
+      </Modal>
+    </div>
+  );
 }
