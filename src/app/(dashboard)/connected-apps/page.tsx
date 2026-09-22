@@ -38,7 +38,7 @@ export default function ConnectedAppsPage() {
   const [busy, setBusy] = useState(false);
 
   const google = useMemo(() => accounts.data?.find((a) => a.provider === "GOOGLE") ?? null, [accounts.data]);
-  const googleCalendarConnected = Boolean(google?.scope?.includes("https://www.googleapis.com/auth/calendar.events"));
+  const googleCalendarConnected = Boolean(google?.scope?.split(/\s+/).includes("https://www.googleapis.com/auth/calendar.events"));
   const spotify = useMemo(() => accounts.data?.find((a) => a.provider === "SPOTIFY") ?? null, [accounts.data]);
 
   useEffect(() => {
