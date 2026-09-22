@@ -154,7 +154,7 @@ export default function SignInPage() {
           ) : (
             <div className="mt-8">
               <button type="button" onClick={() => { setError(null); setPassword(""); setMfaCode(""); setMfaRequired(false); setUseRecoveryCode(false); setStep("choose"); }} className="mb-7 inline-flex items-center gap-2 text-sm font-medium text-[#5f6368] hover:text-[#202124] dark:text-[#bdc1c6] dark:hover:text-[#e8eaed]"><ArrowLeft className="h-4 w-4" />Back</button>
-              <div className="mb-5 rounded-[8px] border border-[#dadce0] px-3 py-2.5 dark:border-[#5f6368]"><p className="truncate text-sm font-medium">{identifier}</p></div>
+              <label className="mb-5 block"><span className="mb-2 block text-sm font-medium">Email or username</span><span className="relative block"><UserRound className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5f6368]" /><input type="text" value={identifier} onChange={(event) => setIdentifier(event.target.value)} autoComplete="username" autoCapitalize="none" autoCorrect="off" spellCheck={false} inputMode="email" className="h-12 w-full rounded-[8px] border border-[#dadce0] bg-white px-11 text-sm outline-none transition-colors focus:border-[#0b57d0] focus:ring-1 focus:ring-[#0b57d0] dark:border-[#5f6368] dark:bg-transparent" placeholder="Email or username" required autoFocus /></span></label>
               <form onSubmit={handleSubmit} className="space-y-5" noValidate>
                 {error && <Alert variant="danger">{error}</Alert>}
                 {!mfaRequired ? (
