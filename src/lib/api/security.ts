@@ -6,7 +6,7 @@ export const connectedAccountsApi = {
   list() { return apiClient.get<{ accounts: ConnectedAccount[] }>("/connected-accounts"); },
   unlink(accountId: string) { return apiClient.delete<{ message: string }>(`/connected-accounts/${accountId}`); },
   spotifyConnect() { return apiClient.get<{ authorizationUrl: string }>("/connected-accounts/spotify/connect"); },
-  spotifyRefresh() { return apiClient.post<{ account: ConnectedAccount }>("/connected-accounts/spotify/refresh", {}); },
+  spotifyRefresh() { return apiClient.post<{ account: ConnectedAccount }>("/connected-accounts/spotify/refresh", {}); },\n  googleCalendarConnect() { return apiClient.get<{ authorizationUrl: string }>("/connected-accounts/google/calendar/connect"); },
   googleConnect(credential: string) { return apiClient.post<{ message: string }>("/auth/google/connect", { credential }); },
 };
 export const oauthApi = {
