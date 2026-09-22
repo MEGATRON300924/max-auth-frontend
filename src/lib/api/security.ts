@@ -7,6 +7,7 @@ export const connectedAccountsApi = {
   unlink(accountId: string) { return apiClient.delete<{ message: string }>(`/connected-accounts/${accountId}`); },
   spotifyConnect() { return apiClient.get<{ authorizationUrl: string }>("/connected-accounts/spotify/connect"); },
   spotifyRefresh() { return apiClient.post<{ account: ConnectedAccount }>("/connected-accounts/spotify/refresh", {}); },
+  googleConnect(credential: string) { return apiClient.post<{ message: string }>("/auth/google/connect", { credential }); },
 };
 export const oauthApi = {
   listClients() { return apiClient.get<{ clients: OAuthClient[] }>("/oauth/clients"); },
