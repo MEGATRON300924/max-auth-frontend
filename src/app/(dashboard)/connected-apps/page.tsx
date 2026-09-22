@@ -138,7 +138,6 @@ export default function ConnectedAppsPage() {
           </div>
 
           <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
-          <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
             <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#1ed760]/10 text-[#1ed760]"><Music2 className="h-5 w-5" /></div>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-ink">Spotify</p>
