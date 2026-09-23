@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, Link2, Music2, RefreshCw, Shield, Unlink, Clock3, Sparkles, Globe2 } from "lucide-react";
+import { CheckCircle2, Link2, Music2, RefreshCw, Shield, Unlink, Clock3, Sparkles, Globe2, MessageCircle } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -15,7 +15,6 @@ import type { ConnectedProvider } from "@/types/api";
 import { GoogleConnectButton } from "@/components/auth/GoogleConnectButton";
 
 const futureProviders: { id: ConnectedProvider; name: string; description: string }[] = [
-  { id: "DISCORD", name: "Discord", description: "Connect your Discord identity when the integration is released." },
   { id: "GITHUB", name: "GitHub", description: "Connect your developer identity when the integration is released." },
   { id: "X", name: "X", description: "Connect your X identity when the integration is released." },
   { id: "INSTAGRAM", name: "Instagram", description: "Connect your Instagram identity when the integration is released." },
@@ -46,18 +45,28 @@ export default function ConnectedAppsPage() {
   const googleContactsConnected = googleScopes.has("https://www.googleapis.com/auth/contacts.readonly");
   const googleYouTubeConnected = googleScopes.has("https://www.googleapis.com/auth/youtube.readonly");
   const spotify = useMemo(() => accounts.data?.find((a) => a.provider === "SPOTIFY") ?? null, [accounts.data]);
+  const discord = useMemo(() => accounts.data?.find((a) => a.provider === "DISCORD") ?? null, [accounts.data]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const result = params.get("spotify");
     const googleConnect = params.get("connect") === "google";
     const googleCalendarResult = params.get("google_calendar");
+    const discordResult = params.get("discord");
     if (result === "connected") {
       showToast({ title: "Spotify connected", description: "Your Spotify account is now linked to MAX.", variant: "success" });
       accounts.refetch();
       window.history.replaceState({}, "", "/connected-apps");
     } else if (result === "error") {
       showToast({ title: "Spotify connection failed", description: "Spotify could not be connected. You can safely try again.", variant: "error" });
+      window.history.replaceState({}, "", "/connected-apps");
+    }
+    if (discordResult === "connected") {
+      showToast({ title: "Discord connected", description: "Your Discord account is now linked to MAX.", variant: "success" });
+      accounts.refetch();
+      window.history.replaceState({}, "", "/connected-apps");
+    } else if (discordResult === "error") {
+      showToast({ title: "Discord connection failed", description: "Discord could not be connected. You can safely try again.", variant: "error" });
       window.history.replaceState({}, "", "/connected-apps");
     }
     if (googleCalendarResult === "connected") {
@@ -78,6 +87,15 @@ export default function ConnectedAppsPage() {
       void connectSpotify();
     }
   }, []);
+
+  async function connectDiscord() {
+    try {
+      const { authorizationUrl } = await connectedAccountsApi.discordConnect();
+      window.location.assign(authorizationUrl);
+    } catch (err) {
+      showToast({ title: "Couldn't start Discord connection", description: err instanceof ApiError ? err.message : "Please try again.", variant: "error" });
+    }
+  }
 
   async function connectSpotify() {
     try {
@@ -177,6 +195,21 @@ export default function ConnectedAppsPage() {
                 <Button size="sm" variant="ghost" onClick={() => setUnlinkId(spotify.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button>
               </div>
             ) : <Button size="sm" onClick={connectSpotify}><Link2 className="h-3.5 w-3.5" /> Connect Spotify</Button>}
+          </div>
+
+          <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#5865F2]/10 text-[#5865F2]"><MessageCircle className="h-5 w-5" /></div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-ink">Discord</p>
+              <p className="text-xs text-ink-faint">Connect your Discord identity, profile, and server memberships with permissions you approve.</p>
+              {discord && <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-ink-faint"><span>Linked {new Date(discord.linkedAt).toLocaleDateString()}</span><Badge variant="success">Identity</Badge><Badge variant="success">Servers</Badge></div>}
+            </div>
+            {discord ? (
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" variant="secondary" onClick={connectDiscord} disabled={busy}><RefreshCw className="h-3.5 w-3.5" /> Reconnect</Button>
+                <Button size="sm" variant="ghost" onClick={() => setUnlinkId(discord.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button>
+              </div>
+            ) : <Button size="sm" onClick={connectDiscord}><Link2 className="h-3.5 w-3.5" /> Connect Discord</Button>}
           </div>
 
           {futureProviders.map((p) => (
