@@ -38,7 +38,12 @@ export default function ConnectedAppsPage() {
   const [busy, setBusy] = useState(false);
 
   const google = useMemo(() => accounts.data?.find((a) => a.provider === "GOOGLE") ?? null, [accounts.data]);
-  const googleCalendarConnected = Boolean(google?.scope?.split(/\s+/).includes("https://www.googleapis.com/auth/calendar.events"));
+  const googleScopes = new Set(google?.scope?.split(/\s+/).filter(Boolean));
+  const googleCalendarConnected = googleScopes.has("https://www.googleapis.com/auth/calendar.events");
+  const googleDriveConnected = googleScopes.has("https://www.googleapis.com/auth/drive.file");
+  const googleGmailConnected = googleScopes.has("https://www.googleapis.com/auth/gmail.modify");
+  const googleTasksConnected = googleScopes.has("https://www.googleapis.com/auth/tasks");
+  const googleContactsConnected = googleScopes.has("https://www.googleapis.com/auth/contacts.readonly");
   const spotify = useMemo(() => accounts.data?.find((a) => a.provider === "SPOTIFY") ?? null, [accounts.data]);
 
   useEffect(() => {
@@ -141,12 +146,16 @@ export default function ConnectedAppsPage() {
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-ink" id="google-connect">Google</p>
               <p className="text-xs text-ink-faint">Use your Google identity to sign in to MAX and connect Google services with permissions you approve.</p>
-              {google && <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-ink-faint"><span>Connected {new Date(google.linkedAt).toLocaleDateString()}</span>{googleCalendarConnected && <Badge variant="success">Calendar connected</Badge>}</div>}
+              {google && <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-ink-faint"><span>Connected {new Date(google.linkedAt).toLocaleDateString()}</span>{googleCalendarConnected && <Badge variant="success">Calendar</Badge>}
+                {googleDriveConnected && <Badge variant="success">Drive</Badge>}
+                {googleGmailConnected && <Badge variant="success">Gmail</Badge>}
+                {googleTasksConnected && <Badge variant="success">Tasks</Badge>}
+                {googleContactsConnected && <Badge variant="success">Contacts</Badge>}</div>}
             </div>
             {google ? (
               <div className="flex flex-wrap items-center gap-2">
                 <Badge variant="success"><CheckCircle2 className="mr-1 h-3.5 w-3.5" />Connected</Badge>
-                {googleCalendarConnected ? <Badge variant="success"><CheckCircle2 className="mr-1 h-3.5 w-3.5" />Calendar ready</Badge> : <Button size="sm" variant="secondary" onClick={async () => { try { const { authorizationUrl } = await connectedAccountsApi.googleCalendarConnect(); window.location.assign(authorizationUrl); } catch (err) { showToast({ title: "Couldn't start Google Calendar", description: err instanceof ApiError ? err.message : "Please try again.", variant: "error" }); } }} disabled={busy}><Link2 className="h-3.5 w-3.5" /> Connect Calendar</Button>}<Button size="sm" variant="ghost" onClick={() => setUnlinkId(google.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button>
+                {googleCalendarConnected && googleDriveConnected && googleGmailConnected && googleTasksConnected && googleContactsConnected ? <Badge variant="success"><CheckCircle2 className="mr-1 h-3.5 w-3.5" />Google services ready</Badge> : <Button size="sm" variant="secondary" onClick={async () => { try { const { authorizationUrl } = await connectedAccountsApi.googleCalendarConnect(); window.location.assign(authorizationUrl); } catch (err) { showToast({ title: "Couldn't start Google connection", description: err instanceof ApiError ? err.message : "Please try again.", variant: "error" }); } }} disabled={busy}><Link2 className="h-3.5 w-3.5" /> Connect Google services</Button>}<Button size="sm" variant="ghost" onClick={() => setUnlinkId(google.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button>
               </div>
             ) : (
               <GoogleConnectButton onConnected={async () => { await accounts.refetch(); showToast({ title: "Google connected", description: "Your Google identity is now linked to your MAX Account.", variant: "success" }); }} />
@@ -180,7 +189,7 @@ export default function ConnectedAppsPage() {
 
       <div className="flex gap-3 rounded-2xl border border-success/15 bg-success/5 p-4">
         <Shield className="mt-0.5 h-5 w-5 shrink-0 text-success" />
-        <p className="text-xs leading-5 text-ink-muted">Google and Spotify credentials are handled by MAX Auth. Connected Apps never receives third-party access or refresh tokens.</p>
+        <p className="text-xs leading-5 text-ink-muted">Google and Spotify credentials are handled by MAX Auth. Connected Apps never receives third-party access or refresh tokens. Google Workspace access is limited to the scopes approved by the user.</p>
       </div>
 
       <Modal open={Boolean(unlinkId)} onClose={() => !busy && setUnlinkId(null)} title="Unlink account?" description="This removes the selected third-party connection from your MAX Account. You can connect it again later.">
