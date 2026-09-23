@@ -60,11 +60,11 @@ export default function ConnectedAppsPage() {
       window.history.replaceState({}, "", "/connected-apps");
     }
     if (googleCalendarResult === "connected") {
-      showToast({ title: "Google Calendar connected", description: "MAX can now use the Google Calendar permissions you approved.", variant: "success" });
+      showToast({ title: "Google services connected", description: "MAX can now use the Google services and permissions you approved.", variant: "success" });
       accounts.refetch();
       window.history.replaceState({}, "", "/connected-apps");
     } else if (googleCalendarResult === "error") {
-      showToast({ title: "Google Calendar connection failed", description: "Google Calendar could not be connected. You can safely try again.", variant: "error" });
+      showToast({ title: "Google connection failed", description: "Google services could not be connected. You can safely try again.", variant: "error" });
       window.history.replaceState({}, "", "/connected-apps");
     }
     if (googleConnect) {
