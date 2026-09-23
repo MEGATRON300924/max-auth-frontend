@@ -9,6 +9,9 @@ export const connectedAccountsApi = {
   spotifyRefresh() { return apiClient.post<{ account: ConnectedAccount }>("/connected-accounts/spotify/refresh", {}); },
   googleCalendarConnect() { return apiClient.get<{ authorizationUrl: string }>("/connected-accounts/google/calendar/connect"); },
   googleConnect(credential: string) { return apiClient.post<{ message: string }>("/auth/google/connect", { credential }); },
+  discordConnect() { return apiClient.get<{ authorizationUrl: string }>("/connected-accounts/discord/connect"); },
+  discordMe() { return apiClient.get<{ profile: Record<string, unknown> }>("/connected-accounts/discord/me"); },
+  discordGuilds() { return apiClient.get<{ guilds: Array<Record<string, unknown>> }>("/connected-accounts/discord/guilds"); },
 };
 export const oauthApi = {
   listClients() { return apiClient.get<{ clients: OAuthClient[] }>("/oauth/clients"); },
