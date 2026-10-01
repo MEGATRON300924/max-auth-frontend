@@ -12,6 +12,7 @@ export const connectedAccountsApi = {
   discordConnect() { return apiClient.get<{ authorizationUrl: string }>("/connected-accounts/discord/connect"); },
   discordMe() { return apiClient.get<{ profile: Record<string, unknown> }>("/connected-accounts/discord/me"); },
   discordGuilds() { return apiClient.get<{ guilds: Array<Record<string, unknown>> }>("/connected-accounts/discord/guilds"); },
+  microsoftConnect() { return apiClient.get<{ authorizationUrl: string }>("/connected-accounts/microsoft/connect"); },
 };
 export const oauthApi = {
   listClients() { return apiClient.get<{ clients: OAuthClient[] }>("/oauth/clients"); },
