@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, Link2, Music2, RefreshCw, Shield, Unlink, Clock3, Sparkles, Globe2, MessageCircle } from "lucide-react";
+import { CheckCircle2, Link2, Music2, RefreshCw, Shield, Unlink, Clock3, Sparkles, Globe2, MessageCircle, Cloud } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -46,6 +46,7 @@ export default function ConnectedAppsPage() {
   const googleYouTubeConnected = googleScopes.has("https://www.googleapis.com/auth/youtube.readonly");
   const spotify = useMemo(() => accounts.data?.find((a) => a.provider === "SPOTIFY") ?? null, [accounts.data]);
   const discord = useMemo(() => accounts.data?.find((a) => a.provider === "DISCORD") ?? null, [accounts.data]);
+  const microsoft = useMemo(() => accounts.data?.find((a) => a.provider === "MICROSOFT") ?? null, [accounts.data]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -53,12 +54,21 @@ export default function ConnectedAppsPage() {
     const googleConnect = params.get("connect") === "google";
     const googleCalendarResult = params.get("google_calendar");
     const discordResult = params.get("discord");
+    const microsoftResult = params.get("microsoft");
     if (result === "connected") {
       showToast({ title: "Spotify connected", description: "Your Spotify account is now linked to MAX.", variant: "success" });
       accounts.refetch();
       window.history.replaceState({}, "", "/connected-apps");
     } else if (result === "error") {
       showToast({ title: "Spotify connection failed", description: "Spotify could not be connected. You can safely try again.", variant: "error" });
+      window.history.replaceState({}, "", "/connected-apps");
+    }
+    if (microsoftResult === "connected") {
+      showToast({ title: "Microsoft connected", description: "Your Microsoft account and approved Microsoft 365 services are now linked to MAX.", variant: "success" });
+      accounts.refetch();
+      window.history.replaceState({}, "", "/connected-apps");
+    } else if (microsoftResult === "error") {
+      showToast({ title: "Microsoft connection failed", description: "Microsoft could not be connected. You can safely try again.", variant: "error" });
       window.history.replaceState({}, "", "/connected-apps");
     }
     if (discordResult === "connected") {
@@ -94,6 +104,15 @@ export default function ConnectedAppsPage() {
       window.location.assign(authorizationUrl);
     } catch (err) {
       showToast({ title: "Couldn't start Discord connection", description: err instanceof ApiError ? err.message : "Please try again.", variant: "error" });
+    }
+  }
+
+  async function connectMicrosoft() {
+    try {
+      const { authorizationUrl } = await connectedAccountsApi.microsoftConnect();
+      window.location.assign(authorizationUrl);
+    } catch (err) {
+      showToast({ title: "Microsoft connection could not start", description: err instanceof ApiError ? err.message : "Please try again.", variant: "error" });
     }
   }
 
@@ -212,6 +231,21 @@ export default function ConnectedAppsPage() {
             ) : <Button size="sm" onClick={connectDiscord}><Link2 className="h-3.5 w-3.5" /> Connect Discord</Button>}
           </div>
 
+          <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#2563EB]/10 text-[#2563EB]"><Cloud className="h-5 w-5" /></div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-ink">Microsoft</p>
+              <p className="text-xs text-ink-faint">Connect Outlook, Calendar, OneDrive, To Do, Contacts, and other approved Microsoft 365 data through Microsoft Graph.</p>
+              {microsoft && <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-ink-faint"><span>Linked {new Date(microsoft.linkedAt).toLocaleDateString()}</span><Badge variant="success">Outlook</Badge><Badge variant="success">Calendar</Badge><Badge variant="success">OneDrive</Badge><Badge variant="success">To Do</Badge><Badge variant="success">Contacts</Badge></div>}
+            </div>
+            {microsoft ? (
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" variant="secondary" onClick={connectMicrosoft} disabled={busy}><RefreshCw className="h-3.5 w-3.5" /> Reconnect</Button>
+                <Button size="sm" variant="ghost" onClick={() => setUnlinkId(microsoft.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button>
+              </div>
+            ) : <Button size="sm" onClick={connectMicrosoft}><Link2 className="h-3.5 w-3.5" /> Connect Microsoft</Button>}
+          </div>
+
           {futureProviders.map((p) => (
             <div key={p.id} className="flex items-center gap-4 p-5 opacity-80">
               <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white/5 text-ink-muted"><Link2 className="h-5 w-5" /></div>
@@ -224,7 +258,7 @@ export default function ConnectedAppsPage() {
 
       <div className="flex gap-3 rounded-2xl border border-success/15 bg-success/5 p-4">
         <Shield className="mt-0.5 h-5 w-5 shrink-0 text-success" />
-        <p className="text-xs leading-5 text-ink-muted">Google and Spotify credentials are handled by MAX Auth. Connected Apps never receives third-party access or refresh tokens. Google Workspace access is limited to the scopes approved by the user.</p>
+        <p className="text-xs leading-5 text-ink-muted">Google, Microsoft, Spotify, and Discord credentials are handled by MAX Auth. Connected Apps never receives third-party access or refresh tokens. Google Workspace access is limited to the scopes approved by the user.</p>
       </div>
 
       <Modal open={Boolean(unlinkId)} onClose={() => !busy && setUnlinkId(null)} title="Unlink account?" description="This removes the selected third-party connection from your MAX Account. You can connect it again later.">
