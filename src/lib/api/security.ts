@@ -13,6 +13,9 @@ export const connectedAccountsApi = {
   discordMe() { return apiClient.get<{ profile: Record<string, unknown> }>("/connected-accounts/discord/me"); },
   discordGuilds() { return apiClient.get<{ guilds: Array<Record<string, unknown>> }>("/connected-accounts/discord/guilds"); },
   microsoftConnect() { return apiClient.get<{ authorizationUrl: string }>("/connected-accounts/microsoft/connect"); },
+  githubConnect() { return apiClient.get<{ authorizationUrl: string }>("/connected-accounts/github/connect"); },
+  githubMe() { return apiClient.get<{ profile: Record<string, unknown> }>("/connected-accounts/github/me"); },
+  githubRepos() { return apiClient.get<{ repos: Array<Record<string, unknown>> }>("/connected-accounts/github/repos"); },
 };
 export const oauthApi = {
   listClients() { return apiClient.get<{ clients: OAuthClient[] }>("/oauth/clients"); },
