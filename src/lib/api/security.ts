@@ -16,6 +16,9 @@ export const connectedAccountsApi = {
   githubConnect() { return apiClient.get<{ authorizationUrl: string }>("/connected-accounts/github/connect"); },
   githubMe() { return apiClient.get<{ profile: Record<string, unknown> }>("/connected-accounts/github/me"); },
   githubRepos() { return apiClient.get<{ repos: Array<Record<string, unknown>> }>("/connected-accounts/github/repos"); },
+  xConnect() { return apiClient.get<{ authorizationUrl: string }>("/connected-accounts/x/connect"); },
+  xMe() { return apiClient.get<{ profile: Record<string, unknown> }>("/connected-accounts/x/me"); },
+  xPosts() { return apiClient.get<{ posts: Record<string, unknown> }>("/connected-accounts/x/posts"); },
 };
 export const oauthApi = {
   listClients() { return apiClient.get<{ clients: OAuthClient[] }>("/oauth/clients"); },
