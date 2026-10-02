@@ -15,9 +15,7 @@ import type { ConnectedProvider } from "@/types/api";
 import { GoogleConnectButton } from "@/components/auth/GoogleConnectButton";
 
 const futureProviders: { id: ConnectedProvider; name: string; description: string }[] = [
-  { id: "X", name: "X", description: "Connect your X identity when the integration is released." },
-  { id: "INSTAGRAM", name: "Instagram", description: "Connect your Instagram identity when the integration is released." },
-  { id: "SNAPCHAT", name: "Snapchat", description: "Connect your Snapchat identity when the integration is released." },
+
 ];
 
 function expiryLabel(value: string | null) {
@@ -48,6 +46,8 @@ export default function ConnectedAppsPage() {
   const microsoft = useMemo(() => accounts.data?.find((a) => a.provider === "MICROSOFT") ?? null, [accounts.data]);
   const github = useMemo(() => accounts.data?.find((a) => a.provider === "GITHUB") ?? null, [accounts.data]);
   const x = useMemo(() => accounts.data?.find((a) => a.provider === "X") ?? null, [accounts.data]);
+  const instagram = useMemo(() => accounts.data?.find((a) => a.provider === "INSTAGRAM") ?? null, [accounts.data]);
+  const snapchat = useMemo(() => accounts.data?.find((a) => a.provider === "SNAPCHAT") ?? null, [accounts.data]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -58,6 +58,8 @@ export default function ConnectedAppsPage() {
     const microsoftResult = params.get("microsoft");
     const githubResult = params.get("github");
     const xResult = params.get("x");
+    const instagramResult = params.get("instagram");
+    const snapchatResult = params.get("snapchat");
     if (result === "connected") {
       showToast({ title: "Spotify connected", description: "Your Spotify account is now linked to MAX.", variant: "success" });
       accounts.refetch();
@@ -90,6 +92,8 @@ export default function ConnectedAppsPage() {
       showToast({ title: "X connection failed", description: "X could not be connected. You can safely try again.", variant: "error" });
       window.history.replaceState({}, "", "/connected-apps");
     }
+    if (instagramResult === "connected") { showToast({ title: "Instagram connected", description: "Your Instagram account is now linked to MAX.", variant: "success" }); accounts.refetch(); window.history.replaceState({}, "", "/connected-apps"); } else if (instagramResult === "error") { showToast({ title: "Instagram connection failed", description: "Instagram could not be connected. You can try again.", variant: "error" }); window.history.replaceState({}, "", "/connected-apps"); }
+    if (snapchatResult === "connected") { showToast({ title: "Snapchat connected", description: "Your Snapchat account is now linked to MAX.", variant: "success" }); accounts.refetch(); window.history.replaceState({}, "", "/connected-apps"); } else if (snapchatResult === "error") { showToast({ title: "Snapchat connection failed", description: "Snapchat could not be connected. You can try again.", variant: "error" }); window.history.replaceState({}, "", "/connected-apps"); }
     if (githubResult === "connected") {
       showToast({ title: "GitHub connected", description: "Your GitHub account is now linked to MAX.", variant: "success" });
       accounts.refetch();
@@ -143,6 +147,9 @@ export default function ConnectedAppsPage() {
       showToast({ title: "Couldn't start X connection", description: err instanceof ApiError ? err.message : "Please try again.", variant: "error" });
     }
   }
+
+  async function connectInstagram() { try { const { authorizationUrl } = await connectedAccountsApi.instagramConnect(); window.location.assign(authorizationUrl); } catch (err) { showToast({ title: "Couldn't start Instagram connection", description: err instanceof ApiError ? err.message : "Please try again.", variant: "error" }); } }
+  async function connectSnapchat() { try { const { authorizationUrl } = await connectedAccountsApi.snapchatConnect(); window.location.assign(authorizationUrl); } catch (err) { showToast({ title: "Couldn't start Snapchat connection", description: err instanceof ApiError ? err.message : "Please try again.", variant: "error" }); } }
 
   async function connectGithub() {
     try {
@@ -313,6 +320,17 @@ export default function ConnectedAppsPage() {
             ) : <Button size="sm" onClick={connectX}><Link2 className="h-3.5 w-3.5" /> Connect X</Button>}
           </div>
 
+          <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-pink-500/10 text-pink-500"><span className="text-sm font-bold">IG</span></div>
+            <div className="min-w-0 flex-1"><p className="text-sm font-semibold text-ink">Instagram</p><p className="text-xs text-ink-faint">Connect an Instagram professional account through Instagram Login.</p>{instagram && <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-ink-faint"><span>Linked {new Date(instagram.linkedAt).toLocaleDateString()}</span><Badge variant="success">Profile</Badge></div>}</div>
+            {instagram ? <div className="flex flex-wrap gap-2"><Button size="sm" variant="secondary" onClick={connectInstagram} disabled={busy}><RefreshCw className="h-3.5 w-3.5" /> Reconnect</Button><Button size="sm" variant="ghost" onClick={() => setUnlinkId(instagram.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button></div> : <Button size="sm" onClick={connectInstagram}><Link2 className="h-3.5 w-3.5" /> Connect Instagram</Button>}
+          </div>
+          <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-yellow-500/10 text-yellow-500"><span className="text-sm font-bold">SC</span></div>
+            <div className="min-w-0 flex-1"><p className="text-sm font-semibold text-ink">Snapchat</p><p className="text-xs text-ink-faint">Connect your Snapchat identity through Snap Login.</p>{snapchat && <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-ink-faint"><span>Linked {new Date(snapchat.linkedAt).toLocaleDateString()}</span><Badge variant="success">Identity</Badge></div>}</div>
+            {snapchat ? <div className="flex flex-wrap gap-2"><Button size="sm" variant="secondary" onClick={connectSnapchat} disabled={busy}><RefreshCw className="h-3.5 w-3.5" /> Reconnect</Button><Button size="sm" variant="ghost" onClick={() => setUnlinkId(snapchat.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button></div> : <Button size="sm" onClick={connectSnapchat}><Link2 className="h-3.5 w-3.5" /> Connect Snapchat</Button>}
+          </div>
+
           {futureProviders.map((p) => (
             <div key={p.id} className="flex items-center gap-4 p-5 opacity-80">
               <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white/5 text-ink-muted"><Link2 className="h-5 w-5" /></div>
@@ -325,7 +343,7 @@ export default function ConnectedAppsPage() {
 
       <div className="flex gap-3 rounded-2xl border border-success/15 bg-success/5 p-4">
         <Shield className="mt-0.5 h-5 w-5 shrink-0 text-success" />
-        <p className="text-xs leading-5 text-ink-muted">Google, Microsoft, Spotify, Discord, GitHub, and X credentials are handled by MAX Auth. Connected Apps never receives third-party access or refresh tokens. Google Workspace access is limited to the scopes approved by the user.</p>
+        <p className="text-xs leading-5 text-ink-muted">Google, Microsoft, Spotify, Discord, GitHub, X, Instagram, and Snapchat credentials are handled by MAX Auth. Connected Apps never receives third-party access or refresh tokens. Google Workspace access is limited to the scopes approved by the user.</p>
       </div>
 
       <Modal open={Boolean(unlinkId)} onClose={() => !busy && setUnlinkId(null)} title="Unlink account?" description="This removes the selected third-party connection from your MAX Account. You can connect it again later.">
