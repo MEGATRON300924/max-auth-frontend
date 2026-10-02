@@ -19,6 +19,9 @@ export const connectedAccountsApi = {
   xConnect() { return apiClient.get<{ authorizationUrl: string }>("/connected-accounts/x/connect"); },
   xMe() { return apiClient.get<{ profile: Record<string, unknown> }>("/connected-accounts/x/me"); },
   xPosts() { return apiClient.get<{ posts: Record<string, unknown> }>("/connected-accounts/x/posts"); },
+  instagramConnect() { return apiClient.get<{ authorizationUrl: string }>("/connected-accounts/instagram/connect"); },
+  instagramMe() { return apiClient.get<{ profile: Record<string, unknown> }>("/connected-accounts/instagram/me"); },
+  snapchatConnect() { return apiClient.get<{ authorizationUrl: string }>("/connected-accounts/snapchat/connect"); },
 };
 export const oauthApi = {
   listClients() { return apiClient.get<{ clients: OAuthClient[] }>("/oauth/clients"); },
