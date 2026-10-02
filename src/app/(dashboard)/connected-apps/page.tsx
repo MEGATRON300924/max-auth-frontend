@@ -47,6 +47,7 @@ export default function ConnectedAppsPage() {
   const discord = useMemo(() => accounts.data?.find((a) => a.provider === "DISCORD") ?? null, [accounts.data]);
   const microsoft = useMemo(() => accounts.data?.find((a) => a.provider === "MICROSOFT") ?? null, [accounts.data]);
   const github = useMemo(() => accounts.data?.find((a) => a.provider === "GITHUB") ?? null, [accounts.data]);
+  const x = useMemo(() => accounts.data?.find((a) => a.provider === "X") ?? null, [accounts.data]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -56,6 +57,7 @@ export default function ConnectedAppsPage() {
     const discordResult = params.get("discord");
     const microsoftResult = params.get("microsoft");
     const githubResult = params.get("github");
+    const xResult = params.get("x");
     if (result === "connected") {
       showToast({ title: "Spotify connected", description: "Your Spotify account is now linked to MAX.", variant: "success" });
       accounts.refetch();
@@ -78,6 +80,14 @@ export default function ConnectedAppsPage() {
       window.history.replaceState({}, "", "/connected-apps");
     } else if (discordResult === "error") {
       showToast({ title: "Discord connection failed", description: "Discord could not be connected. You can safely try again.", variant: "error" });
+      window.history.replaceState({}, "", "/connected-apps");
+    }
+    if (xResult === "connected") {
+      showToast({ title: "X connected", description: "Your X account is now linked to MAX.", variant: "success" });
+      accounts.refetch();
+      window.history.replaceState({}, "", "/connected-apps");
+    } else if (xResult === "error") {
+      showToast({ title: "X connection failed", description: "X could not be connected. You can safely try again.", variant: "error" });
       window.history.replaceState({}, "", "/connected-apps");
     }
     if (githubResult === "connected") {
@@ -122,6 +132,15 @@ export default function ConnectedAppsPage() {
       window.location.assign(authorizationUrl);
     } catch (err) {
       showToast({ title: "Microsoft connection could not start", description: err instanceof ApiError ? err.message : "Please try again.", variant: "error" });
+    }
+  }
+
+  async function connectX() {
+    try {
+      const { authorizationUrl } = await connectedAccountsApi.xConnect();
+      window.location.assign(authorizationUrl);
+    } catch (err) {
+      showToast({ title: "Couldn't start X connection", description: err instanceof ApiError ? err.message : "Please try again.", variant: "error" });
     }
   }
 
@@ -279,6 +298,21 @@ export default function ConnectedAppsPage() {
             ) : <Button size="sm" onClick={connectGithub}><Link2 className="h-3.5 w-3.5" /> Connect GitHub</Button>}
           </div>
 
+          <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-ink/10 text-ink"><span className="text-lg font-bold">𝕏</span></div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-ink">X</p>
+              <p className="text-xs text-ink-faint">Connect your X identity and approved X data to MAX through OAuth 2.0.</p>
+              {x && <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-ink-faint"><span>Linked {new Date(x.linkedAt).toLocaleDateString()}</span><Badge variant="success">Identity</Badge><Badge variant="success">Posts</Badge></div>}
+            </div>
+            {x ? (
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" variant="secondary" onClick={connectX} disabled={busy}><RefreshCw className="h-3.5 w-3.5" /> Reconnect</Button>
+                <Button size="sm" variant="ghost" onClick={() => setUnlinkId(x.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button>
+              </div>
+            ) : <Button size="sm" onClick={connectX}><Link2 className="h-3.5 w-3.5" /> Connect X</Button>}
+          </div>
+
           {futureProviders.map((p) => (
             <div key={p.id} className="flex items-center gap-4 p-5 opacity-80">
               <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white/5 text-ink-muted"><Link2 className="h-5 w-5" /></div>
@@ -291,7 +325,7 @@ export default function ConnectedAppsPage() {
 
       <div className="flex gap-3 rounded-2xl border border-success/15 bg-success/5 p-4">
         <Shield className="mt-0.5 h-5 w-5 shrink-0 text-success" />
-        <p className="text-xs leading-5 text-ink-muted">Google, Microsoft, Spotify, Discord, and GitHub credentials are handled by MAX Auth. Connected Apps never receives third-party access or refresh tokens. Google Workspace access is limited to the scopes approved by the user.</p>
+        <p className="text-xs leading-5 text-ink-muted">Google, Microsoft, Spotify, Discord, GitHub, and X credentials are handled by MAX Auth. Connected Apps never receives third-party access or refresh tokens. Google Workspace access is limited to the scopes approved by the user.</p>
       </div>
 
       <Modal open={Boolean(unlinkId)} onClose={() => !busy && setUnlinkId(null)} title="Unlink account?" description="This removes the selected third-party connection from your MAX Account. You can connect it again later.">
