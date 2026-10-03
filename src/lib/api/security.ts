@@ -23,8 +23,8 @@ export const connectedAccountsApi = {
   instagramMe() { return apiClient.get<{ profile: Record<string, unknown> }>("/connected-accounts/instagram/me"); },
   tiktokConnect() { return apiClient.get<{ authorizationUrl: string }>("/connected-accounts/tiktok/connect"); },
   tiktokMe() { return apiClient.get<{ profile: Record<string, unknown> }>("/connected-accounts/tiktok/me"); },
-  tiktokVideos() { return apiClient.get<{ videos: Record<string, unknown> }>("/connected-accounts/tiktok/videos"); },
-  tiktokRefresh() { return apiClient.post<{ account: ConnectedAccount }>("/connected-accounts/tiktok/refresh", {}); },
+  tiktokVideos() { return apiClient.get<{ videos: Array<Record<string, unknown>>; cursor?: string; has_more?: boolean }>("/connected-accounts/tiktok/videos"); },
+  tiktokRefresh() { return apiClient.post<{ status: "refreshed" }>("/connected-accounts/tiktok/refresh", {}); },
 };
 export const oauthApi = {
   listClients() { return apiClient.get<{ clients: OAuthClient[] }>("/oauth/clients"); },
