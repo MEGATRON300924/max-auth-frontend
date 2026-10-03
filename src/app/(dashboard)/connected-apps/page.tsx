@@ -169,6 +169,20 @@ export default function ConnectedAppsPage() {
     }
   }
 
+  async function refreshTikTok() {
+    setBusy(true);
+    try {
+      await connectedAccountsApi.tiktokRefresh();
+      await accounts.refetch();
+      showToast({ title: "TikTok connection refreshed", variant: "success" });
+    } catch (err) {
+      showToast({ title: "TikTok needs attention", description: err instanceof ApiError ? err.message : "Please reconnect TikTok.", variant: "error" });
+      await accounts.refetch();
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function refreshSpotify() {
     setBusy(true);
     try {
@@ -328,7 +342,7 @@ export default function ConnectedAppsPage() {
           <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
             <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-black/10 text-ink"><span className="text-lg font-bold">♪</span></div>
             <div className="min-w-0 flex-1"><p className="text-sm font-semibold text-ink">TikTok</p><p className="text-xs text-ink-faint">Connect TikTok to let MAX use your approved profile and public video permissions.</p>{tiktok && <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-ink-faint"><span>Linked {new Date(tiktok.linkedAt).toLocaleDateString()}</span><Badge variant="success">Profile</Badge><Badge variant="success">Videos</Badge></div>}</div>
-            {tiktok ? <div className="flex flex-wrap gap-2"><Button size="sm" variant="secondary" onClick={connectTikTok} disabled={busy}><RefreshCw className="h-3.5 w-3.5" /> Reconnect</Button><Button size="sm" variant="ghost" onClick={() => setUnlinkId(tiktok.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button></div> : <Button size="sm" onClick={connectTikTok}><Link2 className="h-3.5 w-3.5" /> Connect TikTok</Button>}
+            {tiktok ? <div className="flex flex-wrap gap-2"><Button size="sm" variant="secondary" onClick={refreshTikTok} disabled={busy}><RefreshCw className="h-3.5 w-3.5" /> Refresh</Button><Button size="sm" variant="secondary" onClick={connectTikTok} disabled={busy}><RefreshCw className="h-3.5 w-3.5" /> Reconnect</Button><Button size="sm" variant="ghost" onClick={() => setUnlinkId(tiktok.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button></div> : <Button size="sm" onClick={connectTikTok}><Link2 className="h-3.5 w-3.5" /> Connect TikTok</Button>}
           </div>
 
           {futureProviders.map((p) => (
