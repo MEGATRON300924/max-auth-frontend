@@ -45,7 +45,7 @@ password change, account deletion, device management (list/trust/revoke), sessio
 client registration/management ("Continue with MAX AI" developer side).
 
 **Architecture-ready, not implemented:** passkeys,
-recovery codes, live provider OAuth buttons (Google/X/Instagram/Snapchat/Spotify/Discord/GitHub),
+recovery codes, live provider OAuth buttons (Google/X/Instagram/Spotify/Discord/GitHub/TikTok),
 and the interactive "Continue with MAX AI" consent/authorize screen (client registration works;
 the actual authorize flow isn't built on the backend yet either, by design).
 
