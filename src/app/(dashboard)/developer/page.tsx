@@ -41,7 +41,24 @@ export default function DeveloperPage() {
     if ((selectedType === "WEB" || selectedType === "SPA") && !cleanOrigins.length) { showToast({ title: "Add an authorized site", variant: "error" }); return; }
     if (selectedType === "ANDROID" && !packageName.trim()) { showToast({ title: "Android package name required", variant: "error" }); return; }
     if (selectedType === "IOS" && !bundleId.trim()) { showToast({ title: "iOS Bundle ID required", variant: "error" }); return; }
-    try { setCreating(true); const result = await oauthApi.createClient({ name: name.trim(), redirectUris: redirects, scopes: permissions, isConfidential: selectedType === "WEB" || selectedType === "DESKTOP" }); await oauthApi.updateClientConfig(result.client.clientId, { applicationType: selectedType, authorizedOrigins: cleanOrigins, packageName: packageName.trim() || null, bundleId: bundleId.trim() || null, certificateFingerprints: fingerprints.map((v) => v.trim()).filter(Boolean), displayName: name.trim(), websiteUrl: cleanOrigins[0] || null }); setSecret(result.clientSecret ?? null); reset(); clients.refetch(); showToast({ title: "Application created", variant: "success" }); } catch (err) { showToast({ title: "Couldn't create application", description: describeError(err), variant: "error" }); } finally { setCreating(false); }
+    try {
+      setCreating(true);
+      const result = await oauthApi.createClient({ name: name.trim(), redirectUris: redirects, scopes: permissions, isConfidential: selectedType === "WEB" || selectedType === "DESKTOP" });
+      reset();
+      setSecret(result.clientSecret ?? null);
+      clients.refetch();
+      showToast({ title: "Application created", description: "Your client ID is ready. You can manage its configuration below.", variant: "success" });
+      try {
+        await oauthApi.updateClientConfig(result.client.clientId, { applicationType: selectedType, authorizedOrigins: cleanOrigins, packageName: packageName.trim() || null, bundleId: bundleId.trim() || null, certificateFingerprints: fingerprints.map((v) => v.trim()).filter(Boolean), displayName: name.trim(), websiteUrl: cleanOrigins[0] || null });
+        clients.refetch();
+      } catch (configError) {
+        showToast({ title: "Application created, configuration needs attention", description: describeError(configError), variant: "error" });
+      }
+    } catch (err) {
+      showToast({ title: "Couldn't create application", description: describeError(err), variant: "error" });
+    } finally {
+      setCreating(false);
+    }
   }
   async function openEditor(client: OAuthClient) { if (editing === client.id) { setEditing(null); return; } setEditing(client.id); if (!configs[client.id]) { try { const result = await oauthApi.getClientConfig(client.clientId); setConfigs((current) => ({ ...current, [client.id]: result.config })); } catch (err) { showToast({ title: "Couldn't load application settings", description: describeError(err), variant: "error" }); } } }
   async function save(client: OAuthClient) { const config = configs[client.id]; if (!config) return; const clean = { ...config, authorizedOrigins: config.authorizedOrigins.map((v) => v.trim()).filter(Boolean), certificateFingerprints: config.certificateFingerprints.map((v) => v.trim()).filter(Boolean) }; try { setSaving(client.id); const result = await oauthApi.updateClientConfig(client.clientId, clean); setConfigs((current) => ({ ...current, [client.id]: result.config })); showToast({ title: "Application settings saved", variant: "success" }); } catch (err) { showToast({ title: "Couldn't save settings", description: describeError(err), variant: "error" }); } finally { setSaving(null); } }
