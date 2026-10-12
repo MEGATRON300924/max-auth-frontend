@@ -51,7 +51,7 @@ function VerifyEmailInner() {
     return (
       <AuthCard title="Check your inbox">
         <div className="flex flex-col items-center py-2 text-center">
-          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-subtle text-brand-500"><MailCheck className="h-6 w-6" /></div>
+          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-500/10 text-brand-500"><MailCheck className="h-6 w-6" /></div>
           <p className="text-sm leading-6 text-ink-muted">{message}</p>
           <div className="mt-6 w-full space-y-3">
             <Button className="w-full" isLoading={isResending} onClick={async () => {
