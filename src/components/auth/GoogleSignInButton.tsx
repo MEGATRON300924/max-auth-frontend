@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Script from "next/script";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ShieldCheck } from "lucide-react";
 import { Alert } from "@/components/ui/Alert";
@@ -16,6 +17,7 @@ export function GoogleSignInButton() {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
+  const [needsAccount, setNeedsAccount] = useState(false);
   const [credential, setCredential] = useState<string | null>(null);
   const [mfaCode, setMfaCode] = useState("");
   const [mfaRequired, setMfaRequired] = useState(false);
@@ -30,11 +32,11 @@ export function GoogleSignInButton() {
 
   const complete = async (code?: string) => {
     if (!credential) return;
-    setLoading(true); setError(null);
+    setLoading(true); setError(null); setNeedsAccount(false);
     try { await googleLogin(credential, code); router.replace(destination()); }
     catch (err) {
       if (err instanceof ApiError && err.code === "MFA_REQUIRED") { setMfaRequired(true); setMfaCode(""); }
-      else setError(err instanceof Error ? err.message : "Google Sign-In failed");
+      else { setError(err instanceof Error ? err.message : "Google Sign-In failed"); setNeedsAccount(err instanceof ApiError && err.code === "GOOGLE_ACCOUNT_NOT_LINKED"); }
     } finally { setLoading(false); }
   };
 
@@ -52,6 +54,7 @@ export function GoogleSignInButton() {
     <div className="space-y-3">
       <Script src="https://accounts.google.com/gsi/client" strategy="afterInteractive" onLoad={render} />
       {error && <Alert variant="danger">{error}</Alert>}
+      {needsAccount && <Link href="/create-account" className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-glass-border px-4 text-sm font-semibold text-ink-muted transition-colors hover:bg-surface">Create a MAX Account</Link>}
       {!mfaRequired ? <div ref={containerRef} className="flex justify-center" /> : (
         <form onSubmit={(event) => { event.preventDefault(); if (recovery ? mfaCode.trim().length >= 8 : /^\d{6}$/.test(mfaCode)) complete(mfaCode.trim()); else setError(recovery ? "Enter a recovery code." : "Enter the 6-digit authenticator code."); }} className="rounded-xl border border-glass-border bg-base-raised p-4">
           <div className="flex items-center gap-2 text-sm font-semibold text-ink"><ShieldCheck className="h-4 w-4 text-brand-500" />Two-factor authentication</div>
