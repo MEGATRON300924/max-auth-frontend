@@ -28,7 +28,7 @@ export default function CreateAccountPage() {
   const [ageConfirmed, setAgeConfirmed] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(true);
+  const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -76,7 +76,6 @@ export default function CreateAccountPage() {
       await register({ username: username.trim(), email: email.trim(), password, displayName: displayName.trim(), rememberMe });
       try {
         if (rememberMe) window.localStorage.setItem(LAST_ACCOUNT_KEY, email.trim().toLowerCase());
-        else window.localStorage.removeItem(LAST_ACCOUNT_KEY);
       } catch {
         // Remembering the account identifier is optional.
       }
