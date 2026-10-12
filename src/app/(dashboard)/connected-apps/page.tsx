@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, Link2, Music2, RefreshCw, Shield, Unlink, Clock3, Sparkles, Globe2, MessageCircle, Cloud, Github, Music } from "lucide-react";
+import { CheckCircle2, Link2, RefreshCw, Shield, Unlink, Clock3, Sparkles } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -238,7 +238,7 @@ export default function ConnectedAppsPage() {
       <Card>
         <CardContent className="divide-y divide-glass-border p-0">
           <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
-            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#4285F4]/10 text-[#4285F4]"><Globe2 className="h-5 w-5" /></div>
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#4285F4]/10"><img src="/brands/google.svg" alt="" className="h-5 w-5" /></div>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-ink" id="google-connect">Google</p>
               <p className="text-xs text-ink-faint">Use your Google identity to sign in to MAX and connect Google services with permissions you approve.</p>
@@ -260,7 +260,7 @@ export default function ConnectedAppsPage() {
           </div>
 
           <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
-            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#1ed760]/10 text-[#1ed760]"><Music2 className="h-5 w-5" /></div>
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#1ed760]/10"><img src="/brands/spotify.svg" alt="" className="h-5 w-5" /></div>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-ink">Spotify</p>
               <p className="text-xs text-ink-faint">Music profile and Spotify permissions approved through Spotify OAuth.</p>
@@ -275,7 +275,7 @@ export default function ConnectedAppsPage() {
           </div>
 
           <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
-            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#5865F2]/10 text-[#5865F2]"><MessageCircle className="h-5 w-5" /></div>
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#5865F2]/10"><img src="/brands/discord.svg" alt="" className="h-5 w-5" /></div>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-ink">Discord</p>
               <p className="text-xs text-ink-faint">Connect your Discord identity, profile, and server memberships with permissions you approve.</p>
@@ -290,7 +290,7 @@ export default function ConnectedAppsPage() {
           </div>
 
           <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
-            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#2563EB]/10 text-[#2563EB]"><Cloud className="h-5 w-5" /></div>
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#2563EB]/10"><img src="/brands/microsoft.svg" alt="" className="h-5 w-5" /></div>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-ink">Microsoft</p>
               <p className="text-xs text-ink-faint">Connect Outlook, Calendar, OneDrive, To Do, Contacts, and other approved Microsoft 365 data through Microsoft Graph.</p>
@@ -305,7 +305,7 @@ export default function ConnectedAppsPage() {
           </div>
 
           <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
-            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-ink/10 text-ink"><Github className="h-5 w-5" /></div>
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-ink/10"><img src="/brands/github.svg" alt="" className="h-5 w-5 dark:invert" /></div>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-ink">GitHub</p>
               <p className="text-xs text-ink-faint">Connect your GitHub identity so MAX can use the GitHub permissions granted to your MAX connection.</p>
@@ -320,7 +320,7 @@ export default function ConnectedAppsPage() {
           </div>
 
           <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
-            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-ink/10 text-ink"><span className="text-lg font-bold">𝕏</span></div>
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-ink/10"><img src="/brands/x.svg" alt="" className="h-5 w-5 dark:invert" /></div>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-ink">X</p>
               <p className="text-xs text-ink-faint">Connect your X identity and approved X data to MAX through OAuth 2.0.</p>
@@ -335,12 +335,12 @@ export default function ConnectedAppsPage() {
           </div>
 
           <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
-            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-pink-500/10 text-pink-500"><span className="text-sm font-bold">IG</span></div>
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-pink-500/10"><img src="/brands/instagram.svg" alt="" className="h-5 w-5" /></div>
             <div className="min-w-0 flex-1"><p className="text-sm font-semibold text-ink">Instagram</p><p className="text-xs text-ink-faint">Connect an Instagram professional account through Instagram Login.</p>{instagram && <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-ink-faint"><span>Linked {new Date(instagram.linkedAt).toLocaleDateString()}</span><Badge variant="success">Profile</Badge></div>}</div>
             {instagram ? <div className="flex flex-wrap gap-2"><Button size="sm" variant="secondary" onClick={connectInstagram} disabled={busy}><RefreshCw className="h-3.5 w-3.5" /> Reconnect</Button><Button size="sm" variant="ghost" onClick={() => setUnlinkId(instagram.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button></div> : <Button size="sm" onClick={connectInstagram}><Link2 className="h-3.5 w-3.5" /> Connect Instagram</Button>}
           </div>
           <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
-            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-black/10 text-ink"><span className="text-lg font-bold">♪</span></div>
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-black/10"><img src="/brands/tiktok.svg" alt="" className="h-5 w-5 dark:invert" /></div>
             <div className="min-w-0 flex-1"><p className="text-sm font-semibold text-ink">TikTok</p><p className="text-xs text-ink-faint">Connect TikTok to let MAX use your approved profile and public video permissions.</p>{tiktok && <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-ink-faint"><span>Linked {new Date(tiktok.linkedAt).toLocaleDateString()}</span><Badge variant="success">Profile</Badge><Badge variant="success">Videos</Badge></div>}</div>
             {tiktok ? <div className="flex flex-wrap gap-2"><Button size="sm" variant="secondary" onClick={refreshTikTok} disabled={busy}><RefreshCw className="h-3.5 w-3.5" /> Refresh</Button><Button size="sm" variant="secondary" onClick={connectTikTok} disabled={busy}><RefreshCw className="h-3.5 w-3.5" /> Reconnect</Button><Button size="sm" variant="ghost" onClick={() => setUnlinkId(tiktok.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button></div> : <Button size="sm" onClick={connectTikTok}><Link2 className="h-3.5 w-3.5" /> Connect TikTok</Button>}
           </div>
