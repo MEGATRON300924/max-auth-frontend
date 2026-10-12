@@ -3,19 +3,21 @@ import { MaxLogo } from "@/components/layout/MaxLogo";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[#f7f8fa] px-4 py-12 text-[#252b36] dark:bg-[#17191d] dark:text-[#e5e7eb]">
+    <div className="aurora-canvas relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-base px-4 py-12 text-ink">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 left-[12%] h-80 w-80 rounded-full bg-blue-200/25 blur-3xl dark:bg-blue-900/15" />
-        <div className="absolute -bottom-40 right-[10%] h-72 w-72 rounded-full bg-slate-200/40 blur-3xl dark:bg-slate-800/25" />
+        <div className="absolute -left-24 -top-32 h-[28rem] w-[28rem] rounded-full bg-blue-400/20 blur-[90px] dark:bg-blue-500/15" />
+        <div className="absolute -right-28 top-[18%] h-[26rem] w-[26rem] rounded-full bg-violet-400/15 blur-[100px] dark:bg-violet-500/15" />
+        <div className="absolute -bottom-48 left-[28%] h-[28rem] w-[28rem] rounded-full bg-cyan-300/15 blur-[100px] dark:bg-cyan-500/10" />
+        <div className="absolute inset-0 opacity-[0.025] [background-image:radial-gradient(rgb(100_116_139)_0.7px,transparent_0.7px)] [background-size:18px_18px]" />
       </div>
-      <div className="relative mb-8">
+      <div className="relative mb-8 rounded-2xl border border-white/50 bg-white/45 px-5 py-3 shadow-[0_10px_40px_-24px_rgba(15,23,42,.3)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[.04]">
         <MaxLogo size={36} />
       </div>
       <div className="relative w-full max-w-md">{children}</div>
-      <p className="relative mt-8 text-center text-xs text-[#667085] dark:text-[#a2a8b3]">
-        <Link href="/privacy-policy" className="transition-colors hover:text-[#344054] dark:hover:text-[#d0d5dd]">Privacy Policy</Link>
+      <p className="relative mt-8 text-center text-xs text-ink-faint">
+        <Link href="/privacy-policy" className="transition-colors hover:text-ink">Privacy Policy</Link>
         {" · "}
-        <Link href="/terms-of-service" className="transition-colors hover:text-[#344054] dark:hover:text-[#d0d5dd]">Terms of Service</Link>
+        <Link href="/terms-of-service" className="transition-colors hover:text-ink">Terms of Service</Link>
       </p>
     </div>
   );
