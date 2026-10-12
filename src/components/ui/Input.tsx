@@ -39,7 +39,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             aria-invalid={!!error}
             aria-describedby={error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined}
             className={cn(
-              "h-10 w-full rounded-lg border bg-base-raised px-3.5 text-sm text-ink placeholder:text-ink-faint",
+              "h-12 w-full rounded-xl border bg-base-raised px-3.5 text-sm text-ink placeholder:text-ink-faint",
               "transition-colors duration-150",
               "border-glass-border hover:border-slate-300 dark:hover:border-slate-600",
               "focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/15",
