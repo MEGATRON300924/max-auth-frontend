@@ -32,7 +32,7 @@ export default function LandingPage() {
       <SiteHeader />
 
       <main>
-        <section className="relative border-b border-glass-border px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+        <section className="aurora-canvas relative border-b border-glass-border/70 px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
           <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.05fr_.95fr] lg:gap-20">
             <div className="max-w-2xl">
               <Badge variant="info" className="mb-6"><ShieldCheck className="h-3.5 w-3.5" /> MAX identity platform</Badge>
@@ -56,7 +56,7 @@ export default function LandingPage() {
 
             <div className="relative mx-auto w-full max-w-[560px]">
               <div className="absolute inset-12 rounded-full bg-brand-500/10 blur-3xl" />
-              <div className="relative rounded-3xl border border-glass-border bg-base-raised p-4 shadow-[0_24px_80px_-35px_rgba(37,99,235,.35)] sm:p-7">
+              <div className="liquid-glass glass-edge relative rounded-[2rem] p-4 sm:p-7">
                 <div className="flex items-center justify-between border-b border-glass-border pb-4">
                   <div><p className="text-xs font-semibold text-ink-faint">MAX AUTH</p><p className="mt-1 text-sm font-bold">Identity overview</p></div>
                   <span className="flex items-center gap-2 text-xs font-semibold text-success"><span className="h-2 w-2 rounded-full bg-success" /> Protected</span>
@@ -81,7 +81,7 @@ export default function LandingPage() {
             </div>
             <div className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-glass-border bg-glass-border sm:grid-cols-2 lg:grid-cols-4">
               {products.map(([name, desc]) => (
-                <div key={name} className="group bg-base-raised p-6 transition-colors hover:bg-glass-hover">
+                <div key={name} className="group bg-base-raised/70 p-6 transition-all duration-300 hover:bg-white/75 hover:shadow-[inset_0_1px_0_rgba(255,255,255,.8)] dark:bg-slate-950/50 dark:hover:bg-white/[.06]">
                   <div className="mb-8 flex h-11 w-11 items-center justify-center rounded-xl border border-glass-border bg-base text-brand-600 dark:text-brand-400">
                     <ProductMark name={name} className="h-5 w-5" />
                   </div>
@@ -111,7 +111,7 @@ export default function LandingPage() {
         </section>
 
         <section id="developers" className="px-4 py-20 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-7xl rounded-2xl border border-glass-border bg-slate-950 p-8 text-white sm:p-12 dark:bg-black">
+          <div className="glass-edge relative mx-auto max-w-7xl overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-slate-950 via-[#111827] to-[#172554] p-8 text-white shadow-[0_30px_90px_-42px_rgba(37,99,235,.55)] sm:p-12">
             <div className="max-w-2xl">
               <p className="text-xs font-bold uppercase tracking-[.18em] text-blue-300">For developers</p>
               <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">Continue with MAX AI.</h2>
