@@ -30,7 +30,7 @@ export function DashboardHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-30 flex min-h-[76px] items-center gap-4 bg-base px-4 sm:px-6 lg:px-8">
+      <header className="sticky top-0 z-30 flex min-h-[76px] items-center gap-4 border-b border-white/35 bg-white/60 px-4 shadow-[0_8px_28px_-24px_rgba(15,23,42,.45)] backdrop-blur-2xl sm:px-6 lg:px-8 dark:border-white/[.06] dark:bg-slate-950/55">
         <button
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-ink-muted hover:bg-base-raised lg:hidden"
           onClick={() => setMobileOpen(true)}
@@ -44,7 +44,7 @@ export function DashboardHeader() {
           <input
             aria-label="Search MAX Account"
             placeholder="Search MAX Account"
-            className="h-12 w-full rounded-full border border-glass-border bg-base-raised pl-12 pr-5 text-sm text-ink outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/15"
+            className="h-12 w-full rounded-full border border-white/65 bg-white/60 pl-12 pr-5 text-sm text-ink shadow-[inset_0_1px_0_rgba(255,255,255,.75),0_8px_24px_-20px_rgba(15,23,42,.3)] outline-none backdrop-blur-xl transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/15 dark:border-white/10 dark:bg-white/[.04]"
           />
         </div>
 
@@ -94,7 +94,7 @@ export function DashboardHeader() {
               animate={{ x: 0 }}
               exit={{ x: -300 }}
               transition={{ duration: 0.18, ease: "easeOut" }}
-              className="absolute left-0 top-0 h-full w-[300px] bg-base"
+              className="absolute left-0 top-0 h-full w-[300px] border-r border-white/20 bg-white/75 shadow-2xl backdrop-blur-2xl dark:bg-slate-950/85"
             >
               <DashboardSidebar className="w-full" />
             </motion.div>
