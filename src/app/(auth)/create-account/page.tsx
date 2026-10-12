@@ -15,6 +15,7 @@ import { ApiError } from "@/lib/api/ApiError";
 import { isValidEmail, isValidUsername, getPasswordStrength } from "@/lib/utils/validators";
 
 const LAST_ACCOUNT_KEY = "max-auth:last-account";
+const ACCOUNTS_KEY = "max-auth:accounts";
 const STEP_COUNT = 5;
 
 export default function CreateAccountPage() {
@@ -87,7 +88,13 @@ export default function CreateAccountPage() {
       });
       if (rememberMe) {
         try {
-          window.localStorage.setItem(LAST_ACCOUNT_KEY, email.trim().toLowerCase());
+          const account = email.trim().toLowerCase();
+          const saved = window.localStorage.getItem(ACCOUNTS_KEY);
+          const parsed: unknown = saved ? JSON.parse(saved) : [];
+          const accounts = Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === "string") : [];
+          const unique = [...new Map([account, ...accounts].map((item) => [item.toLowerCase(), item])).values()].slice(0, 5);
+          window.localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(unique));
+          window.localStorage.removeItem(LAST_ACCOUNT_KEY);
         } catch {
           // Remembering the account is optional and must never block registration.
         }
