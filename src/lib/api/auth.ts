@@ -3,6 +3,7 @@ import { tokenStore } from "./tokenStore";
 import type { MaxUser } from "@/types/api";
 
 export interface AuthPayload { user: MaxUser; accessToken: string; }
+export interface OAuthAuthorizationRequest { clientId: string; clientName: string; clientLogo?: string; clientWebsite?: string; redirectUri: string; scopes: string[]; codeChallenge: string; codeChallengeMethod: "S256"; state: string; expiresAt: number; }
 
 export const authApi = {
   async register(input: { username: string; email: string; password: string; fullName: string; displayName: string; ageConfirmed: true; rememberMe?: boolean }) { const data = await apiClient.post<AuthPayload>("/auth/register", input, { skipAuth: true }); tokenStore.set(data.accessToken); return data; },
@@ -16,5 +17,6 @@ export const authApi = {
   resetPassword(token: string, newPassword: string) { return apiClient.post<{ message: string }>("/auth/password/reset", { token, newPassword }, { skipAuth: true }); },
   changePassword(currentPassword: string, newPassword: string) { return apiClient.post("/auth/password/change", { currentPassword, newPassword }); },
   deleteAccount(password: string) { return apiClient.delete("/auth/account", { body: { password } }); },
+  getOAuthRequest(requestToken: string) { return apiClient.get<{ request: OAuthAuthorizationRequest }>(`/oauth/authorize/details?request_token=${encodeURIComponent(requestToken)}`, { skipAuth: true }).then((data) => data.request); },
   approveOAuth(input: { clientId: string; redirectUri: string; scopes: string; codeChallenge?: string; codeChallengeMethod?: string; state?: string; requestToken: string }) { return apiClient.post<{ redirectUri: string }>("/oauth/authorize/approve", input); },
 };
