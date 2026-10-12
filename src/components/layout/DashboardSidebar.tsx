@@ -16,8 +16,10 @@ import {
   House,
   Link2,
   Code2,
+  ShieldCheck,
 } from "lucide-react";
 import { MaxLogo } from "./MaxLogo";
+import { useAuth } from "@/lib/auth/useAuth";
 import { cn } from "@/lib/utils/cn";
 
 type SidebarItem = {
@@ -64,6 +66,10 @@ const groups: SidebarGroup[] = [
 
 export function DashboardSidebar({ className }: { className?: string }) {
   const pathname = usePathname();
+  const { user } = useAuth();
+  const visibleGroups = user?.isAdmin
+    ? [...groups, { label: "Administration", items: [{ href: "/admin", label: "Admin console", icon: ShieldCheck }] }]
+    : groups;
 
   return (
     <aside className={cn("flex h-full w-[280px] shrink-0 flex-col bg-transparent", className)}>
@@ -75,7 +81,7 @@ export function DashboardSidebar({ className }: { className?: string }) {
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 pb-8" aria-label="MAX Account">
-        {groups.map((group) => (
+        {visibleGroups.map((group) => (
           <div key={group.label} className="mb-7 last:mb-0">
             <p className="mb-2 px-4 text-xs font-medium text-ink-muted">{group.label}</p>
             <div className="space-y-1">
