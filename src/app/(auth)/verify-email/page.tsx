@@ -17,6 +17,8 @@ function VerifyEmailInner() {
   const token = searchParams.get("token");
   const [status, setStatus] = useState<Status>("verifying");
   const [message, setMessage] = useState("");
+  const [isResending, setIsResending] = useState(false);
+  const [resendMessage, setResendMessage] = useState("");
 
   useEffect(() => {
     if (!token) {
@@ -69,11 +71,24 @@ function VerifyEmailInner() {
           <XCircle className="h-6 w-6" />
         </div>
         <p className="text-sm text-ink-muted">{message}</p>
-        <Link href="/dashboard" className="mt-6 w-full">
-          <Button variant="secondary" className="w-full">
-            <MailCheck className="h-4 w-4" /> Resend from your dashboard
+        <div className="mt-6 w-full space-y-3">
+          <Button variant="secondary" className="w-full" isLoading={isResending} onClick={async () => {
+            setIsResending(true);
+            setResendMessage("");
+            try {
+              await authApi.sendVerificationEmail();
+              setResendMessage("A fresh verification link has been sent. Check your inbox and spam folder.");
+            } catch (err) {
+              setResendMessage(err instanceof ApiError ? err.message : "Sign in to your MAX Account first, then request a new verification email.");
+            } finally {
+              setIsResending(false);
+            }
+          }}>
+            <MailCheck className="h-4 w-4" /> Resend verification email
           </Button>
-        </Link>
+          {resendMessage && <p role="status" className="text-sm leading-6 text-ink-muted">{resendMessage}</p>}
+          <Link href="/sign-in" className="block text-sm font-medium text-brand-400 hover:text-brand-300">Back to sign in</Link>
+        </div>
       </div>
     </AuthCard>
   );
