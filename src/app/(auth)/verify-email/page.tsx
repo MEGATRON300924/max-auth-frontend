@@ -15,7 +15,7 @@ type Status = "verifying" | "sent" | "success" | "error";
 function VerifyEmailInner() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
-  const isNewVerification = searchParams.get("sent") === "1";
+  const isNewVerification = searchParams.get("sent") === "1";\n  const developerReturnTo = (() => {\n    const value = searchParams.get("returnTo");\n    if (!value) return null;\n    try {\n      const target = new URL(value);\n      return target.origin === "https://developers.max-ai.name.ng" && target.pathname === "/sign-in" && target.searchParams.get("next") === "/onboarding"\n        ? target.toString()\n        : null;\n    } catch {\n      return null;\n    }\n  })();
   const [status, setStatus] = useState<Status>("verifying");
   const [message, setMessage] = useState("");
   const [isResending, setIsResending] = useState(false);
@@ -67,7 +67,7 @@ function VerifyEmailInner() {
               }
             }}>Resend verification email</Button>
             {resendMessage && <p role="status" className="text-sm leading-6 text-ink-muted">{resendMessage}</p>}
-            <Link href="/dashboard" className="block text-sm font-medium text-brand-400 hover:text-brand-300">Continue to MAX</Link>
+            <Link href={developerReturnTo || "/dashboard"} className="block text-sm font-medium text-brand-400 hover:text-brand-300">{developerReturnTo ? "Return to Developer Platform" : "Continue to MAX"}</Link>
           </div>
         </div>
       </AuthCard>
