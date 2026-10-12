@@ -1,116 +1,168 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
-import { ArrowLeft, Check, ChevronRight, ShieldCheck } from "lucide-react";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ArrowRight, Check, ShieldCheck, UserRound } from "lucide-react";
 import { useAuth } from "@/lib/auth/useAuth";
-import { authApi } from "@/lib/api/auth";
+import { authApi, type OAuthAuthorizationRequest } from "@/lib/api/auth";
+import { ApiError } from "@/lib/api/ApiError";
 
-const scopeLabel = (scope: string) => {
-  switch (scope) {
-    case "openid": return "Your MAX account identity";
-    case "identity:read": return "Your MAX user ID";
-    case "profile:read":
-    case "profile": return "Your basic profile information";
-    case "email:read":
-    case "email": return "Your email address";
-    case "memory:read": return "Your MAX Memory approved for this app";
-    case "offline_access": return "Keep you signed in with a refresh token";
-    case "account:read": return "Your MAX account information";
-    default: return scope.replace(/[:_]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
-  }
+const SCOPE_LABELS: Record<string, { title: string; description: string }> = {
+  openid: { title: "Confirm your MAX identity", description: "Let this app know that your MAX account signed in." },
+  profile: { title: "Basic profile", description: "Share your MAX display name and username." },
+  "profile:read": { title: "Read your profile", description: "Allow this app to read your MAX profile details." },
+  email: { title: "Email address", description: "Share the email address associated with your MAX account." },
+  "email:read": { title: "Read your email", description: "Allow this app to read your MAX account email address." },
+  "account:read": { title: "Account information", description: "Read basic information about your MAX account." },
+  "identity:read": { title: "MAX identity", description: "Read your MAX account identifier." },
+  "memory:read": { title: "MAX Memory", description: "Read the MAX Memory information you have authorized." },
+  offline_access: { title: "Stay connected", description: "Allow this app to refresh its access when you're not actively using it." },
 };
 
-type TrustedAuthorizationRequest = {
-  clientId: string;
-  clientName: string;
-  clientLogo?: string;
-  clientWebsite?: string;
-  redirectUri: string;
-  scopes: string[];
-  codeChallenge: string;
-  codeChallengeMethod: "S256";
-  state: string;
-  exp: number;
-};
-
-function decodeRequestToken(token: string): TrustedAuthorizationRequest | null {
-  try {
-    const encoded = token.split(".")[0];
-    if (!encoded) return null;
-    const normalized = encoded.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(encoded.length / 4) * 4, "=");
-    const parsed = JSON.parse(window.atob(normalized)) as TrustedAuthorizationRequest;
-    if (!parsed.clientId || !parsed.clientName || !parsed.redirectUri || !Array.isArray(parsed.scopes) || !parsed.codeChallenge || parsed.codeChallengeMethod !== "S256" || !parsed.state || typeof parsed.exp !== "number" || parsed.exp < Math.floor(Date.now() / 1000)) return null;
-    return parsed;
-  } catch {
-    return null;
-  }
-}
-
-export default function AuthorizePage() {
-  const { user, isLoading } = useAuth();
-  const [params, setParams] = useState<URLSearchParams | null>(null);
-  const [request, setRequest] = useState<TrustedAuthorizationRequest | null>(null);
-  const [approving, setApproving] = useState(false);
+function AuthorizeContent() {
+  const params = useSearchParams();
+  const router = useRouter();
+  const { user, isLoading, isAuthenticated } = useAuth();
+  const requestToken = params.get("request_token") || "";
+  const [trustedRequest, setTrustedRequest] = useState<OAuthAuthorizationRequest | null>(null);
+  const [isValidating, setIsValidating] = useState(true);
+  const [isApproving, setIsApproving] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const nextParams = new URLSearchParams(window.location.search);
-    setParams(nextParams);
-    const requestToken = nextParams.get("request_token");
-    setRequest(requestToken ? decodeRequestToken(requestToken) : null);
-  }, []);
+    if (isLoading) return;
+    if (!isAuthenticated) {
+      const returnTo = window.location.pathname + window.location.search;
+      router.replace(`/sign-in?returnTo=${encodeURIComponent(returnTo)}`);
+    }
+  }, [isAuthenticated, isLoading, router]);
 
-  const requestToken = params?.get("request_token") || "";
-  const clientName = request?.clientName || "MAX application";
-  const clientLogo = request?.clientLogo || "/logo.png";
-  const clientWebsite = request?.clientWebsite || "";
-  const scopes = useMemo(() => request?.scopes || [], [request]);
-  const returnTo = typeof window === "undefined" ? "/authorize" : `${window.location.pathname}${window.location.search}`;
-  useEffect(() => { if (params) document.title = `Sign in with ${clientName}`; }, [clientName, params]);
+  useEffect(() => {
+    if (isLoading || !isAuthenticated) return;
+    let cancelled = false;
+    setTrustedRequest(null);
+    setValidationError(null);
+    setIsValidating(true);
+    if (!requestToken) {
+      setValidationError("This authorization link is incomplete. Return to the app that sent you here and try again.");
+      setIsValidating(false);
+      return () => { cancelled = true; };
+    }
+    authApi.getOAuthRequest(requestToken)
+      .then((request) => { if (!cancelled) setTrustedRequest(request); })
+      .catch((err) => {
+        if (cancelled) return;
+        setValidationError(err instanceof ApiError && err.code === "INVALID_SCOPE"
+          ? "Some requested permissions are invalid or aren't enabled for this application. No access has been granted."
+          : "This authorization request could not be verified or has expired. No access has been granted.");
+      })
+      .finally(() => { if (!cancelled) setIsValidating(false); });
+    return () => { cancelled = true; };
+  }, [isAuthenticated, isLoading, requestToken]);
 
   const approve = async () => {
-    if (!request || !requestToken) return;
-    setApproving(true); setError(null);
+    if (!trustedRequest || isApproving) return;
+    setError(null);
+    setIsApproving(true);
     try {
       const result = await authApi.approveOAuth({
-        clientId: request.clientId,
-        redirectUri: request.redirectUri,
-        scopes: request.scopes.join(" "),
-        codeChallenge: request.codeChallenge,
-        codeChallengeMethod: request.codeChallengeMethod,
-        state: request.state,
+        clientId: trustedRequest.clientId,
+        redirectUri: trustedRequest.redirectUri,
+        scopes: trustedRequest.scopes.join(" "),
+        codeChallenge: trustedRequest.codeChallenge,
+        codeChallengeMethod: trustedRequest.codeChallengeMethod,
+        state: trustedRequest.state,
         requestToken,
       });
       window.location.assign(result.redirectUri);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to authorize this application.");
-      setApproving(false);
+      setError(err instanceof ApiError && err.code === "INVALID_SCOPE"
+        ? "The application's permissions changed before approval. No access was granted. Return to the app and try again."
+        : "We couldn't complete this request. No access was granted. Please try again.");
+      setIsApproving(false);
     }
   };
 
-  const cancel = () => {
-    if (!request) return;
-    const callback = new URL(request.redirectUri);
-    callback.searchParams.set("error", "access_denied");
-    callback.searchParams.set("error_description", "The user cancelled the MAX sign-in request.");
-    callback.searchParams.set("state", request.state);
-    window.location.assign(callback.toString());
-  };
+  if (isLoading || !isAuthenticated || isValidating) {
+    return <main className="grid min-h-screen place-items-center bg-[#f7f8fa] px-4 text-[#252b36] dark:bg-[#17191d] dark:text-[#e5e7eb]"><p className="text-sm text-[#667085] dark:text-[#a2a8b3]">Checking this request…</p></main>;
+  }
 
-  if (!params || isLoading) return <main className="min-h-screen bg-[#f8f9fa] dark:bg-[#202124]" />;
-  if (!request) return <main className="min-h-screen bg-[#f8f9fa] px-4 py-8 text-[#202124] dark:bg-[#202124] dark:text-[#e8eaed] sm:py-12"><div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-[450px] items-center justify-center"><section className="w-full rounded-[16px] border border-[#dadce0] bg-white px-7 py-9 text-center shadow-sm dark:border-[#5f6368] dark:bg-[#292a2d] sm:px-10 sm:py-10"><img src="/logo.png" alt="MAX" className="mx-auto h-12 w-12 object-contain" /><h1 className="mt-5 text-[22px] font-normal">This sign-in request is no longer valid</h1><p className="mt-3 text-sm leading-6 text-[#5f6368] dark:text-[#bdc1c6]">Please return to the application and start the sign-in process again.</p></section></div></main>;
+  if (!trustedRequest || validationError) {
+    return (
+      <main className="grid min-h-screen place-items-center bg-[#f7f8fa] px-4 py-10 text-[#252b36] dark:bg-[#17191d] dark:text-[#e5e7eb]">
+        <section className="w-full max-w-lg rounded-3xl border border-[#e3e7ed] bg-white p-7 shadow-sm dark:border-[#373b44] dark:bg-[#202329] sm:p-9">
+          <div className="mb-6 flex items-center gap-3"><img src="/logo.png" alt="MAX" className="h-9 w-9 rounded-xl object-contain" /><span className="text-sm font-semibold text-[#667085] dark:text-[#a2a8b3]">MAX</span></div>
+          <h1 className="text-2xl font-semibold tracking-tight">We couldn't verify this request</h1>
+          <p className="mt-3 text-sm leading-6 text-[#667085] dark:text-[#a2a8b3]">{validationError || "This authorization request is invalid or has expired. No access has been granted."}</p>
+          <p className="mt-4 text-sm leading-6 text-[#667085] dark:text-[#a2a8b3]">If you're the developer, review the requested scopes and registered redirect URI in MAX for Developers or MAX Auth. Ask only for the permissions the app needs.</p>
+          <div className="mt-7 flex flex-wrap gap-3">
+            <a href="https://developers.max-ai.name.ng" className="inline-flex h-11 items-center justify-center rounded-full bg-[#3569b7] px-5 text-sm font-semibold text-white transition hover:brightness-105">MAX for Developers</a>
+            <button type="button" onClick={() => router.push("/")} className="inline-flex h-11 items-center justify-center rounded-full border border-[#d7dce4] px-5 text-sm font-semibold transition hover:bg-[#f7f8fa] dark:border-[#454a54] dark:hover:bg-[#2b2f36]">Back to MAX</button>
+          </div>
+          <div className="mt-7 flex justify-center gap-5 text-xs text-[#667085] dark:text-[#a2a8b3]"><a href="/privacy-policy" className="hover:underline">Privacy</a><a href="/terms-of-service" className="hover:underline">Terms</a></div>
+        </section>
+      </main>
+    );
+  }
 
-  return <main className="min-h-screen bg-[#f8f9fa] px-4 py-8 text-[#202124] dark:bg-[#202124] dark:text-[#e8eaed] sm:py-12"><div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-[450px] items-center justify-center"><section className="w-full rounded-[16px] border border-[#dadce0] bg-white px-7 py-9 shadow-sm dark:border-[#5f6368] dark:bg-[#292a2d] sm:px-10 sm:py-10">
-    <div className="text-center"><div className="mx-auto flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border border-[#dadce0] bg-white dark:border-[#5f6368]"><img src={clientLogo} alt="" className="h-full w-full object-contain" onError={(event) => { event.currentTarget.src = "/logo.png"; }} /></div><h1 className="mt-5 text-[24px] font-normal tracking-[-0.01em]">Sign in with MAX</h1><p className="mt-2 text-[15px] leading-6 text-[#5f6368] dark:text-[#bdc1c6]">Continue to <span className="font-medium text-[#202124] dark:text-[#e8eaed]">{clientName}</span></p>{clientWebsite ? <a href={clientWebsite} target="_blank" rel="noreferrer" className="mt-1 inline-block text-xs text-[#5f6368] hover:underline dark:text-[#bdc1c6]">View application</a> : null}</div>
-    {!user ? <div className="mt-8"><Link href={`/sign-in?returnTo=${encodeURIComponent(returnTo)}`} className="group flex w-full items-center gap-3 rounded-[8px] border border-[#dadce0] bg-white px-3 py-3 text-left transition-colors hover:bg-[#f8f9fa] dark:border-[#5f6368] dark:bg-transparent dark:hover:bg-[#303134]"><div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f1f3f4] dark:bg-[#3c4043]"><img src="/logo.png" alt="" className="h-7 w-7 rounded-full object-contain" /></div><div className="min-w-0 flex-1"><p className="text-sm font-medium">Choose a MAX Account</p><p className="mt-0.5 truncate text-sm text-[#5f6368] dark:text-[#bdc1c6]">Sign in or use another account</p></div><ChevronRight className="h-5 w-5 text-[#5f6368]" /></Link><p className="mt-7 text-center text-xs leading-5 text-[#5f6368] dark:text-[#bdc1c6]">MAX Auth keeps your password private and only shares the information you approve.</p></div> : <div className="mt-8">
-      <button type="button" onClick={approve} disabled={approving} className="group flex w-full items-center gap-3 rounded-[8px] border border-[#dadce0] bg-white px-3 py-3 text-left transition-colors hover:bg-[#f8f9fa] disabled:cursor-wait disabled:opacity-70 dark:border-[#5f6368] dark:bg-transparent dark:hover:bg-[#303134]"><div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#f1f3f4] dark:bg-[#3c4043]">{user.avatarUrl ? <img src={user.avatarUrl} alt="" className="h-10 w-10 object-cover" /> : <img src="/logo.png" alt="" className="h-7 w-7 object-contain" />}</div><div className="min-w-0 flex-1"><p className="truncate text-sm font-medium">{user.displayName || user.username}</p><p className="truncate text-sm text-[#5f6368] dark:text-[#bdc1c6]">{user.email}</p></div><ChevronRight className="h-5 w-5 text-[#5f6368] transition-transform group-hover:translate-x-0.5" /></button>
-      {approving && <p className="mt-3 text-center text-xs text-[#5f6368] dark:text-[#bdc1c6]">Signing you in securely…</p>}
-      <Link href={`/sign-in?returnTo=${encodeURIComponent(returnTo)}`} className="mt-3 flex w-full items-center justify-center rounded-[8px] px-3 py-2.5 text-sm font-medium text-[#0b57d0] hover:bg-[#f1f3f4] dark:text-[#8ab4f8] dark:hover:bg-[#303134]">Use another MAX Account</Link>
-      <div className="mt-7 border-t border-[#dadce0] pt-6"><p className="text-sm font-medium">{clientName} will be able to:</p><div className="mt-4 space-y-3">{scopes.map((scope) => <div key={scope} className="flex items-start gap-3 text-sm text-[#3c4043] dark:text-[#e8eaed]"><Check className="mt-0.5 h-4 w-4 shrink-0 text-[#1e8e3e] dark:text-[#81c995]" /><span>{scopeLabel(scope)}</span></div>)}</div></div>
-      <div className="mt-7 flex items-start gap-3 rounded-[8px] bg-[#f8f9fa] p-3 text-xs leading-5 text-[#5f6368] dark:bg-[#303134] dark:text-[#bdc1c6]"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" /><span>You can review or remove this access later from your MAX Account settings.</span></div>
-      {error && <p className="mt-4 text-sm text-[#d93025] dark:text-[#f28b82]">{error}</p>}
-      <div className="mt-7 flex items-center justify-between gap-4"><button type="button" onClick={cancel} className="inline-flex items-center gap-1.5 text-sm font-medium text-[#0b57d0] hover:underline dark:text-[#8ab4f8]"><ArrowLeft className="h-4 w-4" />Cancel</button><button type="button" onClick={approve} disabled={approving} className="rounded-[8px] bg-[#0b57d0] px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#0842a0] disabled:cursor-wait disabled:opacity-60 dark:bg-[#a8c7fa] dark:text-[#062e6f] dark:hover:bg-[#8ab4f8]">{approving ? "Continuing…" : "Continue"}</button></div>
-    </div>}
-  </section></div></main>;
+  const displayedScopes = [...new Set(trustedRequest.scopes)].map((scope) => ({
+    scope,
+    ...(SCOPE_LABELS[scope] || { title: "Additional permission", description: "This app has requested an additional permission for your MAX Account." }),
+  }));
+  let requestingHost = "Unknown site";
+  try { requestingHost = new URL(trustedRequest.redirectUri).host; } catch { /* The backend has already validated this redirect URI. */ }
+
+  return (
+    <main className="min-h-screen bg-[#f7f8fa] px-4 py-8 text-[#252b36] dark:bg-[#17191d] dark:text-[#e5e7eb] sm:py-12">
+      <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-[520px] items-center justify-center">
+        <section className="w-full rounded-[24px] border border-[#e3e7ed] bg-white p-6 shadow-sm dark:border-[#373b44] dark:bg-[#202329] sm:p-9">
+          <div className="mb-7 flex items-center gap-3">
+            <img src="/logo.png" alt="MAX" className="h-9 w-9 rounded-xl object-contain" />
+            <span className="text-sm font-semibold text-[#667085] dark:text-[#a2a8b3]">MAX</span>
+          </div>
+
+          <div className="flex items-start gap-4">
+            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#edf3fc] text-[#3569b7] dark:bg-[#293342] dark:text-[#9abcf6]"><ShieldCheck className="h-6 w-6" /></div>
+            <div className="min-w-0">
+              <h1 className="text-[25px] font-semibold leading-tight tracking-tight">This site is requesting access</h1>
+              <p className="mt-2 text-sm leading-6 text-[#667085] dark:text-[#a2a8b3]"><span className="font-semibold text-[#252b36] dark:text-[#e5e7eb]">{trustedRequest.clientName}</span> wants to connect to your MAX Account.</p>
+              <p className="mt-1 text-xs text-[#667085] dark:text-[#a2a8b3]">Redirects to {requestingHost}</p>
+            </div>
+          </div>
+
+          <div className="mt-6 flex items-center gap-3 rounded-2xl border border-[#e3e7ed] p-3 dark:border-[#373b44]">
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#edf3fc] text-[#3569b7] dark:bg-[#293342] dark:text-[#9abcf6]"><UserRound className="h-5 w-5" /></div>
+            <div className="min-w-0 flex-1"><p className="truncate text-sm font-medium">{user?.displayName || user?.username || "Your MAX Account"}</p><p className="truncate text-xs text-[#667085] dark:text-[#a2a8b3]">{user?.email || "Signed-in account"}</p></div>
+            <Check className="h-4 w-4 text-[#39845a]" />
+          </div>
+
+          <div className="mt-7">
+            <h2 className="text-sm font-semibold">The app is asking to:</h2>
+            <div className="mt-3 divide-y divide-[#e9ecf1] rounded-2xl border border-[#e3e7ed] dark:divide-[#373b44] dark:border-[#373b44]">
+              {displayedScopes.map(({ scope, title, description }) => (
+                <div key={scope} className="flex items-start gap-3 p-4">
+                  <div className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-[#f0f2f5] text-[#435c7d] dark:bg-[#2b2f36] dark:text-[#b3c5df]"><Check className="h-4 w-4" /></div>
+                  <div className="min-w-0 flex-1"><p className="text-sm font-medium">{title}</p><p className="mt-1 text-sm leading-5 text-[#667085] dark:text-[#a2a8b3]">{description}</p></div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {error && <div role="alert" className="mt-5 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200">{error}</div>}
+
+          <p className="mt-5 text-xs leading-5 text-[#667085] dark:text-[#a2a8b3]">Only continue if you recognize this site and trust it with the permissions listed above. You can revoke app access later in your MAX Account settings.</p>
+          <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button type="button" onClick={() => router.push("/dashboard")} className="inline-flex h-12 items-center justify-center rounded-full border border-[#d7dce4] px-5 text-sm font-semibold transition hover:bg-[#f7f8fa] dark:border-[#454a54] dark:hover:bg-[#2b2f36]">Cancel</button>
+            <button type="button" onClick={approve} disabled={isApproving} className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#3569b7] px-6 text-sm font-semibold text-white transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-60">{isApproving ? "Connecting…" : "Continue"} {!isApproving && <ArrowRight className="h-4 w-4" />}</button>
+          </div>
+          <div className="mt-7 flex justify-center gap-5 text-xs text-[#667085] dark:text-[#a2a8b3]"><a href="/privacy-policy" className="hover:underline">Privacy</a><a href="/terms-of-service" className="hover:underline">Terms</a></div>
+        </section>
+      </div>
+    </main>
+  );
+}
+
+export default function AuthorizePage() {
+  return <Suspense fallback={<main className="grid min-h-screen place-items-center"><p className="text-sm text-ink-muted">Checking this request…</p></main>}><AuthorizeContent /></Suspense>;
 }
