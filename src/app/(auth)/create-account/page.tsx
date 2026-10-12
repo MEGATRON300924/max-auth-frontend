@@ -100,7 +100,7 @@ export default function CreateAccountPage() {
         }
       }
       showToast({ title: "Account created", description: "Check your inbox for your email verification link.", variant: "success" });
-      router.push("/dashboard");
+      router.push("/verify-email?sent=1");
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Something went wrong. Please try again.");
     } finally {
