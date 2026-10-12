@@ -16,7 +16,6 @@ import {
   House,
   Link2,
   Code2,
-  ShieldCheck,
 } from "lucide-react";
 import { MaxLogo } from "./MaxLogo";
 import { useAuth } from "@/lib/auth/useAuth";
