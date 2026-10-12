@@ -15,7 +15,19 @@ type Status = "verifying" | "sent" | "success" | "error";
 function VerifyEmailInner() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
-  const isNewVerification = searchParams.get("sent") === "1";\n  const developerReturnTo = (() => {\n    const value = searchParams.get("returnTo");\n    if (!value) return null;\n    try {\n      const target = new URL(value);\n      return target.origin === "https://developers.max-ai.name.ng" && target.pathname === "/sign-in" && target.searchParams.get("next") === "/onboarding"\n        ? target.toString()\n        : null;\n    } catch {\n      return null;\n    }\n  })();
+  const isNewVerification = searchParams.get("sent") === "1";
+  const developerReturnTo = (() => {
+    const value = searchParams.get("returnTo");
+    if (!value) return null;
+    try {
+      const target = new URL(value);
+      return target.origin === "https://developers.max-ai.name.ng" && target.pathname === "/sign-in" && target.searchParams.get("next") === "/onboarding"
+        ? target.toString()
+        : null;
+    } catch {
+      return null;
+    }
+  })();
   const [status, setStatus] = useState<Status>("verifying");
   const [message, setMessage] = useState("");
   const [isResending, setIsResending] = useState(false);
