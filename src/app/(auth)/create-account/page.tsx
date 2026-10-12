@@ -100,7 +100,19 @@ export default function CreateAccountPage() {
         }
       }
       showToast({ title: "Account created", description: "Check your inbox for your email verification link.", variant: "success" });
-      router.push("/verify-email?sent=1");
+      let returnTo = "";
+      try {
+        const requestedReturnTo = new URLSearchParams(window.location.search).get("returnTo");
+        if (requestedReturnTo) {
+          const target = new URL(requestedReturnTo);
+          if (target.origin === "https://developers.max-ai.name.ng" && target.pathname === "/sign-in") {
+            returnTo = `${target.origin}${target.pathname}?next=%2Fonboarding`;
+          }
+        }
+      } catch {
+        // Ignore untrusted or malformed return URLs.
+      }
+      router.push(`/verify-email?sent=1${returnTo ? `&returnTo=${encodeURIComponent(returnTo)}` : ""}`);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Something went wrong. Please try again.");
     } finally {
