@@ -29,6 +29,8 @@ jobs:
         run: npm ci
       - name: Check for critical dependency vulnerabilities
         run: npm audit --audit-level=critical
+      - name: Check production dependencies for high-risk advisories
+        run: npm audit --omit=dev --audit-level=high
       - name: Build application
         run: npm run build
         env:
