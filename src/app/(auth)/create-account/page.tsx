@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Mail, Lock, User, AtSign, ArrowLeft, ArrowRight, CalendarCheck } from "lucide-react";
+import { Mail, Lock, UserRound, AtSign, ArrowLeft, ArrowRight, CalendarCheck, Sparkles } from "lucide-react";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { PasswordStrengthMeter } from "@/components/auth/PasswordStrengthMeter";
 import { Input } from "@/components/ui/Input";
@@ -23,6 +23,7 @@ export default function CreateAccountPage() {
   const router = useRouter();
 
   const [step, setStep] = useState(0);
+  const [fullName, setFullName] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState("");
   const [ageConfirmed, setAgeConfirmed] = useState(false);
@@ -35,17 +36,19 @@ export default function CreateAccountPage() {
 
   const stepTitles = ["What's your name?", "What should MAX call you?", "Age check", "What's your email?", "Create a password"];
   const stepDescriptions = [
-    "Tell us the name you want associated with your account.",
-    "Choose the name people will see across MAX.",
+    "Enter your name to get your MAX Account started.",
+    "Choose your display name and a unique username. You can change your display name later.",
     "Confirm that you meet the minimum age requirement for a MAX Account.",
-    "Use an email address you can open. We'll ask you to verify it.",
+    "Use an email address you can access. We'll send you a verification link.",
     "Choose a password you don't use for another account.",
   ];
 
   const validateStep = () => {
     const errors: Record<string, string> = {};
-    if (step === 0 && !displayName.trim()) errors.displayName = "Enter your name to continue.";
-    if (step === 0 && displayName.trim().length > 64) errors.displayName = "Keep your name to 64 characters or fewer.";
+    if (step === 0 && !fullName.trim()) errors.fullName = "Enter your name to continue.";
+    if (step === 0 && fullName.trim().length > 128) errors.fullName = "Keep your name to 128 characters or fewer.";
+    if (step === 1 && !displayName.trim()) errors.displayName = "Tell MAX what to call you.";
+    if (step === 1 && displayName.trim().length > 64) errors.displayName = "Keep your display name to 64 characters or fewer.";
     if (step === 1 && !isValidUsername(username)) errors.username = "Use 3–32 letters, numbers, underscores, or periods.";
     if (step === 2 && !ageConfirmed) errors.age = "Please confirm the age requirement before continuing.";
     if (step === 3 && !isValidEmail(email)) errors.email = "Enter a valid email address.";
@@ -57,13 +60,13 @@ export default function CreateAccountPage() {
   const goNext = () => {
     setError(null);
     if (!validateStep()) return;
-    setStep((current) => Math.min(current + 1, STEP_COUNT - 1));
+    setStep((currentStep) => Math.min(currentStep + 1, STEP_COUNT - 1));
   };
 
   const goBack = () => {
     setError(null);
     setFieldErrors({});
-    setStep((current) => Math.max(current - 1, 0));
+    setStep((currentStep) => Math.max(currentStep - 1, 0));
   };
 
   const handleSubmit = async (event: FormEvent) => {
@@ -73,13 +76,23 @@ export default function CreateAccountPage() {
 
     setIsLoading(true);
     try {
-      await register({ username: username.trim(), email: email.trim(), password, displayName: displayName.trim(), rememberMe });
-      try {
-        if (rememberMe) window.localStorage.setItem(LAST_ACCOUNT_KEY, email.trim().toLowerCase());
-      } catch {
-        // Remembering the account identifier is optional.
+      await register({
+        fullName: fullName.trim(),
+        displayName: displayName.trim(),
+        username: username.trim(),
+        email: email.trim(),
+        password,
+        ageConfirmed: true,
+        rememberMe,
+      });
+      if (rememberMe) {
+        try {
+          window.localStorage.setItem(LAST_ACCOUNT_KEY, email.trim().toLowerCase());
+        } catch {
+          // Remembering the account is optional and must never block registration.
+        }
       }
-      showToast({ title: "Account created", description: "Check your inbox to verify your email.", variant: "success" });
+      showToast({ title: "Account created", description: "Check your inbox for your email verification link.", variant: "success" });
       router.push("/dashboard");
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Something went wrong. Please try again.");
@@ -87,8 +100,6 @@ export default function CreateAccountPage() {
       setIsLoading(false);
     }
   };
-
-  const field = (content: ReactNode) => <div className="min-h-[92px]">{content}</div>;
 
   return (
     <AuthCard
@@ -106,19 +117,25 @@ export default function CreateAccountPage() {
         </div>
       </div>
 
-      <form
-        onSubmit={step === STEP_COUNT - 1 ? handleSubmit : (event) => { event.preventDefault(); goNext(); }}
-        className="space-y-5"
-        noValidate
-      >
+      <form onSubmit={step === STEP_COUNT - 1 ? handleSubmit : (event) => { event.preventDefault(); goNext(); }} className="space-y-5" noValidate>
         {error && <Alert variant="danger">{error}</Alert>}
 
-        {step === 0 && field(
-          <Input label="Your name" type="text" autoComplete="name" icon={<User className="h-4 w-4" />} value={displayName} onChange={(event) => setDisplayName(event.target.value)} error={fieldErrors.displayName} placeholder="Your name" required autoFocus />
+        {step === 0 && (
+          <Input label="Your full name" type="text" autoComplete="name" icon={<UserRound className="h-4 w-4" />} value={fullName} onChange={(event) => setFullName(event.target.value)} error={fieldErrors.fullName} placeholder="Enter your name" required autoFocus />
         )}
 
-        {step === 1 && field(
-          <Input label="What should MAX call you?" type="text" autoComplete="username" icon={<AtSign className="h-4 w-4" />} value={username} onChange={(event) => setUsername(event.target.value.replace(/\s/g, ""))} error={fieldErrors.username} hint="This becomes your unique MAX username." placeholder="Choose a username" required autoFocus />
+        {step === 1 && (
+          <div className="space-y-4">
+            <div className="flex items-start gap-3 rounded-2xl border border-glass-border bg-base-raised p-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface text-ink-muted"><Sparkles className="h-5 w-5" /></div>
+              <div>
+                <p className="text-sm font-medium text-ink">Your name, your way</p>
+                <p className="mt-1 text-sm leading-5 text-ink-muted">Your display name appears across MAX. Your username helps identify your account.</p>
+              </div>
+            </div>
+            <Input label="Display name" type="text" autoComplete="nickname" icon={<UserRound className="h-4 w-4" />} value={displayName} onChange={(event) => setDisplayName(event.target.value)} error={fieldErrors.displayName} placeholder="What should MAX call you?" required autoFocus />
+            <Input label="MAX username" type="text" autoComplete="username" autoCapitalize="none" icon={<AtSign className="h-4 w-4" />} value={username} onChange={(event) => setUsername(event.target.value.replace(/\s/g, ""))} error={fieldErrors.username} hint="3–32 characters: letters, numbers, periods, or underscores." placeholder="Choose a unique username" required />
+          </div>
         )}
 
         {step === 2 && (
@@ -127,7 +144,7 @@ export default function CreateAccountPage() {
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface text-ink-muted"><CalendarCheck className="h-5 w-5" /></div>
               <div>
                 <p className="text-sm font-medium text-ink">Before we continue</p>
-                <p className="mt-1 text-sm leading-6 text-ink-muted">MAX uses age requirements to help apply the right protections. Please confirm you meet the minimum age requirement that applies to you.</p>
+                <p className="mt-1 text-sm leading-6 text-ink-muted">MAX uses age requirements to help apply the right protections. Please confirm that you meet the minimum age requirement that applies to you.</p>
               </div>
             </div>
             <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-glass-border p-4 transition-colors hover:bg-surface">
@@ -135,23 +152,21 @@ export default function CreateAccountPage() {
               <span className="text-sm leading-6 text-ink">I meet the minimum age requirement for a MAX Account.</span>
             </label>
             {fieldErrors.age && <p role="alert" className="text-sm text-danger">{fieldErrors.age}</p>}
-            <p className="text-xs leading-5 text-ink-faint">This step is an age confirmation, not an independent age verification. No date of birth is requested here.</p>
+            <p className="text-xs leading-5 text-ink-faint">This is an age confirmation, not independent age verification. MAX does not ask for your date of birth on this screen.</p>
           </div>
         )}
 
-        {step === 3 && field(
-          <Input label="Email address" type="email" autoComplete="email" autoCapitalize="none" icon={<Mail className="h-4 w-4" />} value={email} onChange={(event) => setEmail(event.target.value)} error={fieldErrors.email} placeholder="you@example.com" required autoFocus />
+        {step === 3 && (
+          <Input label="Email address" type="email" autoComplete="email" autoCapitalize="none" spellCheck={false} icon={<Mail className="h-4 w-4" />} value={email} onChange={(event) => setEmail(event.target.value)} error={fieldErrors.email} placeholder="you@example.com" required autoFocus />
         )}
 
         {step === 4 && (
           <div className="space-y-3">
-            <div className="relative">
-              <Input label="Password" type="password" autoComplete="new-password" icon={<Lock className="h-4 w-4" />} value={password} onChange={(event) => setPassword(event.target.value)} error={fieldErrors.password} placeholder="Create a strong password" required autoFocus />
-              </div>
+            <Input label="Password" type="password" autoComplete="new-password" icon={<Lock className="h-4 w-4" />} value={password} onChange={(event) => setPassword(event.target.value)} error={fieldErrors.password} placeholder="Create a strong password" required autoFocus />
             <PasswordStrengthMeter password={password} />
             <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-glass-border bg-base-raised p-3 text-sm text-ink-muted">
               <input type="checkbox" checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} className="mt-0.5 h-4 w-4 rounded border-glass-border bg-base text-brand-600 focus:ring-brand-500" />
-              <span><strong className="font-semibold text-ink">Remember this account</strong><br /><span className="text-xs">Only the account identifier is remembered on this device.</span></span>
+              <span><strong className="font-semibold text-ink">Remember this account</strong><br /><span className="text-xs">Only the account identifier is remembered on this device, and only if you opt in.</span></span>
             </label>
             <p className="text-xs leading-5 text-ink-faint">By creating an account, you agree to the <Link href="/terms-of-service" className="text-ink-muted underline underline-offset-2 hover:text-ink">Terms of Service</Link> and <Link href="/privacy-policy" className="text-ink-muted underline underline-offset-2 hover:text-ink">Privacy Policy</Link>.</p>
           </div>
