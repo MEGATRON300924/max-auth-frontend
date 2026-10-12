@@ -10,10 +10,14 @@ import { ApiError } from "@/lib/api/ApiError";
 import type { OAuthApplicationType, OAuthClient, OAuthClientConfig, OAuthClientConfigUpdate, OAuthPermission } from "@/types/api";
 
 const permissionOptions: { id: OAuthPermission; title: string; description: string }[] = [
-  { id: "identity:read", title: "User ID", description: "Identify the signed-in MAX account." },
-  { id: "profile:read", title: "Basic profile", description: "Name, username and profile picture." },
-  { id: "email:read", title: "Email address", description: "Email and verification state." },
-  { id: "memory:read", title: "MAX Memory", description: "Read memory data the user has approved." },
+  { id: "openid", title: "Sign in with MAX", description: "Authenticate the user and receive a stable account subject." },
+  { id: "profile", title: "Basic profile", description: "Share the user's display name and username." },
+  { id: "email", title: "Email address", description: "Share the email address associated with the MAX Account." },
+  { id: "account:read", title: "Account details", description: "Read basic MAX account information." },
+  { id: "identity:read", title: "User ID", description: "Read the signed-in MAX account identifier." },
+  { id: "profile:read", title: "Extended profile", description: "Read additional profile details and profile picture." },
+  { id: "email:read", title: "Email verification", description: "Read email verification status." },
+  { id: "memory:read", title: "MAX Memory", description: "Read memory data the user has explicitly approved." },
   { id: "offline_access", title: "Stay signed in", description: "Use refresh tokens for longer sessions." },
 ];
 const appTypes = [
@@ -29,7 +33,7 @@ function describeError(err: unknown) { return err instanceof ApiError ? `${err.m
 export default function DeveloperPage() {
   const { showToast } = useToast();
   const clients = useAsyncData(() => oauthApi.listClients().then((r) => r.clients));
-  const [createOpen, setCreateOpen] = useState(false); const [selectedType, setSelectedType] = useState<OAuthApplicationType | null>(null); const [name, setName] = useState(""); const [redirectUris, setRedirectUris] = useState<string[]>([""]); const [origins, setOrigins] = useState<string[]>([""]); const defaultPermissions: OAuthPermission[] = ["identity:read", "profile:read", "email:read", "offline_access"];
+  const [createOpen, setCreateOpen] = useState(false); const [selectedType, setSelectedType] = useState<OAuthApplicationType | null>(null); const [name, setName] = useState(""); const [redirectUris, setRedirectUris] = useState<string[]>([""]); const [origins, setOrigins] = useState<string[]>([""]); const defaultPermissions: OAuthPermission[] = ["openid", "profile", "email", "offline_access"];
   const [permissions, setPermissions] = useState<OAuthPermission[]>(defaultPermissions); const [packageName, setPackageName] = useState(""); const [bundleId, setBundleId] = useState(""); const [fingerprints, setFingerprints] = useState<string[]>([""]); const [creating, setCreating] = useState(false); const [secret, setSecret] = useState<string | null>(null); const [editing, setEditing] = useState<string | null>(null); const [configs, setConfigs] = useState<Record<string, OAuthClientConfig>>({}); const [saving, setSaving] = useState<string | null>(null);
   const reset = () => { setCreateOpen(false); setSelectedType(null); setName(""); setRedirectUris([""]); setOrigins([""]); setPermissions(defaultPermissions); setPackageName(""); setBundleId(""); setFingerprints([""]); };
   const togglePermission = (permission: OAuthPermission) => setPermissions((current) => current.includes(permission) ? current.filter((item) => item !== permission) : [...current, permission]);
