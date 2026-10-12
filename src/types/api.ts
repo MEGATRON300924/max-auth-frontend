@@ -6,7 +6,7 @@ export type AccountStatus = "ACTIVE" | "SUSPENDED" | "BANNED" | "DELETED" | "DEA
 export type OAuthApplicationType = "WEB" | "SPA" | "ANDROID" | "IOS" | "DESKTOP";
 export type OAuthPermission = "openid" | "profile" | "email" | "offline_access" | "profile:read" | "email:read" | "account:read" | "identity:read" | "memory:read";
 
-export interface MaxUser { id: string; username: string; displayName: string | null; email: string; avatarUrl: string | null; country: string | null; language: string | null; timezone: string | null; subscriptionTier: SubscriptionTier; verificationStatus: VerificationStatus; status: AccountStatus; isAdmin: boolean; createdAt: string; updatedAt: string; }
+export interface MaxUser { id: string; username: string; fullName?: string | null; displayName: string | null; email: string; avatarUrl: string | null; country: string | null; language: string | null; timezone: string | null; subscriptionTier: SubscriptionTier; verificationStatus: VerificationStatus; status: AccountStatus; isAdmin: boolean; createdAt: string; updatedAt: string; }
 export interface AIProfile { id: string; userId: string; interests: string[] | null; preferences: Record<string, unknown> | null; languages: string[] | null; connectedServices: string[] | null; createdAt: string; updatedAt: string; }
 export interface Device { id: string; deviceName: string | null; deviceType: string | null; os: string | null; browser: string | null; isTrusted: boolean; trustedAt: string | null; lastIp: string | null; lastSeenAt: string; createdAt: string; }
 export interface Session { id: string; deviceId: string | null; device?: Device | null; userAgent: string | null; ipAddress: string | null; isRevoked: boolean; expiresAt: string; createdAt: string; lastUsedAt: string; }
