@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, Link2, RefreshCw, Shield, Unlink, Clock3, Sparkles } from "lucide-react";
+import { Link2, RefreshCw, Shield, Unlink, Clock3 } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
 import { useAsyncData } from "@/lib/hooks/useAsyncData";
 import { useToast } from "@/lib/hooks/useToast";
@@ -219,19 +218,6 @@ export default function ConnectedAppsPage() {
   return (
     <div className="space-y-6">
       <PageHeader title="Connected Apps" description="Control third-party services connected to your MAX Account." />
-
-      <Card className="border-brand-400/20 bg-brand-500/[.04]">
-        <CardContent className="flex items-start gap-4 p-5">
-          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-brand-500/10 text-brand-400"><Sparkles className="h-5 w-5" /></div>
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <p className="text-sm font-semibold text-ink">Your MAX Account is the identity layer</p>
-              <Badge variant="success"><CheckCircle2 className="mr-1 h-3.5 w-3.5" />Ready</Badge>
-            </div>
-            <p className="mt-1 text-xs leading-5 text-ink-muted">MAX services use your MAX Account. Third-party apps such as Spotify are separate OAuth connections and only receive the permissions you approve.</p>
-          </div>
-        </CardContent>
-      </Card>
 
       {notice && <div className="rounded-2xl border border-warning/20 bg-warning/5 p-4 text-sm text-ink-muted">{notice}</div>}
 
