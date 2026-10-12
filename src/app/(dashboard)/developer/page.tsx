@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Apple, CheckCircle2, Globe2, KeyRound, Monitor, Pencil, Plus, ShieldCheck, Smartphone, Trash2, X } from "lucide-react";
 import { AuthFeatureShell, GlassCard, StatusPill } from "@/components/auth/AuthFeatureShell";
 import { useAsyncData } from "@/lib/hooks/useAsyncData";
@@ -32,6 +32,36 @@ function describeError(err: unknown) { return err instanceof ApiError ? `${err.m
 
 export default function DeveloperPage() {
   const { showToast } = useToast();
+  const [showOnboarding, setShowOnboarding] = useState<boolean | null>(null);
+  const [onboardingPurposes, setOnboardingPurposes] = useState<string[]>([]);
+  const [onboardingProjectType, setOnboardingProjectType] = useState("");
+  const [onboardingCapabilities, setOnboardingCapabilities] = useState<string[]>([]);
+  const [onboardingHelp, setOnboardingHelp] = useState<string[]>([]);
+  const [onboardingDescription, setOnboardingDescription] = useState("");
+  useEffect(() => {
+    try {
+      setShowOnboarding(window.localStorage.getItem("max-auth:developer-onboarding-complete") !== "1");
+      const saved = window.localStorage.getItem("max-auth:developer-onboarding");
+      if (saved) {
+        const parsed = JSON.parse(saved) as { purposes?: unknown; projectType?: unknown; capabilities?: unknown; help?: unknown; description?: unknown };
+        if (Array.isArray(parsed.purposes)) setOnboardingPurposes(parsed.purposes.filter((value): value is string => typeof value === "string"));
+        if (typeof parsed.projectType === "string") setOnboardingProjectType(parsed.projectType);
+        if (Array.isArray(parsed.capabilities)) setOnboardingCapabilities(parsed.capabilities.filter((value): value is string => typeof value === "string"));
+        if (Array.isArray(parsed.help)) setOnboardingHelp(parsed.help.filter((value): value is string => typeof value === "string"));
+        if (typeof parsed.description === "string") setOnboardingDescription(parsed.description);
+      }
+    } catch {
+      setShowOnboarding(false);
+    }
+  }, []);
+  const toggleOnboardingValue = (current: string[], value: string, update: (next: string[]) => void) => update(current.includes(value) ? current.filter((item) => item !== value) : [...current, value]);
+  const finishOnboarding = (skip = false) => {
+    try {
+      if (!skip) window.localStorage.setItem("max-auth:developer-onboarding", JSON.stringify({ purposes: onboardingPurposes, projectType: onboardingProjectType, capabilities: onboardingCapabilities, help: onboardingHelp, description: onboardingDescription }));
+      window.localStorage.setItem("max-auth:developer-onboarding-complete", "1");
+    } catch { /* Setup must never block client management. */ }
+    setShowOnboarding(false);
+  };
   const clients = useAsyncData(() => oauthApi.listClients().then((r) => r.clients));
   const [createOpen, setCreateOpen] = useState(false); const [selectedType, setSelectedType] = useState<OAuthApplicationType | null>(null); const [name, setName] = useState(""); const [redirectUris, setRedirectUris] = useState<string[]>([""]); const [origins, setOrigins] = useState<string[]>([""]); const defaultPermissions: OAuthPermission[] = ["openid", "profile", "email", "offline_access"];
   const [permissions, setPermissions] = useState<OAuthPermission[]>(defaultPermissions); const [packageName, setPackageName] = useState(""); const [bundleId, setBundleId] = useState(""); const [fingerprints, setFingerprints] = useState<string[]>([""]); const [creating, setCreating] = useState(false); const [secret, setSecret] = useState<string | null>(null); const [editing, setEditing] = useState<string | null>(null); const [configs, setConfigs] = useState<Record<string, OAuthClientConfig>>({}); const [saving, setSaving] = useState<string | null>(null);
@@ -78,6 +108,47 @@ export default function DeveloperPage() {
   async function updateScopes(client: OAuthClient, scopes: OAuthPermission[]) { try { await oauthApi.updateClient(client.id, { scopes }); await clients.refetch(); showToast({ title: "Permissions updated", variant: "success" }); } catch (err) { showToast({ title: "Could not update permissions", description: describeError(err), variant: "error" }); } }
   async function save(client: OAuthClient) { const config = configs[client.id]; if (!config) return; let authorizedOrigins = config.authorizedOrigins.map((v) => v.trim()).filter(Boolean); if ((config.applicationType === "WEB" || config.applicationType === "SPA") && !authorizedOrigins.length) { try { authorizedOrigins = [new URL(client.redirectUris[0]).origin]; } catch { showToast({ title: "Couldn't save settings", description: "Add a valid HTTPS redirect URI before saving.", variant: "error" }); return; } } const clean: OAuthClientConfigUpdate = { applicationType: config.applicationType, authorizedOrigins, certificateFingerprints: config.certificateFingerprints.map((v) => v.trim()).filter(Boolean), logoUrl: config.logoUrl || null, displayName: config.displayName?.trim() || null, websiteUrl: config.websiteUrl?.trim() || null, manifestUrl: config.manifestUrl?.trim() || null }; if (config.packageName?.trim()) clean.packageName = config.packageName.trim(); if (config.bundleId?.trim()) clean.bundleId = config.bundleId.trim(); try { setSaving(client.id); const result = await oauthApi.updateClientConfig(client.clientId, clean); setConfigs((current) => ({ ...current, [client.id]: result.config })); showToast({ title: "Application settings saved", variant: "success" }); } catch (err) { showToast({ title: "Couldn't save settings", description: describeError(err), variant: "error" }); } finally { setSaving(null); } }
   async function revoke(id: string) { if (!window.confirm("Revoke this MAX Auth application?")) return; try { await oauthApi.revokeClient(id); clients.refetch(); showToast({ title: "Application revoked", variant: "success" }); } catch (err) { showToast({ title: "Couldn't revoke application", description: describeError(err), variant: "error" }); } }
+
+  if (showOnboarding === null) return <div className="min-h-40" aria-busy="true" />;
+  if (showOnboarding) return <AuthFeatureShell eyebrow="MAX Developers" title="Welcome to MAX Auth" description="Before you register an OAuth client, tell us a little about what you’re building. This is optional setup and takes about a minute.">
+    <div className="space-y-5">
+      <GlassCard>
+        <div className="flex items-start justify-between gap-4"><div><h2 className="font-display text-lg font-semibold">What are you using MAX Auth for?</h2><p className="mt-1 text-sm text-ink-muted">Choose any that apply.</p></div><span className="rounded-full border border-white/10 px-3 py-1 text-xs text-ink-muted">1 of 4</span></div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {[
+            ["web", "Web application"], ["mobile", "Mobile application"], ["desktop", "Desktop software"], ["backend", "Backend or API"], ["game", "Game or game service"], ["other", "Something else"],
+          ].map(([value, label]) => <label key={value} className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/10 p-3 text-sm hover:bg-white/5"><input type="checkbox" checked={onboardingPurposes.includes(value)} onChange={() => toggleOnboardingValue(onboardingPurposes, value, setOnboardingPurposes)} className="h-4 w-4 accent-blue-500" />{label}</label>)}
+        </div>
+      </GlassCard>
+      <GlassCard>
+        <h2 className="font-display text-lg font-semibold">What kind of project is it?</h2>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {[
+            ["personal", "Personal project"], ["startup", "Startup or small team"], ["business", "Business"], ["learning", "School or learning"], ["client", "Client project"],
+          ].map(([value, label]) => <button key={value} type="button" onClick={() => setOnboardingProjectType(value)} className={onboardingProjectType === value ? "rounded-xl border border-brand-500 bg-brand-500/10 px-3 py-2.5 text-sm text-ink" : "rounded-xl border border-white/10 px-3 py-2.5 text-sm text-ink-muted hover:bg-white/5"}>{label}</button>)}
+        </div>
+      </GlassCard>
+      <GlassCard>
+        <h2 className="font-display text-lg font-semibold">What do you want help with?</h2>
+        <p className="mt-1 text-sm text-ink-muted">These are preferences, not permissions. Every client’s scopes are still chosen explicitly.</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {[
+            ["signin", "Sign in with MAX"], ["profile", "Account profile information"], ["offline", "Longer sessions where supported"], ["manage", "Manage multiple applications"],
+          ].map(([value, label]) => <label key={value} className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/10 p-3 text-sm hover:bg-white/5"><input type="checkbox" checked={onboardingCapabilities.includes(value)} onChange={() => toggleOnboardingValue(onboardingCapabilities, value, setOnboardingCapabilities)} className="h-4 w-4 accent-blue-500" />{label}</label>)}
+        </div>
+        <div className="mt-5 border-t border-white/10 pt-4"><p className="text-sm font-semibold">What would be useful as you get started?</p><div className="mt-3 flex flex-wrap gap-2">{[
+          ["guides", "Step-by-step guides"], ["examples", "Code examples"], ["oauth", "OAuth and security help"], ["none", "I’ll explore myself"],
+        ].map(([value, label]) => <button key={value} type="button" onClick={() => toggleOnboardingValue(onboardingHelp, value, setOnboardingHelp)} className={onboardingHelp.includes(value) ? "rounded-xl border border-brand-500 bg-brand-500/10 px-3 py-2 text-xs font-semibold text-ink" : "rounded-xl border border-white/10 px-3 py-2 text-xs font-semibold text-ink-muted hover:bg-white/5"}>{label}</button>)}</div></div>
+      </GlassCard>
+      <GlassCard>
+        <label className="block text-sm font-semibold" htmlFor="developer-project-description">Tell us about your project <span className="font-normal text-ink-muted">(optional)</span></label>
+        <p className="mt-1 text-sm text-ink-muted">Don’t include passwords, client secrets or private user data.</p>
+        <textarea id="developer-project-description" value={onboardingDescription} onChange={(event) => setOnboardingDescription(event.target.value.slice(0, 600))} maxLength={600} rows={3} placeholder="I’m building…" className="mt-3 w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm outline-none focus:border-brand-500" />
+        <p className="mt-1 text-right text-xs text-ink-muted">{onboardingDescription.length}/600</p>
+      </GlassCard>
+      <div className="flex flex-wrap items-center justify-between gap-3"><p className="max-w-lg text-xs leading-5 text-ink-muted">Your answers stay in this browser on this device. They won’t grant any permissions or change existing clients.</p><div className="flex gap-2"><button type="button" onClick={() => finishOnboarding(true)} className="rounded-xl border border-white/10 px-4 py-3 text-sm font-semibold text-ink-muted hover:bg-white/5">Skip for now</button><button type="button" onClick={() => finishOnboarding(false)} className="rounded-xl bg-brand-500 px-4 py-3 text-sm font-semibold text-white hover:bg-brand-400">Finish setup and continue</button></div></div>
+    </div>
+  </AuthFeatureShell>;
 
   return <AuthFeatureShell eyebrow="MAX Developers" title="Build with MAX Identity" description="Create and manage MAX Auth applications, permissions and verified client configuration.">
     <div className="space-y-5"><GlassCard><div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-display text-lg font-semibold">Applications</h2><p className="text-sm text-ink-muted">Every client gets its own identity configuration and redirect rules.</p></div><div className="flex gap-2"><a href="/client-tester" target="_blank" className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2.5 text-sm font-semibold text-ink-muted hover:bg-white/5"><KeyRound className="h-4 w-4" /> Test Client ID</a><button onClick={() => setCreateOpen(true)} className="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white"><Plus className="h-4 w-4" /> Create application</button></div></div>
