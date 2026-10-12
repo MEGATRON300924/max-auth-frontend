@@ -82,10 +82,10 @@ export default function SignInPage() {
   }, []);
 
   const beginWithAccount = (account: string) => {
-    setIdentifier(account); setPassword(""); setMfaCode(""); setMfaRequired(false); setUseRecoveryCode(false); setError(null); setStep("credentials");
+    setIdentifier(account); setRememberMe(true); setPassword(""); setMfaCode(""); setMfaRequired(false); setUseRecoveryCode(false); setError(null); setStep("credentials");
   };
   const useAnotherAccount = () => {
-    setIdentifier(""); setPassword(""); setMfaCode(""); setMfaRequired(false); setUseRecoveryCode(false); setError(null); setStep("credentials");
+    setIdentifier(""); setRememberMe(false); setPassword(""); setMfaCode(""); setMfaRequired(false); setUseRecoveryCode(false); setError(null); setStep("credentials");
   };
 
   const handleSubmit = async (event: FormEvent) => {
@@ -101,7 +101,7 @@ export default function SignInPage() {
       await login(account, password, rememberMe, mfaRequired ? mfaCode.trim() : undefined);
       try {
         if (rememberMe) { window.localStorage.setItem(LAST_ACCOUNT_KEY, account); setRememberedAccount(account); }
-        else { window.localStorage.removeItem(LAST_ACCOUNT_KEY); setRememberedAccount(null); }
+        else if (rememberedAccount?.toLowerCase() === account.toLowerCase()) { window.localStorage.removeItem(LAST_ACCOUNT_KEY); setRememberedAccount(null); }
         window.sessionStorage.removeItem(RETURN_TO_KEY);
       } catch {}
       showToast({ title: "Welcome back", variant: "success" });
@@ -137,15 +137,15 @@ export default function SignInPage() {
             <div className="mt-8">
               <div className="space-y-2">
                 {rememberedAccount ? (
-                  <button type="button" onClick={() => beginWithAccount(rememberedAccount)} className="group flex w-full items-center gap-3 rounded-[8px] border border-[#dadce0] bg-white px-3 py-3 text-left transition-colors hover:bg-[#f8f9fa] dark:border-[#5f6368] dark:bg-transparent dark:hover:bg-[#303134]">
+                  <button type="button" onClick={() => beginWithAccount(rememberedAccount)} className="group flex w-full items-center gap-3 rounded-xl border border-[#dadce0] bg-white px-3 py-3 text-left transition-colors hover:bg-[#f8f9fa] dark:border-[#5f6368] dark:bg-transparent dark:hover:bg-[#303134]">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f1f3f4] dark:bg-[#3c4043]"><img src="/logo.png" alt="" className="h-7 w-7 rounded-full object-contain" /></div>
                     <div className="min-w-0 flex-1"><p className="truncate text-sm font-medium">{rememberedAccount}</p><p className="mt-0.5 text-sm text-[#5f6368] dark:text-[#bdc1c6]">Last used</p></div>
                     <span className="text-sm font-medium text-[#0b57d0] dark:text-[#8ab4f8]">Continue</span>
                   </button>
                 ) : (
-                  <button type="button" onClick={useAnotherAccount} className="flex w-full items-center gap-3 rounded-[8px] border border-[#dadce0] bg-white px-3 py-3 text-left transition-colors hover:bg-[#f8f9fa] dark:border-[#5f6368] dark:bg-transparent dark:hover:bg-[#303134]"><div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f1f3f4] dark:bg-[#3c4043]"><UserRound className="h-5 w-5 text-[#5f6368] dark:text-[#bdc1c6]" /></div><div className="min-w-0 flex-1"><p className="text-sm font-medium">Use a MAX Account</p><p className="mt-0.5 text-sm text-[#5f6368] dark:text-[#bdc1c6]">Enter your email or username</p></div><span className="text-lg text-[#5f6368]">›</span></button>
+                  <button type="button" onClick={useAnotherAccount} className="flex w-full items-center gap-3 rounded-xl border border-[#dadce0] bg-white px-3 py-3 text-left transition-colors hover:bg-[#f8f9fa] dark:border-[#5f6368] dark:bg-transparent dark:hover:bg-[#303134]"><div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f1f3f4] dark:bg-[#3c4043]"><UserRound className="h-5 w-5 text-[#5f6368] dark:text-[#bdc1c6]" /></div><div className="min-w-0 flex-1"><p className="text-sm font-medium">Use a MAX Account</p><p className="mt-0.5 text-sm text-[#5f6368] dark:text-[#bdc1c6]">Enter your email or username</p></div><span className="text-lg text-[#5f6368]">›</span></button>
                 )}
-                {rememberedAccount && <button type="button" onClick={useAnotherAccount} className="w-full rounded-[8px] px-3 py-2.5 text-sm font-medium text-[#0b57d0] hover:bg-[#f1f3f4] dark:text-[#8ab4f8] dark:hover:bg-[#303134]">Use another MAX Account</button>}
+                {rememberedAccount && <button type="button" onClick={useAnotherAccount} className="w-full rounded-xl px-3 py-2.5 text-sm font-medium text-[#0b57d0] hover:bg-[#f1f3f4] dark:text-[#8ab4f8] dark:hover:bg-[#303134]">Use another MAX Account</button>}
               </div>
               <div className="my-7 flex items-center gap-3"><div className="h-px flex-1 bg-[#dadce0] dark:bg-[#5f6368]" /><span className="text-xs text-[#5f6368] dark:text-[#bdc1c6]">OR</span><div className="h-px flex-1 bg-[#dadce0] dark:bg-[#5f6368]" /></div>
               <GoogleSignInButton />
@@ -154,16 +154,16 @@ export default function SignInPage() {
           ) : (
             <div className="mt-8">
               <button type="button" onClick={() => { setError(null); setPassword(""); setMfaCode(""); setMfaRequired(false); setUseRecoveryCode(false); setStep("choose"); }} className="mb-7 inline-flex items-center gap-2 text-sm font-medium text-[#5f6368] hover:text-[#202124] dark:text-[#bdc1c6] dark:hover:text-[#e8eaed]"><ArrowLeft className="h-4 w-4" />Back</button>
-              <label className="mb-5 block"><span className="mb-2 block text-sm font-medium">Email or username</span><span className="relative block"><UserRound className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5f6368]" /><input type="text" value={identifier} onChange={(event) => setIdentifier(event.target.value)} autoComplete="username" autoCapitalize="none" autoCorrect="off" spellCheck={false} inputMode="email" className="h-12 w-full rounded-[8px] border border-[#dadce0] bg-white px-11 text-sm outline-none transition-colors focus:border-[#0b57d0] focus:ring-1 focus:ring-[#0b57d0] dark:border-[#5f6368] dark:bg-transparent" placeholder="Email or username" required autoFocus /></span></label>
+              <label className="mb-5 block"><span className="mb-2 block text-sm font-medium">Email or username</span><span className="relative block"><UserRound className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5f6368]" /><input type="text" value={identifier} onChange={(event) => setIdentifier(event.target.value)} autoComplete="username" autoCapitalize="none" autoCorrect="off" spellCheck={false} inputMode="email" className="h-12 w-full rounded-xl border border-[#dadce0] bg-white px-11 text-sm outline-none transition-colors focus:border-[#0b57d0] focus:ring-1 focus:ring-[#0b57d0] dark:border-[#5f6368] dark:bg-transparent" placeholder="Email or username" required autoFocus /></span></label>
               <form onSubmit={handleSubmit} className="space-y-5" noValidate>
                 {error && <Alert variant="danger">{error}</Alert>}
                 {!mfaRequired ? (
                   <>
-                    <label className="block"><span className="mb-2 block text-sm font-medium">Password</span><span className="relative block"><Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5f6368]" /><input type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} className="h-12 w-full rounded-[8px] border border-[#dadce0] bg-white px-11 text-sm outline-none transition-colors focus:border-[#0b57d0] focus:ring-1 focus:ring-[#0b57d0] dark:border-[#5f6368] dark:bg-transparent" placeholder="Password" required autoFocus /></span></label>
+                    <label className="block"><span className="mb-2 block text-sm font-medium">Password</span><span className="relative block"><Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5f6368]" /><input type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} className="h-12 w-full rounded-xl border border-[#dadce0] bg-white px-11 text-sm outline-none transition-colors focus:border-[#0b57d0] focus:ring-1 focus:ring-[#0b57d0] dark:border-[#5f6368] dark:bg-transparent" placeholder="Password" required autoFocus /></span></label>
                     <div className="flex items-center justify-between gap-4"><label className="flex items-center gap-2 text-sm text-[#5f6368] dark:text-[#bdc1c6]"><input type="checkbox" checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} className="h-4 w-4 rounded border-[#dadce0] text-[#0b57d0] focus:ring-[#0b57d0]" />Remember this account</label><Link href="/forgot-password" className="text-sm font-medium text-[#0b57d0] hover:underline dark:text-[#8ab4f8]">Forgot password?</Link></div>
                   </>
                 ) : (
-                  <label className="block"><span className="mb-2 flex items-center gap-2 text-sm font-medium"><ShieldCheck className="h-4 w-4 text-[#0b57d0] dark:text-[#8ab4f8]" />{useRecoveryCode ? "Recovery code" : "Authenticator code"}</span><input value={mfaCode} onChange={(event) => setMfaCode(useRecoveryCode ? event.target.value : event.target.value.replace(/\D/g, "").slice(0, 6))} inputMode={useRecoveryCode ? "text" : "numeric"} autoComplete="one-time-code" maxLength={useRecoveryCode ? 32 : 6} className="h-12 w-full rounded-[8px] border border-[#dadce0] bg-white px-4 text-center font-mono text-base tracking-[.22em] outline-none focus:border-[#0b57d0] focus:ring-1 focus:ring-[#0b57d0] dark:border-[#5f6368] dark:bg-transparent" placeholder={useRecoveryCode ? "XXXX-XXXX-XXXX" : "123456"} required autoFocus /></label>
+                  <label className="block"><span className="mb-2 flex items-center gap-2 text-sm font-medium"><ShieldCheck className="h-4 w-4 text-[#0b57d0] dark:text-[#8ab4f8]" />{useRecoveryCode ? "Recovery code" : "Authenticator code"}</span><input value={mfaCode} onChange={(event) => setMfaCode(useRecoveryCode ? event.target.value : event.target.value.replace(/\D/g, "").slice(0, 6))} inputMode={useRecoveryCode ? "text" : "numeric"} autoComplete="one-time-code" maxLength={useRecoveryCode ? 32 : 6} className="h-12 w-full rounded-xl border border-[#dadce0] bg-white px-4 text-center font-mono text-base tracking-[.22em] outline-none focus:border-[#0b57d0] focus:ring-1 focus:ring-[#0b57d0] dark:border-[#5f6368] dark:bg-transparent" placeholder={useRecoveryCode ? "XXXX-XXXX-XXXX" : "123456"} required autoFocus /></label>
                 )}
                 <Button type="submit" size="lg" className="w-full" isLoading={isLoading}>{mfaRequired ? "Verify and sign in" : "Sign in"}</Button>
                 {mfaRequired && <div className="text-center"><button type="button" onClick={() => { setUseRecoveryCode((value) => !value); setMfaCode(""); setError(null); }} className="text-sm font-medium text-[#0b57d0] hover:underline dark:text-[#8ab4f8]">{useRecoveryCode ? "Use authenticator app instead" : "Use a recovery code instead"}</button></div>}
