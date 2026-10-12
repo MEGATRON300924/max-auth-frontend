@@ -16,6 +16,7 @@ const SCOPE_LABELS: Record<string, { title: string; description: string }> = {
   "account:read": { title: "Account information", description: "Read basic information about your MAX account." },
   "identity:read": { title: "MAX identity", description: "Read your MAX account identifier." },
   "memory:read": { title: "MAX Memory", description: "Read the MAX Memory information you have authorized." },
+  "developer:manage": { title: "Manage your developer applications", description: "Create and manage OAuth applications owned by your MAX Account in MAX for Developers." },
   offline_access: { title: "Stay connected", description: "Allow this app to refresh its access when you're not actively using it." },
 };
 
