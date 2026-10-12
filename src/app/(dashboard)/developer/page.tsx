@@ -7,7 +7,7 @@ import { useAsyncData } from "@/lib/hooks/useAsyncData";
 import { useToast } from "@/lib/hooks/useToast";
 import { oauthApi } from "@/lib/api/security";
 import { ApiError } from "@/lib/api/ApiError";
-import type { OAuthApplicationType, OAuthClient, OAuthClientConfig, OAuthPermission } from "@/types/api";
+import type { OAuthApplicationType, OAuthClient, OAuthClientConfig, OAuthClientConfigUpdate, OAuthPermission } from "@/types/api";
 
 const permissionOptions: { id: OAuthPermission; title: string; description: string }[] = [
   { id: "identity:read", title: "User ID", description: "Identify the signed-in MAX account." },
@@ -50,7 +50,16 @@ export default function DeveloperPage() {
       clients.refetch();
       showToast({ title: "Application created", description: "Your client ID is ready. You can manage its configuration below.", variant: "success" });
       try {
-        await oauthApi.updateClientConfig(result.client.clientId, { applicationType: selectedType, authorizedOrigins: cleanOrigins, packageName: packageName.trim() || null, bundleId: bundleId.trim() || null, certificateFingerprints: fingerprints.map((v) => v.trim()).filter(Boolean), displayName: name.trim(), websiteUrl: cleanOrigins[0] || null });
+        const configPayload: OAuthClientConfigUpdate = {
+          applicationType: selectedType,
+          authorizedOrigins: cleanOrigins,
+          certificateFingerprints: fingerprints.map((v) => v.trim()).filter(Boolean),
+          displayName: name.trim(),
+        };
+        if (packageName.trim()) configPayload.packageName = packageName.trim();
+        if (bundleId.trim()) configPayload.bundleId = bundleId.trim();
+        if (cleanOrigins[0]) configPayload.websiteUrl = cleanOrigins[0];
+        await oauthApi.updateClientConfig(result.client.clientId, configPayload);
         clients.refetch();
       } catch (configError) {
         showToast({ title: "Application created, configuration needs attention", description: describeError(configError), variant: "error" });
@@ -62,7 +71,8 @@ export default function DeveloperPage() {
     }
   }
   async function openEditor(client: OAuthClient) { if (editing === client.id) { setEditing(null); return; } setEditing(client.id); if (!configs[client.id]) { try { const result = await oauthApi.getClientConfig(client.clientId); setConfigs((current) => ({ ...current, [client.id]: result.config })); } catch (err) { showToast({ title: "Couldn't load application settings", description: describeError(err), variant: "error" }); } } }
-  async function save(client: OAuthClient) { const config = configs[client.id]; if (!config) return; let authorizedOrigins = config.authorizedOrigins.map((v) => v.trim()).filter(Boolean); if ((config.applicationType === "WEB" || config.applicationType === "SPA") && !authorizedOrigins.length) { try { authorizedOrigins = [new URL(client.redirectUris[0]).origin]; } catch { showToast({ title: "Couldn't save settings", description: "Add a valid HTTPS redirect URI before saving.", variant: "error" }); return; } } const clean: Record<string, unknown> = { applicationType: config.applicationType, authorizedOrigins, certificateFingerprints: config.certificateFingerprints.map((v) => v.trim()).filter(Boolean), logoUrl: config.logoUrl || null, displayName: config.displayName?.trim() || null, websiteUrl: config.websiteUrl?.trim() || null, manifestUrl: config.manifestUrl?.trim() || null }; if (config.packageName?.trim()) clean.packageName = config.packageName.trim(); if (config.bundleId?.trim()) clean.bundleId = config.bundleId.trim(); try { setSaving(client.id); const result = await oauthApi.updateClientConfig(client.clientId, clean); setConfigs((current) => ({ ...current, [client.id]: result.config })); showToast({ title: "Application settings saved", variant: "success" }); } catch (err) { showToast({ title: "Couldn't save settings", description: describeError(err), variant: "error" }); } finally { setSaving(null); } }
+  async function updateScopes(client: OAuthClient, scopes: OAuthPermission[]) { try { await oauthApi.updateClient(client.id, { scopes }); await clients.refetch(); showToast({ title: "Permissions updated", variant: "success" }); } catch (err) { showToast({ title: "Could not update permissions", description: describeError(err), variant: "error" }); } }
+  async function save(client: OAuthClient) { const config = configs[client.id]; if (!config) return; let authorizedOrigins = config.authorizedOrigins.map((v) => v.trim()).filter(Boolean); if ((config.applicationType === "WEB" || config.applicationType === "SPA") && !authorizedOrigins.length) { try { authorizedOrigins = [new URL(client.redirectUris[0]).origin]; } catch { showToast({ title: "Couldn't save settings", description: "Add a valid HTTPS redirect URI before saving.", variant: "error" }); return; } } const clean: OAuthClientConfigUpdate = { applicationType: config.applicationType, authorizedOrigins, certificateFingerprints: config.certificateFingerprints.map((v) => v.trim()).filter(Boolean), logoUrl: config.logoUrl || null, displayName: config.displayName?.trim() || null, websiteUrl: config.websiteUrl?.trim() || null, manifestUrl: config.manifestUrl?.trim() || null }; if (config.packageName?.trim()) clean.packageName = config.packageName.trim(); if (config.bundleId?.trim()) clean.bundleId = config.bundleId.trim(); try { setSaving(client.id); const result = await oauthApi.updateClientConfig(client.clientId, clean); setConfigs((current) => ({ ...current, [client.id]: result.config })); showToast({ title: "Application settings saved", variant: "success" }); } catch (err) { showToast({ title: "Couldn't save settings", description: describeError(err), variant: "error" }); } finally { setSaving(null); } }
   async function revoke(id: string) { if (!window.confirm("Revoke this MAX Auth application?")) return; try { await oauthApi.revokeClient(id); clients.refetch(); showToast({ title: "Application revoked", variant: "success" }); } catch (err) { showToast({ title: "Couldn't revoke application", description: describeError(err), variant: "error" }); } }
 
   return <AuthFeatureShell eyebrow="MAX Developers" title="Build with MAX Identity" description="Create and manage MAX Auth applications, permissions and verified client configuration.">
