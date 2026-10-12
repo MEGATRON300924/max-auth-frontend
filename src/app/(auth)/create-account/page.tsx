@@ -3,7 +3,7 @@
 import { useState, type FormEvent, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Mail, Lock, User, AtSign, ArrowLeft, ArrowRight, Eye, EyeOff, CalendarCheck } from "lucide-react";
+import { Mail, Lock, User, AtSign, ArrowLeft, ArrowRight, CalendarCheck } from "lucide-react";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { PasswordStrengthMeter } from "@/components/auth/PasswordStrengthMeter";
 import { Input } from "@/components/ui/Input";
@@ -28,7 +28,6 @@ export default function CreateAccountPage() {
   const [ageConfirmed, setAgeConfirmed] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -148,11 +147,8 @@ export default function CreateAccountPage() {
         {step === 4 && (
           <div className="space-y-3">
             <div className="relative">
-              <Input label="Password" type={showPassword ? "text" : "password"} autoComplete="new-password" icon={<Lock className="h-4 w-4" />} value={password} onChange={(event) => setPassword(event.target.value)} error={fieldErrors.password} placeholder="Create a strong password" required autoFocus />
-              <button type="button" onClick={() => setShowPassword((value) => !value)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-3 top-[38px] rounded-full p-2 text-ink-faint transition-colors hover:bg-surface hover:text-ink">
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
-            </div>
+              <Input label="Password" type="password" autoComplete="new-password" icon={<Lock className="h-4 w-4" />} value={password} onChange={(event) => setPassword(event.target.value)} error={fieldErrors.password} placeholder="Create a strong password" required autoFocus />
+              </div>
             <PasswordStrengthMeter password={password} />
             <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-glass-border bg-base-raised p-3 text-sm text-ink-muted">
               <input type="checkbox" checked={rememberMe} onChange={(event) => setRememberMe(event.target.checked)} className="mt-0.5 h-4 w-4 rounded border-glass-border bg-base text-brand-600 focus:ring-brand-500" />
