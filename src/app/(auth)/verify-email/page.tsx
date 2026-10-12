@@ -10,11 +10,12 @@ import { Spinner } from "@/components/ui/Spinner";
 import { authApi } from "@/lib/api/auth";
 import { ApiError } from "@/lib/api/ApiError";
 
-type Status = "verifying" | "success" | "error";
+type Status = "verifying" | "sent" | "success" | "error";
 
 function VerifyEmailInner() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
+  const isNewVerification = searchParams.get("sent") === "1";
   const [status, setStatus] = useState<Status>("verifying");
   const [message, setMessage] = useState("");
   const [isResending, setIsResending] = useState(false);
@@ -23,8 +24,8 @@ function VerifyEmailInner() {
   useEffect(() => {
     if (!token) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setStatus("error");
-      setMessage("This verification link is missing or malformed.");
+      setStatus(isNewVerification ? "sent" : "error");
+      setMessage(isNewVerification ? "Your MAX Account has been created. Check your inbox for the verification link, and check spam if it is not there." : "This verification link is missing or malformed.");
       return;
     }
     authApi
@@ -34,13 +35,40 @@ function VerifyEmailInner() {
         setStatus("error");
         setMessage(err instanceof ApiError ? err.message : "This link is invalid or has expired.");
       });
-  }, [token]);
+  }, [token, isNewVerification]);
 
   if (status === "verifying") {
     return (
       <AuthCard title="Verifying your email">
         <div className="flex flex-col items-center py-4">
           <Spinner className="h-7 w-7" />
+        </div>
+      </AuthCard>
+    );
+  }
+
+  if (status === "sent") {
+    return (
+      <AuthCard title="Check your inbox">
+        <div className="flex flex-col items-center py-2 text-center">
+          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-subtle text-brand-500"><MailCheck className="h-6 w-6" /></div>
+          <p className="text-sm leading-6 text-ink-muted">{message}</p>
+          <div className="mt-6 w-full space-y-3">
+            <Button className="w-full" isLoading={isResending} onClick={async () => {
+              setIsResending(true);
+              setResendMessage("");
+              try {
+                await authApi.sendVerificationEmail();
+                setResendMessage("A fresh verification link has been sent. Check your inbox and spam folder.");
+              } catch (err) {
+                setResendMessage(err instanceof ApiError ? err.message : "Please sign in again and request a new verification email.");
+              } finally {
+                setIsResending(false);
+              }
+            }}>Resend verification email</Button>
+            {resendMessage && <p role="status" className="text-sm leading-6 text-ink-muted">{resendMessage}</p>}
+            <Link href="/dashboard" className="block text-sm font-medium text-brand-400 hover:text-brand-300">Continue to MAX</Link>
+          </div>
         </div>
       </AuthCard>
     );
