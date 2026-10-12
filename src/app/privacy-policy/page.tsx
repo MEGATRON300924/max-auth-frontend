@@ -24,9 +24,7 @@ export default function PrivacyPolicyPage() {
       <section>
         <h2>2. How your MAX Account is used across products</h2>
         <p>
-          Your MAX Account is the shared identity layer behind every product in the MAX AI
-          Ecosystem. Signing in to one MAX product signs you in to the rest, and your core
-          profile is shared across them so you don&apos;t have to manage separate accounts.
+          Your MAX Account lets you sign in to supported MAX services without creating a separate account for each one. The information shared with each service depends on its features and the account settings you choose.
         </p>
       </section>
 
