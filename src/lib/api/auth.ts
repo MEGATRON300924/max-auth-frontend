@@ -5,7 +5,7 @@ import type { MaxUser } from "@/types/api";
 export interface AuthPayload { user: MaxUser; accessToken: string; }
 
 export const authApi = {
-  async register(input: { username: string; email: string; password: string; displayName?: string; rememberMe?: boolean }) { const data = await apiClient.post<AuthPayload>("/auth/register", input, { skipAuth: true }); tokenStore.set(data.accessToken); return data; },
+  async register(input: { username: string; email: string; password: string; fullName: string; displayName: string; ageConfirmed: true; rememberMe?: boolean }) { const data = await apiClient.post<AuthPayload>("/auth/register", input, { skipAuth: true }); tokenStore.set(data.accessToken); return data; },
   async login(identifier: string, password: string, rememberMe = true, mfaCode?: string) { const data = await apiClient.post<AuthPayload>("/auth/login", { identifier, password, rememberMe, ...(mfaCode ? { mfaCode } : {}) }, { skipAuth: true }); tokenStore.set(data.accessToken); return data; },
   async google(credential: string, mfaCode?: string) { const data = await apiClient.post<AuthPayload>("/auth/google", { credential, ...(mfaCode ? { mfaCode } : {}) }, { skipAuth: true }); tokenStore.set(data.accessToken); return data; },
   async logout() { try { await apiClient.post("/auth/logout", undefined, { needsCsrf: true, skipAuth: true }); } finally { tokenStore.set(null); } },
