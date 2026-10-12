@@ -11,6 +11,8 @@ import { ApiError } from "@/lib/api/ApiError";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 
 const LAST_ACCOUNT_KEY = "max-auth:last-account";
+const ACCOUNTS_KEY = "max-auth:accounts";
+const MAX_REMEMBERED_ACCOUNTS = 5;
 const RETURN_TO_KEY = "max-auth:oauth-return-to";
 type SignInStep = "choose" | "credentials";
 
@@ -45,7 +47,7 @@ export default function SignInPage() {
   const { showToast } = useToast();
   const [step, setStep] = useState<SignInStep>("choose");
   const [identifier, setIdentifier] = useState("");
-  const [rememberedAccount, setRememberedAccount] = useState<string | null>(null);
+  const [rememberedAccounts, setRememberedAccounts] = useState<string[]>([]);
   const [password, setPassword] = useState("");
   const [mfaCode, setMfaCode] = useState("");
   const [mfaRequired, setMfaRequired] = useState(false);
@@ -76,10 +78,35 @@ export default function SignInPage() {
 
   useEffect(() => {
     try {
-      const saved = window.localStorage.getItem(LAST_ACCOUNT_KEY);
-      if (saved) { setRememberedAccount(saved); setRememberMe(true); }
+      const savedList = window.localStorage.getItem(ACCOUNTS_KEY);
+      const legacy = window.localStorage.getItem(LAST_ACCOUNT_KEY);
+      let accounts: string[] = [];
+      if (savedList) {
+        const parsed: unknown = JSON.parse(savedList);
+        if (Array.isArray(parsed)) accounts = parsed.filter((item): item is string => typeof item === "string" && item.trim().length > 0);
+      }
+      if (legacy && !accounts.some((item) => item.toLowerCase() === legacy.toLowerCase())) accounts.unshift(legacy);
+      accounts = [...new Map(accounts.map((item) => [item.toLowerCase(), item])).values()].slice(0, MAX_REMEMBERED_ACCOUNTS);
+      setRememberedAccounts(accounts);
+      if (accounts.length) setRememberMe(true);
+      if (accounts.length) window.localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
+      window.localStorage.removeItem(LAST_ACCOUNT_KEY);
     } catch {}
   }, []);
+
+  const persistRememberedAccounts = (accounts: string[]) => {
+    const unique = [...new Map(accounts.map((item) => [item.toLowerCase(), item])).values()].slice(0, MAX_REMEMBERED_ACCOUNTS);
+    setRememberedAccounts(unique);
+    try {
+      if (unique.length) window.localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(unique));
+      else window.localStorage.removeItem(ACCOUNTS_KEY);
+      window.localStorage.removeItem(LAST_ACCOUNT_KEY);
+    } catch {}
+  };
+
+  const forgetAccount = (account: string) => {
+    persistRememberedAccounts(rememberedAccounts.filter((item) => item.toLowerCase() !== account.toLowerCase()));
+  };
 
   const beginWithAccount = (account: string) => {
     setIdentifier(account); setRememberMe(true); setPassword(""); setMfaCode(""); setMfaRequired(false); setUseRecoveryCode(false); setError(null); setStep("credentials");
@@ -100,8 +127,11 @@ export default function SignInPage() {
       const account = identifier.trim();
       await login(account, password, rememberMe, mfaRequired ? mfaCode.trim() : undefined);
       try {
-        if (rememberMe) { window.localStorage.setItem(LAST_ACCOUNT_KEY, account); setRememberedAccount(account); }
-        else if (rememberedAccount?.toLowerCase() === account.toLowerCase()) { window.localStorage.removeItem(LAST_ACCOUNT_KEY); setRememberedAccount(null); }
+        if (rememberMe) {
+          persistRememberedAccounts([account, ...rememberedAccounts.filter((item) => item.toLowerCase() !== account.toLowerCase())]);
+        } else if (rememberedAccounts.some((item) => item.toLowerCase() === account.toLowerCase())) {
+          persistRememberedAccounts(rememberedAccounts.filter((item) => item.toLowerCase() !== account.toLowerCase()));
+        }
         window.sessionStorage.removeItem(RETURN_TO_KEY);
       } catch {}
       showToast({ title: "Welcome back", variant: "success" });
@@ -136,16 +166,17 @@ export default function SignInPage() {
           {step === "choose" ? (
             <div className="mt-8">
               <div className="space-y-2">
-                {rememberedAccount ? (
-                  <button type="button" onClick={() => beginWithAccount(rememberedAccount)} className="group flex w-full items-center gap-3 rounded-xl border border-[#dadce0] bg-white px-3 py-3 text-left transition-colors hover:bg-[#f8f9fa] dark:border-[#5f6368] dark:bg-transparent dark:hover:bg-[#303134]">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f1f3f4] dark:bg-[#3c4043]"><img src="/logo.png" alt="" className="h-7 w-7 rounded-full object-contain" /></div>
-                    <div className="min-w-0 flex-1"><p className="truncate text-sm font-medium">{rememberedAccount}</p><p className="mt-0.5 text-sm text-[#5f6368] dark:text-[#bdc1c6]">Last used</p></div>
-                    <span className="text-sm font-medium text-[#0b57d0] dark:text-[#8ab4f8]">Continue</span>
-                  </button>
-                ) : (
-                  <button type="button" onClick={useAnotherAccount} className="flex w-full items-center gap-3 rounded-xl border border-[#dadce0] bg-white px-3 py-3 text-left transition-colors hover:bg-[#f8f9fa] dark:border-[#5f6368] dark:bg-transparent dark:hover:bg-[#303134]"><div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f1f3f4] dark:bg-[#3c4043]"><UserRound className="h-5 w-5 text-[#5f6368] dark:text-[#bdc1c6]" /></div><div className="min-w-0 flex-1"><p className="text-sm font-medium">Use a MAX Account</p><p className="mt-0.5 text-sm text-[#5f6368] dark:text-[#bdc1c6]">Enter your email or username</p></div><span className="text-lg text-[#5f6368]">›</span></button>
-                )}
-                {rememberedAccount && <button type="button" onClick={useAnotherAccount} className="w-full rounded-xl px-3 py-2.5 text-sm font-medium text-[#0b57d0] hover:bg-[#f1f3f4] dark:text-[#8ab4f8] dark:hover:bg-[#303134]">Use another MAX Account</button>}
+                {rememberedAccounts.map((account, index) => (
+                  <div key={account.toLowerCase()} className="group flex w-full items-center gap-3 rounded-xl border border-[#dadce0] bg-white px-3 py-3 transition-colors hover:bg-[#f8f9fa] dark:border-[#5f6368] dark:bg-transparent dark:hover:bg-[#303134]">
+                    <button type="button" onClick={() => beginWithAccount(account)} className="flex min-w-0 flex-1 items-center gap-3 text-left">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f1f3f4] dark:bg-[#3c4043]"><img src="/logo.png" alt="" className="h-7 w-7 rounded-full object-contain" /></div>
+                      <div className="min-w-0 flex-1"><p className="truncate text-sm font-medium">{account}</p><p className="mt-0.5 text-sm text-[#5f6368] dark:text-[#bdc1c6]">{index === 0 ? "Last used" : "Remembered on this device"}</p></div>
+                      <span className="text-sm font-medium text-[#0b57d0] dark:text-[#8ab4f8]">Continue</span>
+                    </button>
+                    <button type="button" onClick={() => forgetAccount(account)} aria-label={`Forget ${account}`} title="Forget this account" className="rounded-full px-2 py-1 text-xs text-[#5f6368] hover:bg-[#e8eaed] dark:text-[#bdc1c6] dark:hover:bg-[#3c4043]">Remove</button>
+                  </div>
+                ))}
+                <button type="button" onClick={useAnotherAccount} className="flex w-full items-center gap-3 rounded-xl border border-dashed border-[#dadce0] px-3 py-3 text-left transition-colors hover:bg-[#f8f9fa] dark:border-[#5f6368] dark:hover:bg-[#303134]"><div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f1f3f4] dark:bg-[#3c4043]"><UserRound className="h-5 w-5 text-[#5f6368] dark:text-[#bdc1c6]" /></div><div className="min-w-0 flex-1"><p className="text-sm font-medium">Use another MAX Account</p><p className="mt-0.5 text-sm text-[#5f6368] dark:text-[#bdc1c6]">Sign in with a different email or username</p></div><span className="text-lg text-[#5f6368]">›</span></button>
               </div>
               <div className="my-7 flex items-center gap-3"><div className="h-px flex-1 bg-[#dadce0] dark:bg-[#5f6368]" /><span className="text-xs text-[#5f6368] dark:text-[#bdc1c6]">OR</span><div className="h-px flex-1 bg-[#dadce0] dark:bg-[#5f6368]" /></div>
               <GoogleSignInButton />
