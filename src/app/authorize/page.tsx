@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight, Check, ShieldCheck, UserRound } from "lucide-react";
 import { useAuth } from "@/lib/auth/useAuth";
@@ -110,9 +110,8 @@ function AuthorizeContent() {
     scope,
     ...(SCOPE_LABELS[scope] || { title: "Additional permission", description: "This app has requested an additional permission for your MAX Account." }),
   }));
-  const requestingHost = useMemo(() => {
-    try { return new URL(trustedRequest.redirectUri).host; } catch { return "Unknown site"; }
-  }, [trustedRequest.redirectUri]);
+  let requestingHost = "Unknown site";
+  try { requestingHost = new URL(trustedRequest.redirectUri).host; } catch { /* The backend has already validated this redirect URI. */ }
 
   return (
     <main className="min-h-screen bg-[#f7f8fa] px-4 py-8 text-[#252b36] dark:bg-[#17191d] dark:text-[#e5e7eb] sm:py-12">
