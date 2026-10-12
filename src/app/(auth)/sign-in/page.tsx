@@ -50,7 +50,7 @@ export default function SignInPage() {
   const [mfaCode, setMfaCode] = useState("");
   const [mfaRequired, setMfaRequired] = useState(false);
   const [useRecoveryCode, setUseRecoveryCode] = useState(false);
-  const [rememberMe, setRememberMe] = useState(true);
+  const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -77,7 +77,7 @@ export default function SignInPage() {
   useEffect(() => {
     try {
       const saved = window.localStorage.getItem(LAST_ACCOUNT_KEY);
-      if (saved) setRememberedAccount(saved);
+      if (saved) { setRememberedAccount(saved); setRememberMe(true); }
     } catch {}
   }, []);
 
