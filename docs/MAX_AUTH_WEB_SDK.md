@@ -22,7 +22,7 @@ Place this snippet in your shared HTML layout, preferably near the end of body. 
 
 ~~~html
 <script
-  src="https://auth.max-ai.name.ng/sdk/max-auth.js"
+  src="https://api.max-ai.name.ng/sdk/max-auth.js"
   data-client-id="YOUR_MAX_AUTH_CLIENT_ID"
   data-redirect-uri="https://example.com/max-auth/callback"
   data-scope="openid profile email"
@@ -54,7 +54,7 @@ Create a callback page at the exact URL registered in MAX Auth. Add the callback
 
 ~~~html
 <script
-  src="https://auth.max-ai.name.ng/sdk/max-auth.js"
+  src="https://api.max-ai.name.ng/sdk/max-auth.js"
   data-client-id="YOUR_MAX_AUTH_CLIENT_ID"
   data-max-auth-callback
   defer
@@ -91,7 +91,7 @@ Or disable automatic prompting and open sign-in from your own button:
 
 ~~~html
 <script
-  src="https://auth.max-ai.name.ng/sdk/max-auth.js"
+  src="https://api.max-ai.name.ng/sdk/max-auth.js"
   data-client-id="YOUR_MAX_AUTH_CLIENT_ID"
   data-redirect-uri="https://example.com/max-auth/callback"
   data-scope="openid profile email"
