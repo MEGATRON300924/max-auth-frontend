@@ -42,7 +42,7 @@
       redirectUri: script.getAttribute("data-redirect-uri") || "",
       scope: (script.getAttribute("data-scope") || "openid profile email").trim(),
       autoPrompt: script.getAttribute("data-auto-prompt") === "true",
-      delay: Math.max(0, Math.min(30000, Number(script.getAttribute("data-prompt-delay") || 1500))),
+      delay: Math.max(0, Math.min(30000, Number(script.getAttribute("data-prompt-delay") === null ? 1500 : script.getAttribute("data-prompt-delay")) || 0),
       placement: script.getAttribute("data-placement") === "bottom-right" ? "bottom-right" : "top-right",
       frequency: ["once", "session", "always"].indexOf(script.getAttribute("data-frequency")) >= 0
         ? script.getAttribute("data-frequency") : "session",
