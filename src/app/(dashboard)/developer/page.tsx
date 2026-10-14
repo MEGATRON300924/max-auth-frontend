@@ -64,7 +64,7 @@ export default function DeveloperPage() {
   };
   const clients = useAsyncData(() => oauthApi.listClients().then((r) => r.clients));
   const [createOpen, setCreateOpen] = useState(false); const [selectedType, setSelectedType] = useState<OAuthApplicationType | null>(null); const [name, setName] = useState(""); const [redirectUris, setRedirectUris] = useState<string[]>([""]); const [origins, setOrigins] = useState<string[]>([""]); const defaultPermissions: OAuthPermission[] = ["openid", "profile", "email", "offline_access"];
-  const [permissions, setPermissions] = useState<OAuthPermission[]>(defaultPermissions); const [packageName, setPackageName] = useState(""); const [bundleId, setBundleId] = useState(""); const [fingerprints, setFingerprints] = useState<string[]>([""]); const [creating, setCreating] = useState(false); const [credentials, setCredentials] = useState<{ clientId: string; clientSecret: string; name: string; redirectUris: string[]; scopes: string[] } | null>(null); const [editing, setEditing] = useState<string | null>(null); const [configs, setConfigs] = useState<Record<string, OAuthClientConfig>>({}); const [saving, setSaving] = useState<string | null>(null); const [rotating, setRotating] = useState<string | null>(null);
+  const [permissions, setPermissions] = useState<OAuthPermission[]>(defaultPermissions); const [packageName, setPackageName] = useState(""); const [bundleId, setBundleId] = useState(""); const [fingerprints, setFingerprints] = useState<string[]>([""]); const [creating, setCreating] = useState(false); const [credentials, setCredentials] = useState<{ clientId: string; clientSecret: string; name: string; redirectUris: string[]; scopes: string[] } | null>(null); const [editing, setEditing] = useState<string | null>(null); const [configs, setConfigs] = useState<Record<string, OAuthClientConfig>>({}); const [saving, setSaving] = useState<string | null>(null);
   const reset = () => { setCreateOpen(false); setSelectedType(null); setName(""); setRedirectUris([""]); setOrigins([""]); setPermissions(defaultPermissions); setPackageName(""); setBundleId(""); setFingerprints([""]); };
   const togglePermission = (permission: OAuthPermission) => setPermissions((current) => current.includes(permission) ? current.filter((item) => item !== permission) : [...current, permission]);
   const updateArray = (values: string[], setter: (value: string[]) => void, index: number, value: string) => { const next = [...values]; next[index] = value; setter(next); };
@@ -129,32 +129,6 @@ export default function DeveloperPage() {
       setCreating(false);
     }
   }
-  async function rotateExistingClientSecret(client: OAuthClient) {
-    if (!client.isConfidential) {
-      showToast({ title: "No client secret for this application", description: "Public clients do not use a client secret. Only confidential clients can rotate one.", variant: "error" });
-      return;
-    }
-    if (!window.confirm(`Rotate the secret for "${client.name}"? Its current secret will stop working immediately. Save the new secret and update your server environment before using the client again.`)) return;
-    try {
-      setRotating(client.id);
-      const result = await oauthApi.rotateClientSecret(client.id);
-      if (!result.clientSecret) throw new Error("MAX Auth did not return a new client secret. Check the application logs before retrying.");
-      setCredentials({
-        clientId: result.clientId || client.clientId,
-        clientSecret: result.clientSecret,
-        name: client.name,
-        redirectUris: client.redirectUris,
-        scopes: client.scopes,
-      });
-      showToast({ title: "Client secret rotated", description: "Download the JSON credentials now. The previous secret is no longer valid.", variant: "success" });
-    } catch (err) {
-      showToast({ title: "Could not rotate client secret", description: describeError(err), variant: "error" });
-    } finally {
-      setRotating(null);
-    }
-  }
-
-  async function openEditor(client: OAuthClient) { if (editing === client.id) { setEditing(null); return; } setEditing(client.id); if (!configs[client.id]) { try { const result = await oauthApi.getClientConfig(client.clientId); setConfigs((current) => ({ ...current, [client.id]: result.config })); } catch (err) { showToast({ title: "Couldn't load application settings", description: describeError(err), variant: "error" }); } } }
   async function updateScopes(client: OAuthClient, scopes: OAuthPermission[]) { try { await oauthApi.updateClient(client.id, { scopes }); await clients.refetch(); showToast({ title: "Permissions updated", variant: "success" }); } catch (err) { showToast({ title: "Could not update permissions", description: describeError(err), variant: "error" }); } }
   async function save(client: OAuthClient) { const config = configs[client.id]; if (!config) return; let authorizedOrigins = config.authorizedOrigins.map((v) => v.trim()).filter(Boolean); if ((config.applicationType === "WEB" || config.applicationType === "SPA") && !authorizedOrigins.length) { try { authorizedOrigins = [new URL(client.redirectUris[0]).origin]; } catch { showToast({ title: "Couldn't save settings", description: "Add a valid HTTPS redirect URI before saving.", variant: "error" }); return; } } const clean: OAuthClientConfigUpdate = { applicationType: config.applicationType, authorizedOrigins, certificateFingerprints: config.certificateFingerprints.map((v) => v.trim()).filter(Boolean), logoUrl: config.logoUrl || null, displayName: config.displayName?.trim() || null, websiteUrl: config.websiteUrl?.trim() || null, manifestUrl: config.manifestUrl?.trim() || null }; if (config.packageName?.trim()) clean.packageName = config.packageName.trim(); if (config.bundleId?.trim()) clean.bundleId = config.bundleId.trim(); try { setSaving(client.id); const result = await oauthApi.updateClientConfig(client.clientId, clean); setConfigs((current) => ({ ...current, [client.id]: result.config })); showToast({ title: "Application settings saved", variant: "success" }); } catch (err) { showToast({ title: "Couldn't save settings", description: describeError(err), variant: "error" }); } finally { setSaving(null); } }
   async function revoke(id: string) { if (!window.confirm("Revoke this MAX Auth application?")) return; try { await oauthApi.revokeClient(id); clients.refetch(); showToast({ title: "Application revoked", variant: "success" }); } catch (err) { showToast({ title: "Couldn't revoke application", description: describeError(err), variant: "error" }); } }
