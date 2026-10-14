@@ -9,13 +9,14 @@ import { Alert } from "@/components/ui/Alert";
 import { useAuth } from "@/lib/auth/useAuth";
 import { ApiError } from "@/lib/api/ApiError";
 
-interface GoogleAccountsId { initialize: (options: { client_id: string; callback: (response: { credential: string }) => void; auto_select?: boolean }) => void; renderButton: (element: HTMLElement, options: { theme: "outline" | "filled_blue"; size: "large"; width: number; text: "continue_with" }) => void; }
+interface GoogleAccountsId { initialize: (options: { client_id: string; callback: (response: { credential: string }) => void; auto_select?: boolean }) => void; renderButton: (element: HTMLElement, options: { theme: "outline" | "filled_blue"; size: "large"; width: number; text: "continue_with" }) => void; prompt: () => void; }
 declare global { interface Window { google?: { accounts: { id: GoogleAccountsId } } } }
 
 export function GoogleSignInButton() {
   const { googleLogin } = useAuth();
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
+  const initializedRef = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const [needsAccount, setNeedsAccount] = useState(false);
   const [credential, setCredential] = useState<string | null>(null);
@@ -30,10 +31,11 @@ export function GoogleSignInButton() {
     return returnTo && returnTo.startsWith("/") ? returnTo : "/dashboard";
   };
 
-  const complete = async (code?: string) => {
-    if (!credential) return;
+  const complete = async (code?: string, credentialOverride?: string) => {
+    const googleCredential = credentialOverride ?? credential;
+    if (!googleCredential) return;
     setLoading(true); setError(null); setNeedsAccount(false);
-    try { await googleLogin(credential, code); router.replace(destination()); }
+    try { await googleLogin(googleCredential, code); router.replace(destination()); }
     catch (err) {
       if (err instanceof ApiError && err.code === "MFA_REQUIRED") { setMfaRequired(true); setMfaCode(""); }
       else { setError(err instanceof Error ? err.message : "Google Sign-In failed"); setNeedsAccount(err instanceof ApiError && err.code === "GOOGLE_ACCOUNT_NOT_LINKED"); }
@@ -41,10 +43,14 @@ export function GoogleSignInButton() {
   };
 
   const render = () => {
-    if (!clientId || !window.google || !containerRef.current || mfaRequired) return;
-    window.google.accounts.id.initialize({ client_id: clientId, callback: async ({ credential: value }) => { setCredential(value); await complete(); } });
+    if (!clientId || !window.google || !containerRef.current || mfaRequired || initializedRef.current) return;
+    window.google.accounts.id.initialize({ client_id: clientId, callback: async ({ credential: value }) => { setCredential(value); await complete(undefined, value); } });
     containerRef.current.innerHTML = "";
     window.google.accounts.id.renderButton(containerRef.current, { theme: "outline", size: "large", width: 420, text: "continue_with" });
+    initializedRef.current = true;
+    // Ask Google Identity Services to display its native One Tap account prompt.
+    // Google decides whether to show it based on browser support and user settings.
+    window.google.accounts.id.prompt();
   };
 
   useEffect(() => { render(); }, [clientId, mfaRequired]);
