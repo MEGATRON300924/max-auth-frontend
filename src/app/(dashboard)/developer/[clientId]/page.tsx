@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { ArrowLeft, CheckCircle2, Copy, Download, KeyRound, Save, ShieldCheck } from "lucide-react";
 import { AuthFeatureShell, GlassCard, StatusPill } from "@/components/auth/AuthFeatureShell";
 import { useToast } from "@/lib/hooks/useToast";
@@ -28,7 +28,6 @@ const errorText = (error: unknown) => error instanceof ApiError ? `${error.messa
 
 export default function OAuthClientDetailsPage() {
   const params = useParams<{ clientId: string }>();
-  const router = useRouter();
   const { showToast } = useToast();
   const [client, setClient] = useState<OAuthClient | null>(null);
   const [config, setConfig] = useState<OAuthClientConfig>(emptyConfig());
