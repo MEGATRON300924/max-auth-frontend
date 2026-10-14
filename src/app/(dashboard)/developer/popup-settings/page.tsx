@@ -84,6 +84,7 @@ export default function PopupSettingsPage() {
     const attributes = [
       `data-client-id="${selectedClient.clientId}"`,
       `data-redirect-uri="${redirectUri}"`,
+      `data-authorized-origin="${config.authorizedOrigins[0] ?? ""}"`,
       `data-auto-prompt="${config.autoPrompt ? "true" : "false"}"`,
       `data-prompt-delay="${config.promptDelay ?? 1500}"`,
       `data-placement="${config.popupPlacement ?? "bottom-right"}"`,
