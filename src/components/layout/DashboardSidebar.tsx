@@ -59,6 +59,7 @@ const groups: SidebarGroup[] = [
     label: "Developer",
     items: [
       { href: "/developer", label: "Developer platform", icon: Code2 },
+      { href: "/developer/popup-settings", label: "Sign-in popup settings", icon: Sparkles },
     ],
   },
 ];
