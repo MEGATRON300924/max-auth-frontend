@@ -16,6 +16,7 @@ import {
   House,
   Link2,
   Code2,
+  Boxes,
 } from "lucide-react";
 import { MaxLogo } from "./MaxLogo";
 import { useAuth } from "@/lib/auth/useAuth";
@@ -59,6 +60,7 @@ const groups: SidebarGroup[] = [
     label: "Developer",
     items: [
       { href: "/developer", label: "Developer platform", icon: Code2 },
+      { href: "/developer/ecosystems", label: "Organisations & ecosystems", icon: Boxes },
     ],
   },
 ];
@@ -85,8 +87,8 @@ export function DashboardSidebar({ className }: { className?: string }) {
             <p className="mb-2 px-4 text-xs font-medium text-ink-muted">{group.label}</p>
             <div className="space-y-1">
               {group.items.map(({ href, label, icon: Icon }) => {
-                const active = href === "/dashboard"
-                  ? pathname === "/dashboard"
+                const active = href === "/dashboard" || href === "/developer"
+                  ? pathname === href
                   : pathname === href || pathname.startsWith(`${href}/`);
                 const className = cn(
                   "flex min-h-11 items-center gap-3 rounded-full px-4 text-sm font-medium transition-colors",
