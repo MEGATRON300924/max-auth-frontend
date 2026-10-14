@@ -137,7 +137,7 @@ export default function DeveloperPage() {
     if (!window.confirm(`Rotate the secret for "${client.name}"? Its current secret will stop working immediately. Save the new secret and update your server environment before using the client again.`)) return;
     try {
       setRotating(client.id);
-      const result = await oauthApi.rotateClientSecret(client.clientId);
+      const result = await oauthApi.rotateClientSecret(client.id);
       if (!result.clientSecret) throw new Error("MAX Auth did not return a new client secret. Check the application logs before retrying.");
       setCredentials({
         clientId: result.clientId || client.clientId,
