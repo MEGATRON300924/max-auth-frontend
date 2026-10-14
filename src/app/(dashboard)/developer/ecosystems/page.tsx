@@ -63,7 +63,8 @@ export default function EcosystemsPage() {
     try {
       const result = await ecosystemApi.createOrganisation({ name: orgName.trim(), ...(orgSlug.trim() ? { slug: orgSlug.trim() } : {}) });
       setOrgName(""); setOrgSlug(""); setSelectedOrg(result.organisation.id);
-      setNotice("Organisation created."); await load();
+      // The selected-org change triggers load() with the new organisation; calling the old closure here would reload stale selection.
+      setNotice("Organisation created.");
     } catch (err) { setError(errorMessage(err)); }
     finally { setSaving(false); }
   }
