@@ -36,6 +36,10 @@ routes compile and prerender cleanly with zero TypeScript or ESLint errors. Next
 `^16.2.12` specifically because 14.2.5 has a disclosed critical RCE/DoS vulnerability
 (CVE-2025-66478 and related) — always keep this pinned to a current patched version.
 
+## MAX Auth Web SDK
+
+A first browser SDK implementation and developer integration guide are available in [`docs/MAX_AUTH_WEB_SDK.md`](docs/MAX_AUTH_WEB_SDK.md). The SDK provides a dismissible MAX-branded prompt, optional automatic prompting, PKCE authorization, popup callback handling, and sign-in events. It requires a registered OAuth client and exact callback URL. Production deployment and browser/API integration testing are still required before treating this as production-ready.
+
 ## What's implemented vs. prepared
 
 **Fully implemented and wired to the real backend API:** registration, sign-in, sign-out, silent
