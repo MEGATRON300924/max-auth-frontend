@@ -142,6 +142,11 @@
 
     var state = randomString(24);
     var verifier = randomString(32);
+    var width = 480, height = 700;
+    var left = Math.max(0, Math.round(window.screenX + (window.outerWidth - width) / 2));
+    var top = Math.max(0, Math.round(window.screenY + (window.outerHeight - height) / 2));
+    // Open synchronously within the click gesture so popup blockers do not reject it.
+    active = window.open("about:blank", "max-auth-sign-in", "popup=yes,width=" + width + ",height=" + height + ",left=" + left + ",top=" + top + ",resizable=yes,scrollbars=yes");
     var challenge = await createChallenge(verifier);
     var params = new URLSearchParams({
       client_id: config.clientId,
@@ -153,15 +158,12 @@
       code_challenge_method: "S256"
     });
     var authUrl = API_BASE + "/authorize?" + params.toString();
-    var width = 480, height = 700;
-    var left = Math.max(0, Math.round(window.screenX + (window.outerWidth - width) / 2));
-    var top = Math.max(0, Math.round(window.screenY + (window.outerHeight - height) / 2));
-    active = window.open(authUrl, "max-auth-sign-in", "popup=yes,width=" + width + ",height=" + height + ",left=" + left + ",top=" + top + ",resizable=yes,scrollbars=yes");
     if (!active) {
       emit("popupblocked", { message: "The browser blocked the sign-in window. Allow popups or use a direct sign-in link." });
       window.location.assign(authUrl);
       return;
     }
+    active.location = authUrl;
     var finished = false;
     var timeout = window.setTimeout(function () {
       if (!finished) emit("timeout", { message: "MAX sign-in is taking longer than expected." });
