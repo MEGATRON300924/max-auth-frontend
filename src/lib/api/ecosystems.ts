@@ -46,12 +46,12 @@ export const ecosystemApi = {
     return apiClient.post<{ ecosystem: MaxEcosystem }>(`/ecosystems/organisations/${organisationId}/ecosystems`, input);
   },
   linkClient(ecosystemId: string, oauthClientId: string, isPrimary: boolean) {
-    return apiClient.post<{ client: EcosystemClient }>(`/ecosystems/ecosystems/${ecosystemId}/clients`, { oauthClientId, isPrimary });
+    return apiClient.post<{ client: EcosystemClient }>(`/ecosystems/${ecosystemId}/clients`, { oauthClientId, isPrimary });
   },
   setPrimary(ecosystemId: string, oauthClientId: string) {
-    return apiClient.put<{ isPrimary: true }>(`/ecosystems/ecosystems/${ecosystemId}/clients/${oauthClientId}/primary`);
+    return apiClient.put<{ isPrimary: true }>(`/ecosystems/${ecosystemId}/clients/${oauthClientId}/primary`);
   },
   unlinkClient(ecosystemId: string, oauthClientId: string) {
-    return apiClient.delete<{ unlinked: true }>(`/ecosystems/ecosystems/${ecosystemId}/clients/${oauthClientId}`);
+    return apiClient.delete<{ unlinked: true }>(`/ecosystems/${ecosystemId}/clients/${oauthClientId}`);
   },
 };
