@@ -40,6 +40,7 @@
     return {
       clientId: script.getAttribute("data-client-id") || "",
       redirectUri: script.getAttribute("data-redirect-uri") || "",
+      authorizedOrigin: script.getAttribute("data-authorized-origin") || "",
       scope: (script.getAttribute("data-scope") || "openid profile email").trim(),
       autoPrompt: script.getAttribute("data-auto-prompt") === "true",
       delay: Math.max(0, Math.min(30000, Number(script.getAttribute("data-prompt-delay") === null ? 1500 : script.getAttribute("data-prompt-delay")) || 0)),
@@ -74,6 +75,10 @@
 
   function shouldPrompt() {
     if (!config.clientId || !config.redirectUri || !config.autoPrompt || config.callbackOnly) return false;
+    if (config.authorizedOrigin && window.location.origin !== config.authorizedOrigin) {
+      emit("originmismatch", { expectedOrigin: config.authorizedOrigin, actualOrigin: window.location.origin });
+      return false;
+    }
     try {
       if (config.frequency === "once" && localStorage.getItem(STORAGE_KEY + ":" + config.clientId) === "1") return false;
       if (config.frequency === "session" && sessionStorage.getItem(STORAGE_KEY + ":" + config.clientId) === "1") return false;
