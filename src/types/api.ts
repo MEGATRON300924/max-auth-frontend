@@ -15,8 +15,10 @@ export interface AuditLogEntry { id: string; action: string; ipAddress: string |
 export type ConnectedProvider = "GOOGLE" | "X" | "INSTAGRAM" | "SPOTIFY" | "DISCORD" | "GITHUB" | "MICROSOFT" | "TIKTOK";
 export interface ConnectedAccount { id: string; provider: ConnectedProvider; providerAccountId: string; scope: string | null; tokenExpiresAt: string | null; linkedAt: string; updatedAt: string; }
 export interface OAuthClient { id: string; clientId: string; name: string; redirectUris: string[]; scopes: string[]; isConfidential: boolean; isActive: boolean; createdAt: string; }
-export interface OAuthClientConfig { applicationType: OAuthApplicationType; authorizedOrigins: string[]; packageName: string | null; bundleId: string | null; certificateFingerprints: string[]; logoUrl?: string | null; displayName?: string | null; websiteUrl?: string | null; manifestUrl?: string | null; verificationStatus?: VerificationStatus; verifiedAt?: string | null; }
-export type OAuthClientConfigUpdate = Pick<OAuthClientConfig, "applicationType" | "authorizedOrigins" | "certificateFingerprints"> & Partial<Pick<OAuthClientConfig, "packageName" | "bundleId" | "logoUrl" | "displayName" | "websiteUrl" | "manifestUrl">>;
+export type OAuthPopupPlacement = "top-right" | "bottom-right";
+export type OAuthPopupFrequency = "always" | "session" | "once";
+export interface OAuthClientConfig { applicationType: OAuthApplicationType; authorizedOrigins: string[]; packageName: string | null; bundleId: string | null; certificateFingerprints: string[]; logoUrl?: string | null; displayName?: string | null; websiteUrl?: string | null; manifestUrl?: string | null; autoPrompt?: boolean; popupPlacement?: OAuthPopupPlacement; popupFrequency?: OAuthPopupFrequency; promptDelay?: number; verificationStatus?: VerificationStatus; verifiedAt?: string | null; }
+export type OAuthClientConfigUpdate = Pick<OAuthClientConfig, "applicationType" | "authorizedOrigins" | "certificateFingerprints"> & Partial<Pick<OAuthClientConfig, "packageName" | "bundleId" | "logoUrl" | "displayName" | "websiteUrl" | "manifestUrl" | "autoPrompt" | "popupPlacement" | "popupFrequency" | "promptDelay">>;
 export interface OAuthConsent { id: string; scopes: string[]; grantedAt: string; revokedAt: string | null; client: { name: string; clientId: string }; }
 export interface ApiSuccess<T> { success: true; data: T; }
 export interface ApiFailure { success: false; error: { code: string; message: string; details?: unknown; }; }
