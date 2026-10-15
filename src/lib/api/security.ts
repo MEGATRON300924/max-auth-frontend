@@ -29,7 +29,7 @@ export const connectedAccountsApi = {
 export const oauthApi = {
   listClients() { return apiClient.get<{ clients: OAuthClient[] }>("/oauth/clients"); },
   createClient(data: { name: string; redirectUris: string[]; scopes: OAuthPermission[]; isConfidential?: boolean }) { return apiClient.post<{ client: OAuthClient; clientSecret?: string }>("/oauth/clients", data); },
-  updateClient(clientId: string, data: { name?: string; redirectUris?: string[]; scopes?: OAuthPermission[] }) { return apiClient.patch<{ client: OAuthClient }>(`/oauth/clients/${clientId}`, data); },
+  updateClient(clientId: string, data: { name?: string; redirectUris?: string[]; scopes?: OAuthPermission[]; isConfidential?: boolean }) { return apiClient.patch<{ client: OAuthClient }>(`/oauth/clients/${clientId}`, data); },
   getClientConfig(clientId: string) { return apiClient.get<{ config: OAuthClientConfig }>(`/oauth/clients/${clientId}/config`); },
   updateClientConfig(clientId: string, data: OAuthClientConfigUpdate) { return apiClient.put<{ config: OAuthClientConfig }>(`/oauth/clients/${clientId}/config`, data); },
   verifyManifest(clientId: string) { return apiClient.post<{ verified: boolean; checks: Record<string, boolean> }>(`/oauth/clients/${clientId}/verify-manifest`, {}); },
