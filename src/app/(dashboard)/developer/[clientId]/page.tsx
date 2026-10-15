@@ -152,6 +152,23 @@ export default function OAuthClientDetailsPage() {
     }
   }
 
+  async function updateClientType(isConfidential: boolean) {
+    if (!client || client.isConfidential === isConfidential) return;
+    const nextType = isConfidential ? "Confidential" : "Public";
+    const warning = isConfidential
+      ? "Switching to Confidential means this application must authenticate token requests with a client secret. Never use a confidential client in browser or mobile code."
+      : "Switching to Public disables client-secret authentication. Use Authorization Code with PKCE. Existing authorization codes, access tokens, refresh tokens and consent grants for this client will be revoked, so users may need to sign in and approve access again.";
+    if (!window.confirm(`Change this OAuth client to ${nextType}?\n\n${warning}\n\nContinue?`)) return;
+    try {
+      const result = await oauthApi.updateClient(client.id, { isConfidential });
+      setClient(result.client);
+      setSecret(null);
+      showToast({ title: `Client type changed to ${nextType}`, description: "The new authentication mode has been saved.", variant: "success" });
+    } catch (error) {
+      showToast({ title: "Could not change client type", description: errorText(error), variant: "error" });
+    }
+  }
+
   async function addRedirect() {
     if (!client) return;
     const value = window.prompt("Enter the exact redirect URI (including https://)");
@@ -203,6 +220,27 @@ export default function OAuthClientDetailsPage() {
         {config.applicationType === "ANDROID" && <label className="mt-4 block text-xs font-semibold text-ink-muted">Android package name<input value={config.packageName ?? ""} onChange={(event) => setConfig({ ...config, packageName: event.target.value || null })} className="mt-2 w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2.5 text-sm" /></label>}
         {config.applicationType === "IOS" && <label className="mt-4 block text-xs font-semibold text-ink-muted">iOS bundle ID<input value={config.bundleId ?? ""} onChange={(event) => setConfig({ ...config, bundleId: event.target.value || null })} className="mt-2 w-full rounded-xl border border-white/10 bg-black/20 px-3 py-2.5 text-sm" /></label>}
         <button onClick={() => void saveSettings()} disabled={saving} className="mt-5 inline-flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50"><Save className="h-4 w-4" />{saving ? "Saving…" : "Save settings"}</button>
+      </GlassCard>
+      <GlassCard>
+        <div className="flex items-start gap-3">
+          <ShieldCheck className="mt-1 h-5 w-5 text-brand-400" />
+          <div className="min-w-0 flex-1">
+            <h2 className="font-semibold">Client authentication type</h2>
+            <p className="mt-1 text-xs leading-5 text-ink-muted">Choose whether this app uses PKCE as a public client or authenticates with a secret from a secure server.</p>
+          </div>
+          <StatusPill tone={client.isConfidential ? "warning" : "success"}>{client.isConfidential ? "Confidential" : "Public"}</StatusPill>
+        </div>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <button type="button" onClick={() => void updateClientType(false)} disabled={!client.isConfidential || !client.isActive} aria-pressed={!client.isConfidential} className={`rounded-xl border p-4 text-left transition disabled:cursor-default ${!client.isConfidential ? "border-brand-500/50 bg-brand-500/10" : "border-white/10 hover:bg-white/5"}`}>
+            <span className="flex items-center justify-between gap-2 text-sm font-semibold">Public client {!client.isConfidential && <CheckCircle2 className="h-4 w-4 text-brand-400" />}</span>
+            <span className="mt-1 block text-xs leading-5 text-ink-muted">For browser, SPA and mobile apps. Uses Authorization Code with PKCE and never sends a client secret.</span>
+          </button>
+          <button type="button" onClick={() => void updateClientType(true)} disabled={client.isConfidential || !client.isActive} aria-pressed={client.isConfidential} className={`rounded-xl border p-4 text-left transition disabled:cursor-default ${client.isConfidential ? "border-brand-500/50 bg-brand-500/10" : "border-white/10 hover:bg-white/5"}`}>
+            <span className="flex items-center justify-between gap-2 text-sm font-semibold">Confidential client {client.isConfidential && <CheckCircle2 className="h-4 w-4 text-brand-400" />}</span>
+            <span className="mt-1 block text-xs leading-5 text-ink-muted">For trusted server-side apps that can securely store a client secret.</span>
+          </button>
+        </div>
+        <p className="mt-3 text-xs leading-5 text-ink-muted">Changing this setting revokes existing tokens and consent grants for this client. The change applies immediately after confirmation.</p>
       </GlassCard>
       <GlassCard>
         <h2 className="font-semibold">Redirect URIs</h2><p className="mt-1 text-xs text-ink-muted">These must exactly match the redirect URI sent during OAuth sign-in.</p>
