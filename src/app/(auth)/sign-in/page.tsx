@@ -74,8 +74,13 @@ export default function SignInPage() {
 
   useEffect(() => {
     try {
-      const current = getSafeReturnTo();
-      if (current !== "/dashboard") window.sessionStorage.setItem(RETURN_TO_KEY, current);
+      // Preserve the OAuth authorization page across password login, Google login,
+      // refreshes, and route transitions. Do not overwrite a valid return path with null.
+      const queryReturnTo = new URLSearchParams(window.location.search).get("returnTo");
+      const current = getSafeReturnTo(queryReturnTo);
+      if (current && current !== "/dashboard") {
+        window.sessionStorage.setItem(RETURN_TO_KEY, current);
+      }
     } catch {}
   }, []);
 
