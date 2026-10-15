@@ -25,9 +25,26 @@ export function GoogleSignInButton() {
   const [loading, setLoading] = useState(false);
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "181249615928-afrsbbcfjl3jutf8kmq1e8kv4b7u0sva.apps.googleusercontent.com";
 
+  const safeReturnPath = (value: string | null) => {
+    if (!value) return null;
+    try {
+      const url = new URL(value, window.location.origin);
+      if (url.origin !== window.location.origin || url.pathname.startsWith("//")) return null;
+      return `${url.pathname}${url.search}${url.hash}`;
+    } catch {
+      return null;
+    }
+  };
+
   const destination = () => {
-    const returnTo = new URLSearchParams(window.location.search).get("returnTo");
-    return returnTo && returnTo.startsWith("/") ? returnTo : "/dashboard";
+    const queryReturnTo = new URLSearchParams(window.location.search).get("returnTo");
+    const fromQuery = safeReturnPath(queryReturnTo);
+    if (fromQuery && fromQuery !== "/dashboard") return fromQuery;
+    try {
+      const saved = safeReturnPath(window.sessionStorage.getItem("max-auth:oauth-return-to"));
+      if (saved) return saved;
+    } catch {}
+    return fromQuery || "/dashboard";
   };
 
   const complete = async (code?: string) => {
