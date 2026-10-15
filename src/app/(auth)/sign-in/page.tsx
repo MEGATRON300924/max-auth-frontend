@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { ArrowLeft, Lock, UserRound, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -16,17 +16,27 @@ const MAX_REMEMBERED_ACCOUNTS = 5;
 const RETURN_TO_KEY = "max-auth:oauth-return-to";
 type SignInStep = "choose" | "credentials";
 
-function getSafeReturnTo() {
-  if (typeof window === "undefined") return "/dashboard";
-  const returnTo = new URLSearchParams(window.location.search).get("returnTo");
-  if (!returnTo) return "/dashboard";
+function getSafeReturnTo(value: string | null | undefined) {
+  if (typeof window === "undefined" || !value) return null;
   try {
-    const url = new URL(returnTo, window.location.origin);
-    if (url.origin !== window.location.origin) return "/dashboard";
+    const url = new URL(value, window.location.origin);
+    if (url.origin !== window.location.origin || url.pathname.startsWith("//")) return null;
     return `${url.pathname}${url.search}${url.hash}`;
   } catch {
-    return "/dashboard";
+    return null;
   }
+}
+
+function getDestination() {
+  if (typeof window === "undefined") return "/dashboard";
+  const queryReturnTo = new URLSearchParams(window.location.search).get("returnTo");
+  const fromQuery = getSafeReturnTo(queryReturnTo);
+  if (fromQuery && fromQuery !== "/dashboard") return fromQuery;
+  try {
+    const saved = getSafeReturnTo(window.sessionStorage.getItem(RETURN_TO_KEY));
+    if (saved) return saved;
+  } catch {}
+  return fromQuery || "/dashboard";
 }
 
 function getClientName() {
@@ -56,11 +66,6 @@ export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const destination = useMemo(() => {
-    const current = getSafeReturnTo();
-    if (current !== "/dashboard") return current;
-    try { return window.sessionStorage.getItem(RETURN_TO_KEY) || "/dashboard"; } catch { return "/dashboard"; }
-  }, []);
 
   useEffect(() => {
     const clientName = getClientName();
@@ -74,7 +79,7 @@ export default function SignInPage() {
     } catch {}
   }, []);
 
-  useEffect(() => { if (isAuthenticated) window.location.assign(destination); }, [destination, isAuthenticated]);
+  useEffect(() => { if (isAuthenticated) window.location.assign(getDestination()); }, [isAuthenticated]);
 
   useEffect(() => {
     try {
@@ -126,6 +131,7 @@ export default function SignInPage() {
     try {
       const account = identifier.trim();
       await login(account, password, rememberMe, mfaRequired ? mfaCode.trim() : undefined);
+      const destination = getDestination();
       try {
         if (rememberMe) {
           persistRememberedAccounts([account, ...rememberedAccounts.filter((item) => item.toLowerCase() !== account.toLowerCase())]);
