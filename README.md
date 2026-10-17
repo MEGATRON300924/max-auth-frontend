@@ -44,8 +44,8 @@ password change, account deletion, device management (list/trust/revoke), sessio
 (list/revoke/revoke-all), login history, audit log, connected-accounts list/unlink, and OAuth
 client registration/management ("Continue with MAX AI" developer side).
 
-**Architecture-ready, not implemented:** passkeys,
-recovery codes, live provider OAuth buttons (Google/X/Instagram/Spotify/Discord/GitHub/TikTok),
-The OAuth authorization/consent screen is implemented in `src/app/authorize/page.tsx` and wired to the backend authorization-request and approval endpoints. However, production readiness still requires a real end-to-end test of sign-in, consent, callback, code exchange, userinfo, refresh, and revocation with the registered production client.
+**Not implemented in the frontend yet:** passkey sign-in and live provider OAuth buttons (Google/X/Instagram/Spotify/Discord/GitHub/TikTok). Recovery-code handling and other account-security features should be checked against the current UI before they are advertised as complete.
+
+**OAuth authorization/consent:** implemented in `src/app/authorize/page.tsx` and wired to the backend authorization-request and approval endpoints. Production readiness still requires an end-to-end test of sign-in, consent, callback, code exchange, userinfo, refresh, and revocation with the registered production client.
 
 See `docs/FOLDER_STRUCTURE.md` for a full file-by-file explanation.
