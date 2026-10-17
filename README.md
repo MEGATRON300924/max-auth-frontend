@@ -46,7 +46,6 @@ client registration/management ("Continue with MAX AI" developer side).
 
 **Architecture-ready, not implemented:** passkeys,
 recovery codes, live provider OAuth buttons (Google/X/Instagram/Spotify/Discord/GitHub/TikTok),
-and the interactive "Continue with MAX AI" consent/authorize screen (client registration works;
-the actual authorize flow isn't built on the backend yet either, by design).
+The OAuth authorization/consent screen is implemented in `src/app/authorize/page.tsx` and wired to the backend authorization-request and approval endpoints. However, production readiness still requires a real end-to-end test of sign-in, consent, callback, code exchange, userinfo, refresh, and revocation with the registered production client.
 
 See `docs/FOLDER_STRUCTURE.md` for a full file-by-file explanation.
