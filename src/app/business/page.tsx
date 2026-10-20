@@ -140,11 +140,11 @@ export default function BusinessPortalPage() {
   }
 
   async function disconnectApp(app: BusinessApp) {
-    if (!selected || !window.confirm(\`Disconnect \${app.client.name} from this business? Its business-scoped access and refresh tokens will be revoked.\`)) return;
+    if (!selected || !window.confirm(`Disconnect ${app.client.name} from this business? Its business-scoped access and refresh tokens will be revoked.`)) return;
     setError(""); setNotice("");
     try {
-      await apiClient.delete(\`/businesses/\${selected.id}/apps/\${app.id}\`);
-      setNotice(\`\${app.client.name} was disconnected from this business.\`);
+      await apiClient.delete(`/businesses/${selected.id}/apps/${app.id}`);
+      setNotice(`${app.client.name} was disconnected from this business.`);
       await loadWorkspace(selected);
     } catch (err) { setError(err instanceof Error ? err.message : "We couldn't disconnect this product."); }
   }
