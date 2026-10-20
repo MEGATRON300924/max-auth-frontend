@@ -30,7 +30,7 @@ function formatDate(value: string) {
 }
 
 export default function BusinessPortalPage() {
-  const { isAuthenticated, isLoading: authLoading, user } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [selected, setSelected] = useState<Business | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
@@ -103,7 +103,7 @@ export default function BusinessPortalPage() {
       setShowCreate(false);
       setNotice(data.emailVerificationSent ? "Business identity created. Check the business email to verify control of the address." : "Business identity created, but the verification email could not be sent. Contact support to restore email delivery.");
       await loadBusinesses();
-      setSelected(data.business);
+      setSelected({ ...data.business, role: "OWNER" });
     } catch (err) {
       setError(err instanceof Error ? err.message : "We couldn't create this business. Please check the details and try again.");
     } finally { setLoading(false); }
@@ -197,7 +197,7 @@ export default function BusinessPortalPage() {
                     <label className="text-sm font-medium">Business type<select required value={form.businessType} onChange={(e) => updateField("businessType", e.target.value)} className="mt-1.5 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500"><option value="Hospitality">Hospitality</option><option value="Hotel">Hotel</option><option value="Restaurant">Restaurant</option><option value="Retail">Retail</option><option value="Technology">Technology</option><option value="Professional services">Professional services</option><option value="Other">Other</option></select></label>
                     <label className="text-sm font-medium">Business email<input required type="email" maxLength={254} value={form.email} onChange={(e) => updateField("email", e.target.value)} placeholder="business@example.com" className="mt-1.5 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /></label>
                     <label className="text-sm font-medium">Business phone<input required type="tel" minLength={7} maxLength={40} value={form.phone} onChange={(e) => updateField("phone", e.target.value)} placeholder="+234…" className="mt-1.5 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /></label>
-                    <label className="text-sm font-medium">Country<select required value={form.country} onChange={(e) => updateField("country", e.target.value)} className="mt-1.5 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500"><option value="NG">Nigeria</option><option value="GH">Ghana</option><option value="KE">Kenya</option><option value="ZA">South Africa</option><option value="GB">United Kingdom</option><option value="US">United States</option><option value="OTHER">Other</option></select></label>
+                    <label className="text-sm font-medium">Country<select required value={form.country} onChange={(e) => updateField("country", e.target.value)} className="mt-1.5 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500"><option value="NG">Nigeria</option><option value="GH">Ghana</option><option value="KE">Kenya</option><option value="ZA">South Africa</option><option value="GB">United Kingdom</option><option value="US">United States</option><option value="ZZ">Other</option></select></label>
                     <label className="text-sm font-medium">Registration number <span className="text-xs font-normal text-ink-muted">Optional</span><input maxLength={120} value={form.registrationNumber} onChange={(e) => updateField("registrationNumber", e.target.value)} placeholder="CAC or local registration number" className="mt-1.5 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /></label>
                     <label className="text-sm font-medium sm:col-span-2">Website <span className="text-xs font-normal text-ink-muted">Optional</span><input type="url" value={form.websiteUrl} onChange={(e) => updateField("websiteUrl", e.target.value)} placeholder="https://example.com" className="mt-1.5 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /></label>
                     <label className="text-sm font-medium sm:col-span-2">Business description <span className="text-xs font-normal text-ink-muted">Optional</span><textarea rows={3} maxLength={2000} value={form.description} onChange={(e) => updateField("description", e.target.value)} placeholder="What does your business do?" className="mt-1.5 w-full resize-y rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /></label>
