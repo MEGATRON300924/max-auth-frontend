@@ -89,6 +89,17 @@ export default function BusinessPortalPage() {
   }, []);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("created") === "1") {
+      setNotice("Business account created. Check the business email for a verification link.");
+      params.delete("created");
+      const query = params.toString();
+      window.history.replaceState({}, "", `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`);
+    }
+  }, []);
+
+  useEffect(() => {
     if (isAuthenticated) void loadBusinesses();
     else if (!authLoading) setPageLoading(false);
   }, [isAuthenticated, authLoading, loadBusinesses]);
@@ -234,7 +245,7 @@ export default function BusinessPortalPage() {
             <h1 className="font-display text-3xl font-bold tracking-tight sm:text-5xl">Your business, connected to MAX.</h1>
             <p className="mt-4 max-w-xl text-base leading-7 text-ink-muted">Create a trusted business identity, manage your team, and decide how MAX products connect to your organization.</p>
           </div>
-          {isAuthenticated && <Button onClick={() => { setShowCreate((value) => !value); setError(""); setNotice(""); }}><Plus className="h-4 w-4" /> Create a business</Button>}
+          <Link href="/business/create-account"><Button><Plus className="h-4 w-4" /> Create A Business Account</Button></Link>
         </div>
 
         {error && <div role="alert" className="mb-5 flex items-start gap-3 rounded-xl border border-danger/30 bg-danger/5 px-4 py-3 text-sm text-danger"><CircleAlert className="mt-0.5 h-4 w-4 shrink-0" />{error}</div>}
@@ -245,9 +256,9 @@ export default function BusinessPortalPage() {
         ) : !isAuthenticated ? (
           <section className="mx-auto max-w-2xl rounded-3xl border border-glass-border bg-base-raised p-7 text-center shadow-sm sm:p-10">
             <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300"><ShieldCheck className="h-7 w-7" /></span>
-            <h2 className="mt-5 text-2xl font-semibold">Sign in to manage your business</h2>
-            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-ink-muted">Use your existing personal MAX Account. Your personal identity stays separate from the business identity you create or join.</p>
-            <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row"><Link href="/sign-in"><Button>Sign in to MAX <ArrowRight className="h-4 w-4" /></Button></Link><Link href="/create-account"><Button variant="secondary">Create a MAX Account</Button></Link></div>
+            <h2 className="mt-5 text-2xl font-semibold">Create A Business Account</h2>
+            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-ink-muted">Start by creating your organisation profile. You can sign in with your personal MAX Account to become its first owner; your personal identity stays separate from your business.</p>
+            <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row"><Link href="/business/create-account"><Button><Plus className="h-4 w-4" /> Create A Business Account</Button></Link><Link href="/sign-in"><Button variant="secondary">Already have a MAX Account? Sign in <ArrowRight className="h-4 w-4" /></Button></Link></div>
           </section>
         ) : (
           <div className="grid gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
@@ -255,7 +266,7 @@ export default function BusinessPortalPage() {
               <div className="rounded-2xl border border-glass-border bg-base-raised p-4">
                 <div className="mb-3 flex items-center justify-between"><h2 className="text-sm font-semibold">Your businesses</h2><span className="rounded-full bg-glass-hover px-2 py-0.5 text-xs text-ink-muted">{businesses.length}</span></div>
                 {businesses.length ? <div className="space-y-2">{businesses.map((business) => <button key={business.id} onClick={() => { setSelected(business); setNotice(""); setInviteLink(""); }} className={`flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-colors ${selected?.id === business.id ? "border-brand-500/40 bg-brand-50/60 dark:bg-brand-500/10" : "border-transparent hover:bg-glass-hover"}`}><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-base text-brand-700 dark:text-brand-300"><Building2 className="h-5 w-5" /></span><span className="min-w-0 flex-1"><span className="block truncate text-sm font-semibold">{business.displayName}</span><span className="block truncate text-xs text-ink-muted">@{business.handle}</span></span><ChevronRight className="h-4 w-4 shrink-0 text-ink-faint" /></button>)}</div> : <div className="rounded-xl border border-dashed border-glass-border px-4 py-6 text-center"><Building2 className="mx-auto h-6 w-6 text-ink-faint" /><p className="mt-2 text-sm font-medium">No business identity yet</p><p className="mt-1 text-xs leading-5 text-ink-muted">Create one to start connecting your business to MAX.</p></div>}
-                {!businesses.length && <Button className="mt-4 w-full" onClick={() => setShowCreate(true)}><Plus className="h-4 w-4" /> Create your first business</Button>}
+                {!businesses.length && <Link href="/business/create-account" className="mt-4 block"><Button className="w-full"><Plus className="h-4 w-4" /> Create your first business</Button></Link>}
               </div>
               <div className="rounded-2xl border border-glass-border bg-base-raised p-4"><div className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-glass-hover"><ShieldCheck className="h-5 w-5" /></span><div><p className="text-sm font-semibold">Business identity</p><p className="text-xs text-ink-muted">Separate from your MAX Account</p></div></div><p className="mt-3 text-xs leading-5 text-ink-muted">Email verification confirms access to an email address. Legal business verification is a separate process.</p></div>
             </aside>
