@@ -79,7 +79,7 @@ export default function AdminOrganisationsPage() {
       ""
     );
     if (nextStatus !== "VERIFIED" && reason === null) return;
-    if (nextStatus === "REJECTED" && !reason.trim()) {
+    if (nextStatus === "REJECTED" && !(reason || "").trim()) {
       showToast({ title: "A reason is required", description: "Add a short explanation before rejecting an organisation.", variant: "error" });
       return;
     }
