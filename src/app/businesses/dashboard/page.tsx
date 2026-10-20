@@ -76,7 +76,7 @@ export default function BusinessDashboardPage() {
           <div className="mt-8 rounded-2xl border border-dashed border-glass-border bg-base-raised p-8 text-center sm:p-12">
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-glass-border bg-base text-brand-600 dark:text-brand-400"><Building2 className="h-7 w-7" /></div>
             <h2 className="mt-5 text-lg font-bold">Your first business starts here</h2>
-            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-ink-muted">Create a business identity to establish its profile and become its first owner. Team management and product connections will be added in later stages.</p>
+            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-ink-muted">Create a business identity to establish its profile and become its first owner. You can then invite team members and manage their roles from its workspace.</p>
             <div className="mt-5"><Link href="/businesses/register"><Button>Create business identity <ArrowRight className="h-4 w-4" /></Button></Link></div>
           </div>
         ) : (
