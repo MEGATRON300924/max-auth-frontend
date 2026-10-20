@@ -98,7 +98,7 @@ export default function RegisterBusinessPage() {
                 </div>
                 <p className="mt-4 text-sm leading-6 text-ink-muted">Use your personal MAX account to establish a business profile. You will be recorded as its owner.</p>
                 {!isAuthenticated && <div className="mt-5 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm">You need to sign in with MAX before submitting this form. Your entries will remain on this page only until you navigate away.</div>}
-                {error && <div className="mt-5"><Alert variant="error" title="Couldn't create business">{error}</Alert></div>}
+                {error && <div className="mt-5"><Alert variant="danger" title="Couldn't create business">{error}</Alert></div>}
                 <form onSubmit={submit} className="mt-7 space-y-5">
                   <div className="grid gap-5 sm:grid-cols-2">
                     <label className="block text-sm font-semibold">Legal business name<input required maxLength={160} value={legalName} onChange={(event) => setLegalName(event.target.value)} className="mt-2 w-full rounded-xl border border-glass-border bg-base px-3.5 py-3 font-normal outline-none focus:border-brand-500" placeholder="Registered or trading name" /></label>
