@@ -42,6 +42,7 @@ export default function BusinessPortalPage() {
   const [inviteRole, setInviteRole] = useState("MEMBER");
   const [inviteLink, setInviteLink] = useState("");
   const [showCreate, setShowCreate] = useState(false);
+  const [showEditProfile, setShowEditProfile] = useState(false);
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
   const [error, setError] = useState("");
@@ -112,6 +113,48 @@ export default function BusinessPortalPage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "We couldn't create this business. Please check the details and try again.");
     } finally { setLoading(false); }
+  }
+
+  function beginEditProfile() {
+    if (!selected) return;
+    setForm({
+      legalName: selected.legalName, displayName: selected.displayName, handle: selected.handle, email: selected.email,
+      phone: selected.phone, country: selected.country, businessType: selected.businessType,
+      websiteUrl: selected.websiteUrl || "", description: selected.description || "", registrationNumber: selected.registrationNumber || "",
+    });
+    setShowCreate(false);
+    setShowEditProfile(true);
+    setError("");
+    setNotice("");
+  }
+
+  async function saveProfile(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!selected) return;
+    setLoading(true); setError(""); setNotice("");
+    try {
+      const data = await apiClient.patch<{ business: Business; emailVerificationSent?: boolean }>(`/businesses/${selected.id}`, {
+        legalName: form.legalName, displayName: form.displayName, email: form.email, phone: form.phone,
+        country: form.country.toUpperCase(), businessType: form.businessType,
+        websiteUrl: form.websiteUrl.trim() || null, description: form.description.trim() || null,
+        registrationNumber: form.registrationNumber.trim() || null,
+      });
+      setShowEditProfile(false);
+      setNotice(data.emailVerificationSent === false ? "Business profile updated, but the new email verification message could not be sent." : data.emailVerificationSent ? "Business profile updated. Verify the new email address to confirm access." : "Business profile updated.");
+      await loadBusinesses();
+      setSelected({ ...data.business, role: selected.role });
+    } catch (err) { setError(err instanceof Error ? err.message : "We couldn't update this business profile."); }
+    finally { setLoading(false); }
+  }
+
+  async function resendVerification() {
+    if (!selected) return;
+    setLoading(true); setError(""); setNotice("");
+    try {
+      const data = await apiClient.post<{ emailVerificationSent: boolean }>(`/businesses/${selected.id}/resend-email-verification`, {});
+      setNotice(data.emailVerificationSent ? "A fresh verification link has been sent to the business email." : "We couldn't send the verification email. Please try again later.");
+    } catch (err) { setError(err instanceof Error ? err.message : "We couldn't resend the verification email."); }
+    finally { setLoading(false); }
   }
 
   async function inviteMember(event: FormEvent<HTMLFormElement>) {
@@ -206,6 +249,9 @@ export default function BusinessPortalPage() {
                 <section className="rounded-2xl border border-glass-border bg-base-raised p-5 sm:p-7">
                   <div className="mb-6"><h2 className="text-xl font-semibold">Create a business identity</h2><p className="mt-1 text-sm text-ink-muted">Your permanent MAX business ID will be created when you submit.</p></div>
                   <form onSubmit={createBusiness} className="grid gap-4 sm:grid-cols-2">
+                <section className="rounded-2xl border border-glass-border bg-base-raised p-5 sm:p-7">
+                  <div className="mb-6"><h2 className="text-xl font-semibold">Create a business identity</h2><p className="mt-1 text-sm text-ink-muted">Your permanent MAX business ID will be created when you submit.</p></div>
+                  <form onSubmit={createBusiness} className="grid gap-4 sm:grid-cols-2">
                     <label className="text-sm font-medium">Legal business name<input required minLength={2} maxLength={180} value={form.legalName} onChange={(e) => updateField("legalName", e.target.value)} placeholder="Registered legal name" className="mt-1.5 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /></label>
                     <label className="text-sm font-medium">Display name<input required minLength={2} maxLength={120} value={form.displayName} onChange={(e) => updateField("displayName", e.target.value)} placeholder="Name shown in MAX" className="mt-1.5 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /></label>
                     <label className="text-sm font-medium">Business handle<input required minLength={3} maxLength={64} pattern="[A-Za-z0-9]+(-[A-Za-z0-9]+)*" value={form.handle} onChange={(e) => updateField("handle", e.target.value)} placeholder="your-business" className="mt-1.5 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /><span className="mt-1 block text-xs text-ink-muted">Unique and used as a public identifier.</span></label>
@@ -217,6 +263,22 @@ export default function BusinessPortalPage() {
                     <label className="text-sm font-medium sm:col-span-2">Website <span className="text-xs font-normal text-ink-muted">Optional</span><input type="url" value={form.websiteUrl} onChange={(e) => updateField("websiteUrl", e.target.value)} placeholder="https://example.com" className="mt-1.5 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /></label>
                     <label className="text-sm font-medium sm:col-span-2">Business description <span className="text-xs font-normal text-ink-muted">Optional</span><textarea rows={3} maxLength={2000} value={form.description} onChange={(e) => updateField("description", e.target.value)} placeholder="What does your business do?" className="mt-1.5 w-full resize-y rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /></label>
                     <div className="flex flex-col-reverse gap-3 pt-2 sm:col-span-2 sm:flex-row sm:justify-end"><Button type="button" variant="secondary" onClick={() => setShowCreate(false)}>Cancel</Button><Button type="submit" disabled={loading}>{loading ? <><LoaderCircle className="h-4 w-4 animate-spin" /> Creating…</> : <>Create business identity <ArrowRight className="h-4 w-4" /></>}</Button></div>
+                  </form>
+                </section>
+              ) : showEditProfile && selected ? (
+                <section className="rounded-2xl border border-glass-border bg-base-raised p-5 sm:p-7">
+                  <div className="mb-6"><h2 className="text-xl font-semibold">Edit business profile</h2><p className="mt-1 text-sm text-ink-muted">Your permanent business ID and handle cannot be changed here.</p></div>
+                  <form onSubmit={saveProfile} className="grid gap-4 sm:grid-cols-2">
+                    <label className="text-sm font-medium">Legal business name<input required minLength={2} maxLength={180} value={form.legalName} onChange={(e) => updateField("legalName", e.target.value)} className="mt-1.5 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /></label>
+                    <label className="text-sm font-medium">Display name<input required minLength={2} maxLength={120} value={form.displayName} onChange={(e) => updateField("displayName", e.target.value)} className="mt-1.5 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /></label>
+                    <label className="text-sm font-medium">Business email<input required type="email" maxLength={254} value={form.email} onChange={(e) => updateField("email", e.target.value)} className="mt-1.5 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /></label>
+                    <label className="text-sm font-medium">Business phone<input required type="tel" minLength={7} maxLength={40} value={form.phone} onChange={(e) => updateField("phone", e.target.value)} className="mt-1.5 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /></label>
+                    <label className="text-sm font-medium">Country code<input required minLength={2} maxLength={2} value={form.country} onChange={(e) => updateField("country", e.target.value)} className="mt-1.5 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /></label>
+                    <label className="text-sm font-medium">Business type<input required minLength={2} maxLength={80} value={form.businessType} onChange={(e) => updateField("businessType", e.target.value)} className="mt-1.5 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /></label>
+                    <label className="text-sm font-medium sm:col-span-2">Website<input type="url" value={form.websiteUrl} onChange={(e) => updateField("websiteUrl", e.target.value)} placeholder="https://example.com" className="mt-1.5 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /></label>
+                    <label className="text-sm font-medium sm:col-span-2">Business description<textarea rows={3} maxLength={2000} value={form.description} onChange={(e) => updateField("description", e.target.value)} className="mt-1.5 w-full resize-y rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /></label>
+                    <label className="text-sm font-medium sm:col-span-2">Registration number<input maxLength={120} value={form.registrationNumber} onChange={(e) => updateField("registrationNumber", e.target.value)} className="mt-1.5 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /></label>
+                    <div className="flex flex-col-reverse gap-3 pt-2 sm:col-span-2 sm:flex-row sm:justify-end"><Button type="button" variant="secondary" onClick={() => setShowEditProfile(false)}>Cancel</Button><Button type="submit" disabled={loading}>{loading ? "Saving…" : "Save profile"}</Button></div>
                   </form>
                 </section>
               ) : selected ? (
