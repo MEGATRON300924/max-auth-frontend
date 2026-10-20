@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useParams } from "next/navigation";
 import { ArrowLeft, Building2, RefreshCw, ShieldCheck, UserRound, UserMinus } from "lucide-react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
@@ -18,6 +18,7 @@ type Member = {
   createdAt: string;
   user: { id: string; username: string; fullName: string | null; displayName: string | null; avatarUrl: string | null };
 };
+type Invitation = { id: string; email: string; role: string; expiresAt: string; createdAt: string; inviter: { username: string; displayName: string | null; fullName: string | null } };
 type Business = {
   businessId: string; handle: string; legalName: string; displayName: string;
   businessType: string; country: string; businessEmail: string; phone: string | null;
@@ -38,6 +39,10 @@ export default function BusinessWorkspacePage() {
   const { isAuthenticated } = useAuth();
   const [business, setBusiness] = useState<Business | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
+  const [invitations, setInvitations] = useState<Invitation[]>([]);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState("MEMBER");
+  const [inviteBusy, setInviteBusy] = useState(false);
   const [loading, setLoading] = useState(true);
   const [busyUser, setBusyUser] = useState("");
   const [error, setError] = useState("");
@@ -53,8 +58,11 @@ export default function BusinessWorkspacePage() {
       if (result.business.role === "OWNER" || result.business.role === "ADMINISTRATOR") {
         const memberResult = await apiClient.get<{ members: Member[] }>(`/businesses/${encodeURIComponent(businessId)}/members`);
         setMembers(memberResult.members);
+        const invitationResult = await apiClient.get<{ invitations: Invitation[] }>(`/businesses/${encodeURIComponent(businessId)}/invitations`);
+        setInvitations(invitationResult.invitations);
       } else {
         setMembers([]);
+        setInvitations([]);
       }
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "We couldn't load this business workspace.");
@@ -86,6 +94,32 @@ export default function BusinessWorkspacePage() {
       await load();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "We couldn't remove this member.");
+    } finally { setBusyUser(""); }
+  }
+
+
+  async function sendInvitation(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setInviteBusy(true); setError(""); setNotice("");
+    try {
+      const result = await apiClient.post<{ invitation: { email: string; role: string }; delivery: string }>(`/businesses/${encodeURIComponent(businessId)}/invitations`, { email: inviteEmail.trim(), role: inviteRole });
+      setNotice(`Invitation email sent to ${result.invitation.email}.`);
+      setInviteEmail("");
+      await load();
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "We couldn't send this invitation.");
+    } finally { setInviteBusy(false); }
+  }
+
+  async function revokeInvitation(invitation: Invitation) {
+    if (!window.confirm(`Revoke the pending invitation for ${invitation.email}?`)) return;
+    setBusyUser(invitation.id); setError(""); setNotice("");
+    try {
+      await apiClient.delete(`/businesses/${encodeURIComponent(businessId)}/invitations/${encodeURIComponent(invitation.id)}`);
+      setNotice(`Invitation for ${invitation.email} revoked.`);
+      await load();
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "We couldn't revoke this invitation.");
     } finally { setBusyUser(""); }
   }
 
@@ -150,8 +184,28 @@ export default function BusinessWorkspacePage() {
                   </div>
                 </div>
               )}
-              <p className="mt-4 text-xs leading-5 text-ink-faint">Owner protection is enforced by the API. Ownership transfer and invitation workflows are separate follow-up features; this page does not grant access by itself.</p>
+              <p className="mt-4 text-xs leading-5 text-ink-faint">The API protects owner accounts and checks permissions on every request. Invitation links expire after seven days, are single-use, and require the invited email to be verified in MAX Auth.</p>
             </section>
+
+            {canManage && (
+              <section className="mt-8">
+                <div><h2 className="font-display text-2xl font-bold">Invite people</h2><p className="mt-2 text-sm text-ink-muted">Send a one-time invitation link to someone who should join this business.</p></div>
+                <form onSubmit={sendInvitation} className="mt-5 grid gap-3 rounded-2xl border border-glass-border bg-base-raised p-5 sm:grid-cols-[minmax(0,1fr)_180px_auto] sm:items-end">
+                  <label className="block text-sm font-semibold">Email address<input required type="email" maxLength={255} value={inviteEmail} onChange={(event) => setInviteEmail(event.target.value)} className="mt-2 w-full rounded-xl border border-glass-border bg-base px-3.5 py-3 font-normal outline-none focus:border-brand-500" placeholder="teammate@example.com" /></label>
+                  <label className="block text-sm font-semibold">Role<select value={inviteRole} onChange={(event) => setInviteRole(event.target.value)} className="mt-2 w-full rounded-xl border border-glass-border bg-base px-3.5 py-3 font-normal"><option value="MEMBER">Member</option><option value="MANAGER">Manager</option><option value="VIEWER">Viewer</option><option value="DEVELOPER">Developer</option>{business.role === "OWNER" && <option value="ADMINISTRATOR">Administrator</option>}</select></label>
+                  <Button type="submit" disabled={inviteBusy}>{inviteBusy ? "Sending…" : "Send invitation"}</Button>
+                  <p className="text-xs leading-5 text-ink-faint sm:col-span-3">The invitee must sign in to MAX using this email address and verify it before accepting. Invitation emails require the MAX Auth email provider to be configured.</p>
+                </form>
+                <div className="mt-5">
+                  <h3 className="text-sm font-bold">Pending invitations <span className="ml-1 font-normal text-ink-faint">({invitations.length})</span></h3>
+                  {invitations.length === 0 ? <p className="mt-3 rounded-xl border border-dashed border-glass-border p-5 text-sm text-ink-muted">No pending invitations.</p> : (
+                    <div className="mt-3 overflow-hidden rounded-2xl border border-glass-border bg-base-raised divide-y divide-glass-border">
+                      {invitations.map((invitation) => <div key={invitation.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-sm font-semibold">{invitation.email}</p><p className="mt-1 text-xs text-ink-muted">{invitation.role.toLowerCase()} · expires {new Date(invitation.expiresAt).toLocaleDateString()}</p></div><Button variant="secondary" size="sm" disabled={busyUser === invitation.id} onClick={() => void revokeInvitation(invitation)}>{busyUser === invitation.id ? "Revoking…" : "Revoke invitation"}</Button></div>)}
+                    </div>
+                  )}
+                </div>
+              </section>
+            )}
           </>
         ) : null}
       </main>
