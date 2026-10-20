@@ -17,6 +17,7 @@ type Business = {
 };
 type Member = { id: string; role: string; status: string; createdAt: string; user: { id: string; username: string; fullName?: string | null; displayName?: string | null; email: string; avatarUrl?: string | null } };
 type AuditEntry = { id: string; action: string; createdAt: string; actorId?: string | null; metadata?: unknown };
+type BusinessApp = { id: string; scopes: string[]; connectedAt: string; status: string; client: { clientId: string; name: string; isActive: boolean }; authorizedBy: { email: string; displayName?: string | null; username: string } };
 type BusinessForm = { legalName: string; displayName: string; handle: string; email: string; phone: string; country: string; businessType: string; websiteUrl: string; description: string; registrationNumber: string };
 
 const initialForm: BusinessForm = { legalName: "", displayName: "", handle: "", email: "", phone: "", country: "NG", businessType: "Hospitality", websiteUrl: "", description: "", registrationNumber: "" };
@@ -35,6 +36,7 @@ export default function BusinessPortalPage() {
   const [selected, setSelected] = useState<Business | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
   const [logs, setLogs] = useState<AuditEntry[]>([]);
+  const [apps, setApps] = useState<BusinessApp[]>([]);
   const [form, setForm] = useState<BusinessForm>(initialForm);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("MEMBER");
@@ -70,9 +72,12 @@ export default function BusinessPortalPage() {
       ]);
       setMembers(memberData.members);
       setLogs(logData.logs);
+      const appData = await apiClient.get<{ apps: BusinessApp[] }>(`/businesses/${business.id}/apps`).catch(() => ({ apps: [] as BusinessApp[] }));
+      setApps(appData.apps);
     } catch (err) {
       setMembers([]);
       setLogs([]);
+      setApps([]);
       setError(err instanceof Error ? err.message : "We couldn't load this business workspace.");
     }
   }, []);
@@ -84,7 +89,7 @@ export default function BusinessPortalPage() {
 
   useEffect(() => {
     if (selected && isAuthenticated) void loadWorkspace(selected);
-    else { setMembers([]); setLogs([]); }
+    else { setMembers([]); setLogs([]); setApps([]); }
   }, [selected?.id, isAuthenticated, loadWorkspace]);
 
   async function createBusiness(event: FormEvent<HTMLFormElement>) {
@@ -132,6 +137,16 @@ export default function BusinessPortalPage() {
       setNotice("Member role updated.");
       await loadWorkspace(selected);
     } catch (err) { setError(err instanceof Error ? err.message : "We couldn't update this role."); }
+  }
+
+  async function disconnectApp(app: BusinessApp) {
+    if (!selected || !window.confirm(\`Disconnect \${app.client.name} from this business? Its business-scoped access and refresh tokens will be revoked.\`)) return;
+    setError(""); setNotice("");
+    try {
+      await apiClient.delete(\`/businesses/\${selected.id}/apps/\${app.id}\`);
+      setNotice(\`\${app.client.name} was disconnected from this business.\`);
+      await loadWorkspace(selected);
+    } catch (err) { setError(err instanceof Error ? err.message : "We couldn't disconnect this product."); }
   }
 
   async function removeMember(member: Member) {
@@ -221,6 +236,11 @@ export default function BusinessPortalPage() {
                     {canManage && <form onSubmit={inviteMember} className="mb-5 grid gap-3 rounded-xl border border-glass-border bg-base p-3 sm:grid-cols-[minmax(0,1fr)_170px_auto]"><input required type="email" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} placeholder="Teammate's email address" className="min-w-0 rounded-lg border border-glass-border bg-base-raised px-3 py-2.5 text-sm outline-none focus:border-brand-500" /><select value={inviteRole} onChange={(e) => setInviteRole(e.target.value)} className="rounded-lg border border-glass-border bg-base-raised px-3 py-2.5 text-sm outline-none focus:border-brand-500">{roles.map((role) => <option key={role} value={role}>{labelRole(role)}</option>)}</select><Button type="submit" disabled={loading}>{loading ? "Inviting…" : "Invite member"}</Button></form>}
                     {inviteLink && <div className="mb-5 rounded-xl border border-brand-500/30 bg-brand-50/50 p-3 text-sm dark:bg-brand-500/5"><p className="font-medium">Invitation link</p><p className="mt-1 break-all font-mono text-xs text-ink-muted">{inviteLink}</p><button className="mt-2 text-xs font-semibold text-brand-700 underline dark:text-brand-300" onClick={() => void navigator.clipboard.writeText(inviteLink)}>Copy invitation link</button></div>}
                     {members.length ? <div className="divide-y divide-glass-border">{members.map((member) => <div key={member.id} className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-glass-hover text-sm font-semibold">{(member.user.displayName || member.user.fullName || member.user.email).slice(0, 1).toUpperCase()}</span><div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold">{member.user.displayName || member.user.fullName || member.user.username}</p><p className="truncate text-xs text-ink-muted">{member.user.email}</p></div><span className="text-xs text-ink-muted">Joined {formatDate(member.createdAt)}</span>{canManage && member.role !== "OWNER" && <div className="flex gap-2"><select aria-label={`Role for ${member.user.email}`} value={member.role} onChange={(e) => void changeRole(member, e.target.value)} className="rounded-lg border border-glass-border bg-base px-2 py-1.5 text-xs">{roles.map((role) => <option key={role} value={role}>{labelRole(role)}</option>)}</select><button onClick={() => void removeMember(member)} className="rounded-lg border border-glass-border px-2 py-1.5 text-xs text-danger hover:bg-danger/5">Remove</button></div>}</div>)}</div> : <p className="rounded-xl bg-base px-4 py-6 text-center text-sm text-ink-muted">Your team member list is empty.</p>}
+                  </section>
+
+                  <section className="rounded-2xl border border-glass-border bg-base-raised p-5 sm:p-7">
+                    <div className="mb-4 flex items-center justify-between gap-3"><div><h2 className="text-lg font-semibold">Connected MAX products</h2><p className="mt-1 text-sm text-ink-muted">Apps authorized for this business context.</p></div><span className="rounded-full bg-glass-hover px-2.5 py-1 text-xs">{apps.length} connected</span></div>
+                    {apps.length ? <div className="divide-y divide-glass-border">{apps.map((app) => <div key={app.id} className="flex flex-col gap-3 py-4 sm:flex-row sm:items-start"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-glass-hover"><Building2 className="h-5 w-5" /></span><div className="min-w-0 flex-1"><p className="text-sm font-semibold">{app.client.name}</p><p className="mt-1 text-xs text-ink-muted">Connected by {app.authorizedBy.displayName || app.authorizedBy.username} · {formatDate(app.connectedAt)}</p><div className="mt-2 flex flex-wrap gap-1.5">{app.scopes.filter((scope) => scope.startsWith("business:")).map((scope) => <span key={scope} className="rounded-md bg-glass-hover px-2 py-1 text-[10px] text-ink-muted">{scope}</span>)}</div></div>{canManage && <button onClick={() => void disconnectApp(app)} className="self-start rounded-lg border border-glass-border px-3 py-2 text-xs font-semibold text-danger hover:bg-danger/5">Disconnect</button>}</div>)}</div> : <p className="rounded-xl bg-base px-4 py-6 text-center text-sm text-ink-muted">No MAX products are connected yet. Use “Connect MAX Hotels” above to authorize the first product.</p>}
                   </section>
 
                   {canManage && <section className="rounded-2xl border border-glass-border bg-base-raised p-5 sm:p-7"><h2 className="text-lg font-semibold">Recent business activity</h2><p className="mt-1 text-sm text-ink-muted">Sensitive membership and ownership actions are recorded here.</p>{logs.length ? <div className="mt-4 divide-y divide-glass-border">{logs.slice(0, 8).map((log) => <div key={log.id} className="flex flex-wrap justify-between gap-2 py-3"><span className="text-sm">{log.action.toLowerCase().replace(/_/g, " ")}</span><span className="text-xs text-ink-muted">{formatDate(log.createdAt)}</span></div>)}</div> : <p className="mt-4 text-sm text-ink-muted">No activity has been recorded yet.</p>}</section>}
