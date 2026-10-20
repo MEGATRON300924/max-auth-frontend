@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Building2, CheckCircle2, Clock3, LoaderCircle, RefreshCw, Search, ShieldCheck, XCircle, Mail, MapPin, Globe2 } from "lucide-react";
+import { ArrowLeft, Building2, CheckCircle2, Clock3, LoaderCircle, RefreshCw, Search, XCircle, Mail, MapPin, Globe2 } from "lucide-react";
 import { useAuth } from "@/lib/auth/useAuth";
 import { apiClient } from "@/lib/api/client";
 import { Card, CardContent } from "@/components/ui/Card";
