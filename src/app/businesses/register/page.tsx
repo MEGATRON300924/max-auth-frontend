@@ -88,7 +88,7 @@ export default function RegisterBusinessPage() {
                   <Button onClick={() => router.push("/businesses/dashboard")}>Open business workspace</Button>
                   <Link href="/businesses"><Button variant="secondary">Business overview</Button></Link>
                 </div>
-                <p className="mt-4 text-xs text-ink-faint">The business overview is available now. Team invitations, verification review, and product connections are being implemented separately.</p>
+                <p className="mt-4 text-xs text-ink-faint">You can invite team members and manage roles from the business workspace. Verification review and product connections are separate release steps.</p>
               </div>
             ) : (
               <>
