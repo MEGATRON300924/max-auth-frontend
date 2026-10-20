@@ -16,6 +16,7 @@ import {
   House,
   Link2,
   Code2,
+  Building2,
 } from "lucide-react";
 import { MaxLogo } from "./MaxLogo";
 import { useAuth } from "@/lib/auth/useAuth";
@@ -67,7 +68,7 @@ export function DashboardSidebar({ className }: { className?: string }) {
   const pathname = usePathname();
   const { user } = useAuth();
   const visibleGroups = user?.isAdmin
-    ? [...groups, { label: "Administration", items: [{ href: "/admin", label: "Admin console", icon: ShieldCheck }] }]
+    ? [...groups, { label: "Administration", items: [{ href: "/admin", label: "Admin console", icon: ShieldCheck }, { href: "/admin/organisations", label: "Organisation review", icon: Building2 }] }]
     : groups;
 
   return (
