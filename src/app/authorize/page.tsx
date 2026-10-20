@@ -17,6 +17,11 @@ const SCOPE_LABELS: Record<string, { title: string; description: string }> = {
   "identity:read": { title: "MAX identity", description: "Read your MAX account identifier." },
   "memory:read": { title: "MAX Memory", description: "Read the MAX Memory information you have authorized." },
   "developer:manage": { title: "Manage your developer applications", description: "Create and manage OAuth applications owned by your MAX Account in MAX for Developers." },
+  "business:read": { title: "Read a business identity", description: "Share the selected business's basic identity and profile with this app." },
+  "business:manage": { title: "Manage a business identity", description: "Allow business profile actions that your business role permits." },
+  "business:members:read": { title: "Read the business team", description: "Share business team membership and role information with this app." },
+  "business:members:manage": { title: "Manage business team access", description: "Allow team invitations and membership changes where your role permits." },
+  "business:apps:manage": { title: "Manage connected business apps", description: "Allow management of MAX product connections for the selected business." },
   offline_access: { title: "Stay connected", description: "Allow this app to refresh its access when you're not actively using it." },
 };
 
@@ -129,6 +134,7 @@ function AuthorizeContent() {
               <h1 className="text-[25px] font-semibold leading-tight tracking-tight">This site is requesting access</h1>
               <p className="mt-2 text-sm leading-6 text-[#667085] dark:text-[#a2a8b3]"><span className="font-semibold text-[#252b36] dark:text-[#e5e7eb]">{trustedRequest.clientName}</span> wants to connect to your MAX Account.</p>
               <p className="mt-1 text-xs text-[#667085] dark:text-[#a2a8b3]">Redirects to {requestingHost}</p>
+              {trustedRequest.businessId && <div className="mt-3 rounded-xl border border-[#d9e3f1] bg-[#f4f7fc] px-3 py-2.5 dark:border-[#3c4656] dark:bg-[#252c37]"><p className="text-xs font-semibold text-[#252b36] dark:text-[#e5e7eb]">Business context</p><p className="mt-1 text-sm font-medium text-[#252b36] dark:text-[#e5e7eb]">{trustedRequest.businessName || "Selected MAX business"}</p><p className="mt-1 break-all font-mono text-[11px] text-[#667085] dark:text-[#a2a8b3]">{trustedRequest.businessId}</p></div>}
             </div>
           </div>
 

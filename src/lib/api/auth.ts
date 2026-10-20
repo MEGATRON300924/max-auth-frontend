@@ -3,7 +3,7 @@ import { tokenStore } from "./tokenStore";
 import type { MaxUser } from "@/types/api";
 
 export interface AuthPayload { user: MaxUser; accessToken: string; }
-export interface OAuthAuthorizationRequest { clientId: string; clientName: string; clientLogo?: string; clientWebsite?: string; redirectUri: string; scopes: string[]; codeChallenge: string; codeChallengeMethod: "S256"; state: string; expiresAt: number; }
+export interface OAuthAuthorizationRequest { clientId: string; clientName: string; clientLogo?: string; clientWebsite?: string; redirectUri: string; scopes: string[]; codeChallenge: string; codeChallengeMethod: "S256"; state: string; expiresAt: number; businessId?: string; businessName?: string; }
 
 export const authApi = {
   async register(input: { username: string; email: string; password: string; fullName: string; displayName: string; ageConfirmed: true; rememberMe?: boolean }) { const data = await apiClient.post<AuthPayload>("/auth/register", input, { skipAuth: true }); tokenStore.set(data.accessToken); return data; },

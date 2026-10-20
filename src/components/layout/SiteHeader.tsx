@@ -12,6 +12,7 @@ const links = [
   { href: "/#products", label: "Products" },
   { href: "/#security", label: "Security" },
   { href: "/#developers", label: "Developers" },
+  { href: "/business", label: "Businesses" },
 ];
 
 export function SiteHeader() {
