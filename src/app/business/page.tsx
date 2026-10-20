@@ -258,7 +258,7 @@ export default function BusinessPortalPage() {
             <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300"><ShieldCheck className="h-7 w-7" /></span>
             <h2 className="mt-5 text-2xl font-semibold">Create A Business Account</h2>
             <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-ink-muted">Start by creating your organisation profile. You can sign in with your personal MAX Account to become its first owner; your personal identity stays separate from your business.</p>
-            <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row"><Link href="/business/create-account"><Button><Plus className="h-4 w-4" /> Create A Business Account</Button></Link><Link href="/sign-in"><Button variant="secondary">Already have a MAX Account? Sign in <ArrowRight className="h-4 w-4" /></Button></Link></div>
+            <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row"><Link href="/business/create-account"><Button><Plus className="h-4 w-4" /> Create A Business Account</Button></Link><Link href="/sign-in?returnTo=%2Fbusiness"><Button variant="secondary">Sign in to manage your organisation <ArrowRight className="h-4 w-4" /></Button></Link></div>
           </section>
         ) : (
           <div className="grid gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
