@@ -188,10 +188,10 @@ export default function BusinessPortalPage() {
   }
 
   async function revokeInvitation(invitation: BusinessInvitation) {
-    if (!selected || !window.confirm(\`Revoke the invitation for \${invitation.email}?\`)) return;
+    if (!selected || !window.confirm(`Revoke the invitation for ${invitation.email}?`)) return;
     setError(""); setNotice("");
     try {
-      await apiClient.delete(\`/businesses/\${selected.id}/invitations/\${invitation.id}\`);
+      await apiClient.delete(`/businesses/${selected.id}/invitations/${invitation.id}`);
       setNotice("Invitation revoked.");
       await loadWorkspace(selected);
     } catch (err) { setError(err instanceof Error ? err.message : "We couldn't revoke this invitation."); }
