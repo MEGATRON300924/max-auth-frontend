@@ -234,7 +234,7 @@ export default function BusinessPortalPage() {
             <h1 className="font-display text-3xl font-bold tracking-tight sm:text-5xl">Your business, connected to MAX.</h1>
             <p className="mt-4 max-w-xl text-base leading-7 text-ink-muted">Create a trusted business identity, manage your team, and decide how MAX products connect to your organization.</p>
           </div>
-          {isAuthenticated && <Link href="/business/create-account"><Button><Plus className="h-4 w-4" /> Create a business account</Button></Link>}
+          <Link href="/business/create-account"><Button><Plus className="h-4 w-4" /> Create A Business Account</Button></Link>
         </div>
 
         {error && <div role="alert" className="mb-5 flex items-start gap-3 rounded-xl border border-danger/30 bg-danger/5 px-4 py-3 text-sm text-danger"><CircleAlert className="mt-0.5 h-4 w-4 shrink-0" />{error}</div>}
@@ -245,9 +245,9 @@ export default function BusinessPortalPage() {
         ) : !isAuthenticated ? (
           <section className="mx-auto max-w-2xl rounded-3xl border border-glass-border bg-base-raised p-7 text-center shadow-sm sm:p-10">
             <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300"><ShieldCheck className="h-7 w-7" /></span>
-            <h2 className="mt-5 text-2xl font-semibold">Sign in to manage your business</h2>
-            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-ink-muted">Use your existing personal MAX Account. Your personal identity stays separate from the business identity you create or join.</p>
-            <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row"><Link href="/sign-in"><Button>Sign in to MAX <ArrowRight className="h-4 w-4" /></Button></Link><Link href="/create-account"><Button variant="secondary">Create a MAX Account</Button></Link></div>
+            <h2 className="mt-5 text-2xl font-semibold">Create A Business Account</h2>
+            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-ink-muted">Start by creating your organisation profile. You can sign in with your personal MAX Account to become its first owner; your personal identity stays separate from your business.</p>
+            <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row"><Link href="/business/create-account"><Button><Plus className="h-4 w-4" /> Create A Business Account</Button></Link><Link href="/sign-in"><Button variant="secondary">Already have a MAX Account? Sign in <ArrowRight className="h-4 w-4" /></Button></Link></div>
           </section>
         ) : (
           <div className="grid gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
