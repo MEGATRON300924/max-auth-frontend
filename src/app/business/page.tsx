@@ -19,7 +19,7 @@ type Member = { id: string; role: string; status: string; createdAt: string; use
 type AuditEntry = { id: string; action: string; createdAt: string; actorId?: string | null; metadata?: unknown };
 type BusinessApp = { id: string; scopes: string[]; connectedAt: string; status: string; client: { clientId: string; name: string; isActive: boolean }; authorizedBy: { email: string; displayName?: string | null; username: string } };
 type BusinessInvitation = { id: string; email: string; role: string; status: string; expiresAt: string; createdAt: string };
-type BusinessForm = { legalName: string; displayName: string; handle: string; email: string; phone: string; country: string; businessType: string; websiteUrl: string; description: string; registrationNumber: string };
+type BusinessForm = { legalName: string; displayName: string; handle: string; email: string; phone: string; country: string; businessType: string; websiteUrl: string; logoUrl: string; description: string; registrationNumber: string };
 
 const initialForm: BusinessForm = { legalName: "", displayName: "", handle: "", email: "", phone: "", country: "NG", businessType: "Hospitality", websiteUrl: "", logoUrl: "", description: "", registrationNumber: "" };
 const roles = ["ADMINISTRATOR", "MANAGER", "MEMBER", "VIEWER", "DEVELOPER"];
