@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, CheckCircle2, MailCheck } from "lucide-react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
@@ -14,18 +14,19 @@ import { ApiError } from "@/lib/api/ApiError";
 type AcceptedBusiness = { businessId: string; displayName: string; handle: string };
 
 export default function AcceptBusinessInvitationPage() {
-  const searchParams = useSearchParams();
   const router = useRouter();
   const { isAuthenticated } = useAuth();
-  const token = searchParams.get("token") || "";
+  const [token, setToken] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [business, setBusiness] = useState<AcceptedBusiness | null>(null);
   const [role, setRole] = useState("");
 
   useEffect(() => {
-    if (!token || !/^[a-f0-9]{64}$/.test(token)) setError("This invitation link is missing a valid invitation token.");
-  }, [token]);
+    const value = new URLSearchParams(window.location.search).get("token") || "";
+    setToken(value);
+    if (!value || !/^[a-f0-9]{64}$/.test(value)) setError("This invitation link is missing a valid invitation token.");
+  }, []);
 
   async function accept() {
     setLoading(true); setError("");
