@@ -11,7 +11,7 @@ import { apiClient } from "@/lib/api/client";
 
 type Business = {
   id: string; businessId: string; handle: string; legalName: string; displayName: string; email: string;
-  phone: string; country: string; businessType: string; websiteUrl?: string | null; description?: string | null;
+  phone: string; country: string; businessType: string; websiteUrl?: string | null; logoUrl?: string | null; description?: string | null;
   registrationNumber?: string | null; status: string; verificationStatus: string; emailVerifiedAt?: string | null;
   createdAt: string; role?: string;
 };
