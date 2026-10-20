@@ -234,7 +234,7 @@ export default function BusinessPortalPage() {
             <h1 className="font-display text-3xl font-bold tracking-tight sm:text-5xl">Your business, connected to MAX.</h1>
             <p className="mt-4 max-w-xl text-base leading-7 text-ink-muted">Create a trusted business identity, manage your team, and decide how MAX products connect to your organization.</p>
           </div>
-          {isAuthenticated && <Button onClick={() => { setShowCreate((value) => !value); setError(""); setNotice(""); }}><Plus className="h-4 w-4" /> Create a business</Button>}
+          {isAuthenticated && <Link href="/business/create-account"><Button><Plus className="h-4 w-4" /> Create a business account</Button></Link>}
         </div>
 
         {error && <div role="alert" className="mb-5 flex items-start gap-3 rounded-xl border border-danger/30 bg-danger/5 px-4 py-3 text-sm text-danger"><CircleAlert className="mt-0.5 h-4 w-4 shrink-0" />{error}</div>}
@@ -255,7 +255,7 @@ export default function BusinessPortalPage() {
               <div className="rounded-2xl border border-glass-border bg-base-raised p-4">
                 <div className="mb-3 flex items-center justify-between"><h2 className="text-sm font-semibold">Your businesses</h2><span className="rounded-full bg-glass-hover px-2 py-0.5 text-xs text-ink-muted">{businesses.length}</span></div>
                 {businesses.length ? <div className="space-y-2">{businesses.map((business) => <button key={business.id} onClick={() => { setSelected(business); setNotice(""); setInviteLink(""); }} className={`flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-colors ${selected?.id === business.id ? "border-brand-500/40 bg-brand-50/60 dark:bg-brand-500/10" : "border-transparent hover:bg-glass-hover"}`}><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-base text-brand-700 dark:text-brand-300"><Building2 className="h-5 w-5" /></span><span className="min-w-0 flex-1"><span className="block truncate text-sm font-semibold">{business.displayName}</span><span className="block truncate text-xs text-ink-muted">@{business.handle}</span></span><ChevronRight className="h-4 w-4 shrink-0 text-ink-faint" /></button>)}</div> : <div className="rounded-xl border border-dashed border-glass-border px-4 py-6 text-center"><Building2 className="mx-auto h-6 w-6 text-ink-faint" /><p className="mt-2 text-sm font-medium">No business identity yet</p><p className="mt-1 text-xs leading-5 text-ink-muted">Create one to start connecting your business to MAX.</p></div>}
-                {!businesses.length && <Button className="mt-4 w-full" onClick={() => setShowCreate(true)}><Plus className="h-4 w-4" /> Create your first business</Button>}
+                {!businesses.length && <Link href="/business/create-account" className="mt-4 block"><Button className="w-full"><Plus className="h-4 w-4" /> Create your first business</Button></Link>}
               </div>
               <div className="rounded-2xl border border-glass-border bg-base-raised p-4"><div className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-glass-hover"><ShieldCheck className="h-5 w-5" /></span><div><p className="text-sm font-semibold">Business identity</p><p className="text-xs text-ink-muted">Separate from your MAX Account</p></div></div><p className="mt-3 text-xs leading-5 text-ink-muted">Email verification confirms access to an email address. Legal business verification is a separate process.</p></div>
             </aside>
