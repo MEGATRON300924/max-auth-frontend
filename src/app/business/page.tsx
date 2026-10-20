@@ -105,7 +105,8 @@ export default function BusinessPortalPage() {
       const payload = {
         legalName: form.legalName, displayName: form.displayName, ...(form.handle.trim() ? { handle: form.handle.trim() } : {}),
         email: form.email, phone: form.phone, country: form.country.toUpperCase(), businessType: form.businessType,
-        ...(form.websiteUrl.trim() ? { websiteUrl: form.websiteUrl.trim() } : {}),\n        ...(form.logoUrl.trim() ? { logoUrl: form.logoUrl.trim() } : {}),
+        ...(form.websiteUrl.trim() ? { websiteUrl: form.websiteUrl.trim() } : {}),
+        ...(form.logoUrl.trim() ? { logoUrl: form.logoUrl.trim() } : {}),
         ...(form.description.trim() ? { description: form.description.trim() } : {}),
         ...(form.registrationNumber.trim() ? { registrationNumber: form.registrationNumber.trim() } : {}),
       };
