@@ -89,6 +89,17 @@ export default function BusinessPortalPage() {
   }, []);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("created") === "1") {
+      setNotice("Business account created. Check the business email for a verification link.");
+      params.delete("created");
+      const query = params.toString();
+      window.history.replaceState({}, "", `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`);
+    }
+  }, []);
+
+  useEffect(() => {
     if (isAuthenticated) void loadBusinesses();
     else if (!authLoading) setPageLoading(false);
   }, [isAuthenticated, authLoading, loadBusinesses]);
