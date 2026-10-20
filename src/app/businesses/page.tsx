@@ -41,7 +41,7 @@ export default function BusinessesPage() {
             <div className="max-w-2xl">
               <p className="text-xs font-bold uppercase tracking-[.18em] text-brand-600 dark:text-brand-400">One foundation</p>
               <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">Built for the way organizations work.</h2>
-              <p className="mt-4 text-sm leading-6 text-ink-muted">Business identity is the starting point. Membership controls, invitations, verification, and product connections are being built in stages.</p>
+              <p className="mt-4 text-sm leading-6 text-ink-muted">Business identity is the starting point. You can invite team members and manage their roles; business verification and product-specific access are separate steps.</p>
             </div>
             <div className="mt-9 grid gap-4 sm:grid-cols-2">
               {benefits.map(({ icon: Icon, title, description }) => (
