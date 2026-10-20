@@ -86,7 +86,7 @@ export default function BusinessDashboardPage() {
                 <div className="flex items-start justify-between gap-3"><div className="flex h-11 w-11 items-center justify-center rounded-xl border border-glass-border bg-base text-brand-600 dark:text-brand-400"><Building2 className="h-5 w-5" /></div><span className="rounded-full border border-glass-border px-2.5 py-1 text-xs font-semibold">{business.verificationStatus.toLowerCase()}</span></div>
                 <h2 className="mt-5 text-lg font-bold">{business.displayName}</h2><p className="mt-1 text-sm text-ink-muted">@{business.handle} · {business.country}</p>
                 <div className="mt-5 grid grid-cols-2 gap-3 rounded-xl bg-base p-3"><div><p className="text-xs text-ink-faint">Your role</p><p className="mt-1 text-sm font-semibold">{business.role.toLowerCase().replace("_", " ")}</p></div><div><p className="text-xs text-ink-faint">Account status</p><p className="mt-1 text-sm font-semibold">{business.status.toLowerCase()}</p></div></div>
-                <p className="mt-4 break-all font-mono text-xs text-ink-faint">{business.businessId}</p>
+                <p className="mt-4 break-all font-mono text-xs text-ink-faint">{business.businessId}</p><div className="mt-5"><Link href={`/businesses/dashboard/${encodeURIComponent(business.businessId)}`}><Button variant="secondary">Open workspace <ArrowRight className="h-4 w-4" /></Button></Link></div>
               </article>
             ))}
           </div>
