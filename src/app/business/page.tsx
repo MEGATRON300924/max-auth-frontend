@@ -11,7 +11,7 @@ import { apiClient } from "@/lib/api/client";
 
 type Business = {
   id: string; businessId: string; handle: string; legalName: string; displayName: string; email: string;
-  phone: string; country: string; businessType: string; websiteUrl?: string | null; description?: string | null;
+  phone: string; country: string; businessType: string; websiteUrl?: string | null; logoUrl?: string | null; description?: string | null;
   registrationNumber?: string | null; status: string; verificationStatus: string; emailVerifiedAt?: string | null;
   createdAt: string; role?: string;
 };
@@ -19,9 +19,9 @@ type Member = { id: string; role: string; status: string; createdAt: string; use
 type AuditEntry = { id: string; action: string; createdAt: string; actorId?: string | null; metadata?: unknown };
 type BusinessApp = { id: string; scopes: string[]; connectedAt: string; status: string; client: { clientId: string; name: string; isActive: boolean }; authorizedBy: { email: string; displayName?: string | null; username: string } };
 type BusinessInvitation = { id: string; email: string; role: string; status: string; expiresAt: string; createdAt: string };
-type BusinessForm = { legalName: string; displayName: string; handle: string; email: string; phone: string; country: string; businessType: string; websiteUrl: string; description: string; registrationNumber: string };
+type BusinessForm = { legalName: string; displayName: string; handle: string; email: string; phone: string; country: string; businessType: string; websiteUrl: string; logoUrl: string; description: string; registrationNumber: string };
 
-const initialForm: BusinessForm = { legalName: "", displayName: "", handle: "", email: "", phone: "", country: "NG", businessType: "Hospitality", websiteUrl: "", description: "", registrationNumber: "" };
+const initialForm: BusinessForm = { legalName: "", displayName: "", handle: "", email: "", phone: "", country: "NG", businessType: "Hospitality", websiteUrl: "", logoUrl: "", description: "", registrationNumber: "" };
 const roles = ["ADMINISTRATOR", "MANAGER", "MEMBER", "VIEWER", "DEVELOPER"];
 
 function labelRole(role?: string) {
@@ -106,6 +106,7 @@ export default function BusinessPortalPage() {
         legalName: form.legalName, displayName: form.displayName, ...(form.handle.trim() ? { handle: form.handle.trim() } : {}),
         email: form.email, phone: form.phone, country: form.country.toUpperCase(), businessType: form.businessType,
         ...(form.websiteUrl.trim() ? { websiteUrl: form.websiteUrl.trim() } : {}),
+        ...(form.logoUrl.trim() ? { logoUrl: form.logoUrl.trim() } : {}),
         ...(form.description.trim() ? { description: form.description.trim() } : {}),
         ...(form.registrationNumber.trim() ? { registrationNumber: form.registrationNumber.trim() } : {}),
       };
@@ -125,7 +126,7 @@ export default function BusinessPortalPage() {
     setForm({
       legalName: selected.legalName, displayName: selected.displayName, handle: selected.handle, email: selected.email,
       phone: selected.phone, country: selected.country, businessType: selected.businessType,
-      websiteUrl: selected.websiteUrl || "", description: selected.description || "", registrationNumber: selected.registrationNumber || "",
+      websiteUrl: selected.websiteUrl || "", logoUrl: selected.logoUrl || "", description: selected.description || "", registrationNumber: selected.registrationNumber || "",
     });
     setShowCreate(false);
     setShowEditProfile(true);
@@ -141,7 +142,7 @@ export default function BusinessPortalPage() {
       const data = await apiClient.patch<{ business: Business; emailVerificationSent?: boolean }>(`/businesses/${selected.id}`, {
         legalName: form.legalName, displayName: form.displayName, email: form.email, phone: form.phone,
         country: form.country.toUpperCase(), businessType: form.businessType,
-        websiteUrl: form.websiteUrl.trim() || null, description: form.description.trim() || null,
+        websiteUrl: form.websiteUrl.trim() || null, logoUrl: form.logoUrl.trim() || null, description: form.description.trim() || null,
         registrationNumber: form.registrationNumber.trim() || null,
       });
       setShowEditProfile(false);
@@ -273,6 +274,7 @@ export default function BusinessPortalPage() {
                     <label className="text-sm font-medium">Country<select required value={form.country} onChange={(e) => updateField("country", e.target.value)} className="mt-1.5 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500"><option value="NG">Nigeria</option><option value="GH">Ghana</option><option value="KE">Kenya</option><option value="ZA">South Africa</option><option value="GB">United Kingdom</option><option value="US">United States</option><option value="ZZ">Other</option></select></label>
                     <label className="text-sm font-medium">Registration number <span className="text-xs font-normal text-ink-muted">Optional</span><input maxLength={120} value={form.registrationNumber} onChange={(e) => updateField("registrationNumber", e.target.value)} placeholder="CAC or local registration number" className="mt-1.5 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /></label>
                     <label className="text-sm font-medium sm:col-span-2">Website <span className="text-xs font-normal text-ink-muted">Optional</span><input type="url" value={form.websiteUrl} onChange={(e) => updateField("websiteUrl", e.target.value)} placeholder="https://example.com" className="mt-1.5 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /></label>
+                    <label className="text-sm font-medium sm:col-span-2">Logo URL <span className="text-xs font-normal text-ink-muted">Optional</span><input type="url" value={form.logoUrl} onChange={(e) => updateField("logoUrl", e.target.value)} placeholder="https://example.com/logo.png" className="mt-1.5 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /></label>
                     <label className="text-sm font-medium sm:col-span-2">Business description <span className="text-xs font-normal text-ink-muted">Optional</span><textarea rows={3} maxLength={2000} value={form.description} onChange={(e) => updateField("description", e.target.value)} placeholder="What does your business do?" className="mt-1.5 w-full resize-y rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /></label>
                     <div className="flex flex-col-reverse gap-3 pt-2 sm:col-span-2 sm:flex-row sm:justify-end"><Button type="button" variant="secondary" onClick={() => setShowCreate(false)}>Cancel</Button><Button type="submit" disabled={loading}>{loading ? <><LoaderCircle className="h-4 w-4 animate-spin" /> Creating…</> : <>Create business identity <ArrowRight className="h-4 w-4" /></>}</Button></div>
                   </form>
@@ -288,6 +290,7 @@ export default function BusinessPortalPage() {
                     <label className="text-sm font-medium">Country code<input required minLength={2} maxLength={2} value={form.country} onChange={(e) => updateField("country", e.target.value)} className="mt-1.5 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /></label>
                     <label className="text-sm font-medium">Business type<input required minLength={2} maxLength={80} value={form.businessType} onChange={(e) => updateField("businessType", e.target.value)} className="mt-1.5 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /></label>
                     <label className="text-sm font-medium sm:col-span-2">Website<input type="url" value={form.websiteUrl} onChange={(e) => updateField("websiteUrl", e.target.value)} placeholder="https://example.com" className="mt-1.5 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /></label>
+                    <label className="text-sm font-medium sm:col-span-2">Logo URL <span className="text-xs font-normal text-ink-muted">Optional</span><input type="url" value={form.logoUrl} onChange={(e) => updateField("logoUrl", e.target.value)} placeholder="https://example.com/logo.png" className="mt-1.5 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /></label>
                     <label className="text-sm font-medium sm:col-span-2">Business description<textarea rows={3} maxLength={2000} value={form.description} onChange={(e) => updateField("description", e.target.value)} className="mt-1.5 w-full resize-y rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /></label>
                     <label className="text-sm font-medium sm:col-span-2">Registration number<input maxLength={120} value={form.registrationNumber} onChange={(e) => updateField("registrationNumber", e.target.value)} className="mt-1.5 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm outline-none focus:border-brand-500" /></label>
                     <div className="flex flex-col-reverse gap-3 pt-2 sm:col-span-2 sm:flex-row sm:justify-end"><Button type="button" variant="secondary" onClick={() => setShowEditProfile(false)}>Cancel</Button><Button type="submit" disabled={loading}>{loading ? "Saving…" : "Save profile"}</Button></div>
