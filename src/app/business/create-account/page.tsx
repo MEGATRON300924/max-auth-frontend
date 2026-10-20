@@ -94,7 +94,7 @@ export default function BusinessCreateAccountPage() {
           <section className="pt-2">
             <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300"><Building2 className="h-6 w-6" /></span>
             <p className="mt-5 text-xs font-bold uppercase tracking-[0.16em] text-brand-700 dark:text-brand-300">MAX Auth for Businesses</p>
-            <h1 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">Create your business account.</h1>
+            <h1 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">Create A Business Account.</h1>
             <p className="mt-4 text-sm leading-6 text-ink-muted">Register your organisation separately from your personal MAX Account. Your business identity can then be connected to MAX products, services, and team members.</p>
             <div className="mt-6 flex items-start gap-3 rounded-2xl border border-glass-border bg-base-raised p-4">
               <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-brand-600" />
@@ -149,7 +149,7 @@ export default function BusinessCreateAccountPage() {
                   <label className={labelClass + " sm:col-span-2"}>What does your organisation do? <span className="font-normal text-ink-muted">(optional)</span>
                     <textarea rows={3} maxLength={2000} value={form.description} onChange={(e) => update("description", e.target.value)} placeholder="A short description of your organisation" className={fieldClass + " resize-y"} />
                   </label>
-                  <div className="pt-2 sm:col-span-2"><Button type="submit" isLoading={loading} disabled={loading} className="w-full" size="lg">{loading ? "Creating business account…" : "Create business account"} <ArrowRight className="h-4 w-4" /></Button><p className="mt-3 text-center text-xs leading-5 text-ink-muted">After registration, MAX will send a verification link to the business email address.</p></div>
+                  <div className="pt-2 sm:col-span-2"><Button type="submit" isLoading={loading} disabled={loading} className="w-full" size="lg">{loading ? "Creating business account…" : "Create A Business Account"} <ArrowRight className="h-4 w-4" /></Button><p className="mt-3 text-center text-xs leading-5 text-ink-muted">After registration, MAX will send a verification link to the business email address.</p></div>
                 </form>
               </>
             )}
