@@ -19,6 +19,7 @@ type Member = {
   user: { id: string; username: string; fullName: string | null; displayName: string | null; avatarUrl: string | null };
 };
 type Invitation = { id: string; email: string; role: string; expiresAt: string; createdAt: string; inviter: { username: string; displayName: string | null; fullName: string | null } };
+type AuditEvent = { id: string; action: string; metadata: Record<string, unknown> | null; createdAt: string; actor: { username: string; displayName: string | null; fullName: string | null } | null };
 type Business = {
   businessId: string; handle: string; legalName: string; displayName: string;
   businessType: string; country: string; businessEmail: string; phone: string | null;
@@ -40,6 +41,7 @@ export default function BusinessWorkspacePage() {
   const [business, setBusiness] = useState<Business | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
+  const [auditEvents, setAuditEvents] = useState<AuditEvent[]>([]);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("MEMBER");
   const [inviteBusy, setInviteBusy] = useState(false);
@@ -60,9 +62,12 @@ export default function BusinessWorkspacePage() {
         setMembers(memberResult.members);
         const invitationResult = await apiClient.get<{ invitations: Invitation[] }>(`/businesses/${encodeURIComponent(businessId)}/invitations`);
         setInvitations(invitationResult.invitations);
+        const auditResult = await apiClient.get<{ events: AuditEvent[] }>(`/businesses/${encodeURIComponent(businessId)}/audit-logs`);
+        setAuditEvents(auditResult.events);
       } else {
         setMembers([]);
         setInvitations([]);
+        setAuditEvents([]);
       }
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "We couldn't load this business workspace.");
@@ -187,6 +192,23 @@ export default function BusinessWorkspacePage() {
               <p className="mt-4 text-xs leading-5 text-ink-faint">The API protects owner accounts and checks permissions on every request. Invitation links expire after seven days, are single-use, and require the invited email to be verified in MAX Auth.</p>
             </section>
 
+
+            {canManage && (
+              <section className="mt-8">
+                <div><h2 className="font-display text-2xl font-bold">Business activity</h2><p className="mt-2 text-sm text-ink-muted">A recent audit trail of business profile, member, and invitation changes.</p></div>
+                {auditEvents.length === 0 ? (
+                  <div className="mt-4 rounded-2xl border border-glass-border bg-base-raised p-6 text-sm text-ink-muted">No audit events have been recorded yet.</div>
+                ) : (
+                  <div className="mt-4 overflow-hidden rounded-2xl border border-glass-border bg-base-raised divide-y divide-glass-border">
+                    {auditEvents.map((event) => {
+                      const actorName = event.actor?.displayName || event.actor?.fullName || event.actor?.username || "System";
+                      const metadata = event.metadata ? Object.entries(event.metadata).map(([key, value]) => `${key}: ${typeof value === "string" ? value : JSON.stringify(value)}`).join(" · ") : "";
+                      return <article key={event.id} className="p-4"><div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between"><p className="text-sm font-semibold">{event.action.toLowerCase().replaceAll("_", " ")}</p><time className="text-xs text-ink-faint">{new Date(event.createdAt).toLocaleString()}</time></div><p className="mt-1 text-xs text-ink-muted">By {actorName}</p>{metadata && <p className="mt-2 break-words text-xs leading-5 text-ink-faint">{metadata}</p>}</article>;
+                    })}
+                  </div>
+                )}
+              </section>
+            )}
             {canManage && (
               <section className="mt-8">
                 <div><h2 className="font-display text-2xl font-bold">Invite people</h2><p className="mt-2 text-sm text-ink-muted">Send a one-time invitation link to someone who should join this business.</p></div>
