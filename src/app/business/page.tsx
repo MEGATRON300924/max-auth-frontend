@@ -44,6 +44,7 @@ export default function BusinessPortalPage() {
   const [inviteRole, setInviteRole] = useState("MEMBER");
   const [inviteLink, setInviteLink] = useState("");
   const [showCreate, setShowCreate] = useState(false);
+  const [showNoBusinessesPrompt, setShowNoBusinessesPrompt] = useState(false);
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
@@ -56,6 +57,7 @@ export default function BusinessPortalPage() {
     try {
       const data = await apiClient.get<{ businesses: Business[] }>("/businesses");
       setBusinesses(data.businesses);
+      setShowNoBusinessesPrompt(data.businesses.length === 0);
       setSelected((current) => {
         if (current) return data.businesses.find((business) => business.id === current.id) || data.businesses[0] || null;
         return data.businesses[0] || null;
@@ -124,6 +126,7 @@ export default function BusinessPortalPage() {
       const data = await apiClient.post<{ business: Business; emailVerificationSent: boolean }>("/businesses", payload);
       setForm(initialForm);
       setShowCreate(false);
+      setShowNoBusinessesPrompt(false);
       setNotice(data.emailVerificationSent ? "Business identity created. Check the business email to verify control of the address." : "Business identity created, but the verification email could not be sent. Contact support to restore email delivery.");
       await loadBusinesses();
       setSelected({ ...data.business, role: "OWNER" });
@@ -248,6 +251,8 @@ export default function BusinessPortalPage() {
           <Link href="/business/create-account"><Button><Plus className="h-4 w-4" /> Create A Business Account</Button></Link>
         </div>
 
+        {showNoBusinessesPrompt && isAuthenticated && !pageLoading && <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/45 p-4" role="presentation"><section role="dialog" aria-modal="true" aria-labelledby="no-business-title" className="w-full max-w-md rounded-3xl border border-glass-border bg-base-raised p-6 shadow-2xl sm:p-8"><span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300"><Building2 className="h-6 w-6" /></span><h2 id="no-business-title" className="mt-5 text-xl font-semibold">No businesses linked to your MAX Account yet</h2><p className="mt-3 text-sm leading-6 text-ink-muted">Register a business identity to connect MAX for Hotels. After registration, return here and choose <strong>Connect MAX Hotels</strong> to continue to your hotel dashboard.</p><div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end"><Button variant="secondary" onClick={() => setShowNoBusinessesPrompt(false)}>Maybe later</Button><Link href="/business/create-account"><Button><Plus className="h-4 w-4" /> Register a business</Button></Link></div></section></div>}
+
         {error && <div role="alert" className="mb-5 flex items-start gap-3 rounded-xl border border-danger/30 bg-danger/5 px-4 py-3 text-sm text-danger"><CircleAlert className="mt-0.5 h-4 w-4 shrink-0" />{error}</div>}
         {notice && <div role="status" className="mb-5 flex items-start gap-3 rounded-xl border border-success/30 bg-success/5 px-4 py-3 text-sm text-ink"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" />{notice}</div>}
 
@@ -258,7 +263,7 @@ export default function BusinessPortalPage() {
             <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300"><ShieldCheck className="h-7 w-7" /></span>
             <h2 className="mt-5 text-2xl font-semibold">Create A Business Account</h2>
             <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-ink-muted">Start by creating your organisation profile. You can sign in with your personal MAX Account to become its first owner; your personal identity stays separate from your business.</p>
-            <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row"><Link href="/business/create-account"><Button><Plus className="h-4 w-4" /> Create A Business Account</Button></Link><Link href="/sign-in"><Button variant="secondary">Already have a MAX Account? Sign in <ArrowRight className="h-4 w-4" /></Button></Link></div>
+            <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row"><Link href="/business/create-account"><Button><Plus className="h-4 w-4" /> Create A Business Account</Button></Link><Link href="/sign-in?returnTo=%2Fbusiness"><Button variant="secondary">Already have a MAX Account? Sign in <ArrowRight className="h-4 w-4" /></Button></Link></div>
           </section>
         ) : (
           <div className="grid gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
@@ -315,7 +320,7 @@ export default function BusinessPortalPage() {
                       <div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><h2 className="text-2xl font-semibold tracking-tight">{selected.displayName}</h2><span className="rounded-full bg-glass-hover px-2.5 py-1 text-xs font-medium">{labelRole(selected.role)}</span></div><p className="mt-1 text-sm text-ink-muted">{selected.legalName} · @{selected.handle}</p><p className="mt-4 break-all font-mono text-xs text-ink-muted">Business ID: {selected.businessId}</p></div>
                       <div className="flex flex-wrap gap-2"><span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${selected.emailVerifiedAt ? "bg-success/10 text-success" : "bg-warning/10 text-ink-muted"}`}><Mail className="h-3.5 w-3.5" /> {selected.emailVerifiedAt ? "Email verified" : "Email unverified"}</span><span className="rounded-full bg-glass-hover px-2.5 py-1 text-xs font-medium">{selected.verificationStatus === "VERIFIED" ? "Business verified" : "Business verification pending"}</span></div>
                     </div>
-                    {canManage && <div className="mt-5 flex flex-wrap items-start gap-3"><div><a href={`https://max-hotel-frontend.vercel.app/api/auth/start?business_id=${encodeURIComponent(selected.businessId)}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">Connect MAX Hotels <ArrowRight className="h-4 w-4" /></a><p className="mt-2 max-w-md text-xs text-ink-muted">Authorize MAX Hotels to use this business identity and create property workspaces. Your business ID alone does not grant access.</p></div><button onClick={beginEditProfile} className="inline-flex items-center gap-2 rounded-full border border-glass-border px-4 py-2.5 text-sm font-semibold hover:bg-glass-hover">Edit profile</button>{!selected.emailVerifiedAt && <button disabled={loading} onClick={() => void resendVerification()} className="inline-flex items-center gap-2 rounded-full border border-glass-border px-4 py-2.5 text-sm font-semibold hover:bg-glass-hover">{loading ? "Sending…" : "Resend email verification"}</button>}</div>}
+                    {canManage && <div className="mt-5 flex flex-wrap items-start gap-3"><div><a href={`https://hotels.max-ai.name.ng/api/auth/start?business_id=${encodeURIComponent(selected.businessId)}`} className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700">Connect MAX Hotels <ArrowRight className="h-4 w-4" /></a><p className="mt-2 max-w-md text-xs text-ink-muted">Authorize MAX Hotels to use this business identity and create property workspaces. Your business ID alone does not grant access.</p></div><button onClick={beginEditProfile} className="inline-flex items-center gap-2 rounded-full border border-glass-border px-4 py-2.5 text-sm font-semibold hover:bg-glass-hover">Edit profile</button>{!selected.emailVerifiedAt && <button disabled={loading} onClick={() => void resendVerification()} className="inline-flex items-center gap-2 rounded-full border border-glass-border px-4 py-2.5 text-sm font-semibold hover:bg-glass-hover">{loading ? "Sending…" : "Resend email verification"}</button>}</div>}
                     <div className="mt-6 grid gap-4 border-t border-glass-border pt-5 sm:grid-cols-3"><div><p className="text-xs text-ink-muted">Business email</p><p className="mt-1 break-all text-sm font-medium">{selected.email}</p></div><div><p className="text-xs text-ink-muted">Business type</p><p className="mt-1 text-sm font-medium">{selected.businessType}</p></div><div><p className="text-xs text-ink-muted">Created</p><p className="mt-1 text-sm font-medium">{formatDate(selected.createdAt)}</p></div></div>
                   </section>
 
