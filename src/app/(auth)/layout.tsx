@@ -1,7 +1,22 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { MaxLogo } from "@/components/layout/MaxLogo";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+
+  // The split-screen sign-in page owns its full-screen layout. Do not constrain
+  // it with the centered max-w-md card used by the other authentication pages.
+  if (pathname === "/sign-in") {
+    return (
+      <div className="min-h-screen w-full overflow-x-hidden bg-base text-ink">
+        {children}
+      </div>
+    );
+  }
+
   return (
     <div className="aurora-canvas relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-base px-4 py-12 text-ink">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
