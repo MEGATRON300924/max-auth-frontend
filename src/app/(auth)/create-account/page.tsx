@@ -28,6 +28,8 @@ export default function CreateAccountPage() {
   const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState("");
   const [ageConfirmed, setAgeConfirmed] = useState(false);
+  const [ageGroup, setAgeGroup] = useState<"UNDER_16" | "AGE_16_17" | "AGE_18_PLUS">("AGE_18_PLUS");
+  const [parentEmail, setParentEmail] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -51,7 +53,8 @@ export default function CreateAccountPage() {
     if (step === 1 && !displayName.trim()) errors.displayName = "Tell MAX what to call you.";
     if (step === 1 && displayName.trim().length > 64) errors.displayName = "Keep your display name to 64 characters or fewer.";
     if (step === 1 && !isValidUsername(username)) errors.username = "Use 3–32 letters, numbers, underscores, or periods.";
-    if (step === 2 && !ageConfirmed) errors.age = "Please confirm the age requirement before continuing.";
+    if (step === 2 && !ageConfirmed) errors.age = "Please confirm your age group before continuing.";
+    if (step === 2 && ageGroup !== "AGE_18_PLUS" && !isValidEmail(parentEmail)) errors.parentEmail = "Enter a valid parent or guardian email address.";
     if (step === 3 && !isValidEmail(email)) errors.email = "Enter a valid email address.";
     if (step === 4 && !getPasswordStrength(password).meetsMinimum) errors.password = "Use at least 8 characters, including a letter and a number.";
     setFieldErrors(errors);
@@ -84,6 +87,8 @@ export default function CreateAccountPage() {
         email: email.trim(),
         password,
         ageConfirmed: true,
+        ageGroup,
+        ...(ageGroup !== "AGE_18_PLUS" ? { parentEmail: parentEmail.trim() } : {}),
         rememberMe,
       });
       if (rememberMe) {
@@ -99,7 +104,11 @@ export default function CreateAccountPage() {
           // Remembering the account is optional and must never block registration.
         }
       }
-      showToast({ title: "Account created", description: "Check your inbox for your email verification link.", variant: "success" });
+      showToast({ title: ageGroup === "AGE_18_PLUS" ? "Account created" : "Approval requested", description: ageGroup === "AGE_18_PLUS" ? "Check your inbox for your email verification link." : "We sent your parent or guardian an approval request.", variant: "success" });
+      if (ageGroup !== "AGE_18_PLUS") {
+        router.push("/parental-approval/pending");
+        return;
+      }
       let returnTo = "";
       try {
         const requestedReturnTo = new URLSearchParams(window.location.search).get("returnTo");
@@ -162,16 +171,31 @@ export default function CreateAccountPage() {
             <div className="flex items-start gap-3 rounded-2xl border border-glass-border bg-base-raised p-4">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface text-ink-muted"><CalendarCheck className="h-5 w-5" /></div>
               <div>
-                <p className="text-sm font-medium text-ink">Before we continue</p>
-                <p className="mt-1 text-sm leading-6 text-ink-muted">MAX uses age requirements to help apply the right protections. Please confirm that you meet the minimum age requirement that applies to you.</p>
+                <p className="text-sm font-medium text-ink">A safer MAX experience</p>
+                <p className="mt-1 text-sm leading-6 text-ink-muted">Choose the age group that applies to you. If you're under 18, we'll ask a parent or guardian to approve your account before it can be used.</p>
               </div>
             </div>
+            <div className="space-y-2">
+              {([
+                ["UNDER_16", "Under 16", "A parent or guardian must approve your account."],
+                ["AGE_16_17", "16–17 years old", "You're almost 18 🎉 Some services may remain restricted until you turn 18."],
+                ["AGE_18_PLUS", "18 or older", "Continue with the standard account setup."]
+              ] as const).map(([value, label, description]) => (
+                <label key={value} className={ageGroup === value ? "flex cursor-pointer items-start gap-3 rounded-2xl border border-brand-500 bg-brand-500/5 p-4 transition-colors" : "flex cursor-pointer items-start gap-3 rounded-2xl border border-glass-border p-4 transition-colors hover:bg-surface"}>
+                  <input type="radio" name="ageGroup" value={value} checked={ageGroup === value} onChange={() => setAgeGroup(value)} className="mt-1 h-4 w-4 border-glass-border text-brand-600 focus:ring-brand-500" />
+                  <span><span className="block text-sm font-semibold text-ink">{label}</span><span className="mt-1 block text-xs leading-5 text-ink-muted">{description}</span></span>
+                </label>
+              ))}
+            </div>
+            {ageGroup !== "AGE_18_PLUS" && (
+              <Input label="Parent or guardian email" type="email" autoComplete="email" autoCapitalize="none" spellCheck={false} icon={<Mail className="h-4 w-4" />} value={parentEmail} onChange={(event) => setParentEmail(event.target.value)} error={fieldErrors.parentEmail} placeholder="parent@example.com" required />
+            )}
             <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-glass-border p-4 transition-colors hover:bg-surface">
               <input type="checkbox" checked={ageConfirmed} onChange={(event) => setAgeConfirmed(event.target.checked)} className="mt-1 h-4 w-4 rounded border-glass-border text-brand-600 focus:ring-brand-500" />
-              <span className="text-sm leading-6 text-ink">I meet the minimum age requirement for a MAX Account.</span>
+              <span className="text-sm leading-6 text-ink">I confirm that the age group I selected is correct.</span>
             </label>
             {fieldErrors.age && <p role="alert" className="text-sm text-danger">{fieldErrors.age}</p>}
-            <p className="text-xs leading-5 text-ink-faint">This is an age confirmation, not independent age verification. MAX does not ask for your date of birth on this screen.</p>
+            <p className="text-xs leading-5 text-ink-faint">This is an age declaration, not independent age verification. MAX does not request an ID or payment card on this screen.</p>
           </div>
         )}
 
