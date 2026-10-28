@@ -164,12 +164,12 @@ export default function ParentalApprovalPage() {
               <p className="mt-3 text-sm leading-6 text-ink-muted">Your child's MAX Account has been approved! We recommend creating your own MAX Auth account so you can discover the MAX AI Ecosystem, understand the services your child uses, and explore the tools available to your family.</p>
               <div className="my-6 grid grid-cols-2 gap-3">
                 <div className="rounded-2xl border border-glass-border bg-base p-4">
-                  <img src="https://max-ai.name.ng/favicon.png" alt="MAX AI" width={42} height={42} className="mb-3 rounded-xl" />
+                  <img src="https://www.max-ai.name.ng/favicon.png" alt="MAX AI" width={42} height={42} className="mb-3 rounded-xl" />
                   <p className="text-sm font-semibold">The MAX AI Ecosystem</p>
                   <p className="mt-1 text-xs leading-5 text-ink-muted">Explore the services that work together with MAX Auth.</p>
                 </div>
                 <div className="rounded-2xl border border-glass-border bg-base p-4">
-                  <img src="https://max-ai.name.ng/max_home.png" alt="MAX Home" width={42} height={42} className="mb-3 rounded-xl object-contain" />
+                  <img src="https://www.max-ai.name.ng/max_home.png" alt="MAX Home" width={42} height={42} className="mb-3 rounded-xl object-contain" />
                   <p className="text-sm font-semibold">MAX Home</p>
                   <p className="mt-1 text-xs leading-5 text-ink-muted">Discover family-focused home tools and settings.</p>
                 </div>
