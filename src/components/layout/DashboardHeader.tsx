@@ -8,7 +8,6 @@ import { useAuth } from "@/lib/auth/useAuth";
 import { useToast } from "@/lib/hooks/useToast";
 import { Dropdown, DropdownItem } from "@/components/ui/Dropdown";
 import { DashboardSidebar } from "./DashboardSidebar";
-import { getInitials } from "@/lib/utils/formatters";
 
 export function DashboardHeader() {
   const { user, logout } = useAuth();
@@ -27,6 +26,7 @@ export function DashboardHeader() {
   };
 
   const displayName = user?.displayName || user?.username || "Account";
+  const profilePicture = user?.avatarUrl || "/user.png";
 
   return (
     <>
@@ -58,10 +58,18 @@ export function DashboardHeader() {
 
           <Dropdown
             trigger={
-              <button aria-label="Open account menu" className="ml-1 flex h-11 w-11 items-center justify-center rounded-full p-0.5 hover:bg-base-raised">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-600 text-xs font-semibold text-white">
-                  {getInitials(displayName)}
-                </span>
+              <button aria-label={`Open account menu for ${displayName}`} className="ml-1 flex h-11 w-11 items-center justify-center rounded-full p-0.5 hover:bg-base-raised">
+                <img
+                  src={profilePicture}
+                  alt={`${displayName} profile`}
+                  onError={(event) => {
+                    if (event.currentTarget.src !== new URL("/user.png", window.location.origin).href) {
+                      event.currentTarget.src = "/user.png";
+                    }
+                  }}
+                  className="h-9 w-9 rounded-full border border-glass-border bg-base-raised object-cover"
+                  referrerPolicy="no-referrer"
+                />
               </button>
             }
           >
