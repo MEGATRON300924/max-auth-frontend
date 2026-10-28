@@ -219,8 +219,6 @@ export default function SignInPage() {
           <Link href="/terms-of-service" className="hover:underline">Terms and Conditions</Link>
           <span aria-hidden="true">·</span>
           <Link href="/privacy-policy" className="hover:underline">Privacy Policy</Link>
-          <span aria-hidden="true">·</span>
-          <Link href="/support" className="hover:underline">Help</Link>
         </footer>
       </div>
     </main>
