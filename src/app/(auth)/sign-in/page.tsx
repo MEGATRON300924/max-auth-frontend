@@ -69,7 +69,7 @@ export default function SignInPage() {
 
   useEffect(() => {
     const clientName = getClientName();
-    document.title = clientName ? `Sign in with ${clientName}` : "Sign in with MAX Account";
+    document.title = clientName ? `Sign in with ${clientName}` : "Sign In With Your MAX Account";
   }, []);
 
   useEffect(() => {
@@ -159,7 +159,7 @@ export default function SignInPage() {
   };
 
   const clientName = getClientName();
-  const signInTitle = clientName ? "You’re about to sign in to:" : "Sign in with MAX Account";
+  const signInTitle = clientName ? "You’re about to sign in to:" : "Sign In With Your MAX Account";
   const signInDescription = clientName ? "Continue securely with your MAX Account." : "Use your MAX Account to continue to MAX services and apps.";
 
   return (
