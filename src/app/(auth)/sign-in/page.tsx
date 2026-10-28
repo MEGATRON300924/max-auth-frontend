@@ -180,7 +180,7 @@ export default function SignInPage() {
                 {rememberedAccounts.map((account, index) => (
                   <div key={account.toLowerCase()} className="group flex w-full items-center gap-3 rounded-xl border border-[#dadce0] bg-white px-3 py-3 transition-colors hover:bg-[#f8f9fa] dark:border-[#5f6368] dark:bg-transparent dark:hover:bg-[#303134]">
                     <button type="button" onClick={() => beginWithAccount(account)} className="flex min-w-0 flex-1 items-center gap-3 text-left">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#dadce0] bg-[#f8f9fa] dark:border-[#5f6368] dark:bg-[#303134]"><UserRound aria-hidden="true" className="h-5 w-5 text-[#5f6368] dark:text-[#bdc1c6]" /></div>
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#dadce0] bg-[#f8f9fa] dark:border-[#5f6368] dark:bg-[#303134]"><img src="/user.png" alt="" className="h-full w-full rounded-full object-cover" /></div>
                       <div className="min-w-0 flex-1"><p className="truncate text-sm font-medium">{account}</p><p className="mt-0.5 text-sm text-[#5f6368] dark:text-[#bdc1c6]">{index === 0 ? "Last used" : "Remembered on this device"}</p></div>
                       <span className="text-sm font-medium text-[#0b57d0] dark:text-[#8ab4f8]">Continue</span>
                     </button>
