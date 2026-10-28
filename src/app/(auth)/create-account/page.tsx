@@ -37,11 +37,11 @@ export default function CreateAccountPage() {
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
-  const stepTitles = ["What's your name?", "What should MAX call you?", "Age check", "What's your email?", "Create a password"];
+  const stepTitles = ["What's your name?", "What should MAX call you?", "How old are you?", "What's your email?", "Create a password"];
   const stepDescriptions = [
     "Enter your name to get your MAX Account started.",
     "Choose your display name and a unique username. You can change your display name later.",
-    "Confirm that you meet the minimum age requirement for a MAX Account.",
+    "Choose your age group so MAX can apply the right protections and approval steps.",
     "Use an email address you can access. We'll send you a verification link.",
     "Choose a password you don't use for another account.",
   ];
