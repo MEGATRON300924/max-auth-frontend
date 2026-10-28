@@ -2,7 +2,7 @@
 
 export type SubscriptionTier = "FREE" | "PLUS" | "PRO" | "BUSINESS" | "ENTERPRISE";
 export type VerificationStatus = "UNVERIFIED" | "PENDING" | "VERIFIED";
-export type AccountStatus = "ACTIVE" | "SUSPENDED" | "BANNED" | "DELETED" | "DEACTIVATED";
+export type AccountStatus = "ACTIVE" | "SUSPENDED" | "BANNED" | "DELETED" | "DEACTIVATED" | "PENDING_PARENTAL_APPROVAL";
 export type OAuthApplicationType = "WEB" | "SPA" | "ANDROID" | "IOS" | "DESKTOP";
 export type OAuthPermission = "openid" | "profile" | "email" | "offline_access" | "profile:read" | "email:read" | "account:read" | "identity:read" | "memory:read";
 
