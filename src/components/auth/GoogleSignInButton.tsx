@@ -61,7 +61,7 @@ export function GoogleSignInButton() {
     if (!clientId || !window.google || !containerRef.current || mfaRequired) return;
     window.google.accounts.id.initialize({ client_id: clientId, callback: async ({ credential: value }) => { setCredential(value); await complete(); } });
     containerRef.current.innerHTML = "";
-    window.google.accounts.id.renderButton(containerRef.current, { theme: "outline", size: "large", width: 420, text: "continue_with" });
+    window.google.accounts.id.renderButton(containerRef.current, { theme: "outline", size: "large", width: Math.min(containerRef.current.clientWidth || 360, 400), text: "continue_with" });
   };
 
   useEffect(() => { render(); }, [clientId, mfaRequired]);
@@ -72,7 +72,7 @@ export function GoogleSignInButton() {
       <Script src="https://accounts.google.com/gsi/client" strategy="afterInteractive" onLoad={render} />
       {error && <Alert variant="danger">{error}</Alert>}
       {needsAccount && <Link href="/create-account" className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-glass-border px-4 text-sm font-semibold text-ink-muted transition-colors hover:bg-surface">Create a MAX Account</Link>}
-      {!mfaRequired ? <div ref={containerRef} className="flex justify-center" /> : (
+      {!mfaRequired ? <div ref={containerRef} className="flex w-full justify-center overflow-hidden rounded-xl" /> : (
         <form onSubmit={(event) => { event.preventDefault(); if (recovery ? mfaCode.trim().length >= 8 : /^\d{6}$/.test(mfaCode)) complete(mfaCode.trim()); else setError(recovery ? "Enter a recovery code." : "Enter the 6-digit authenticator code."); }} className="rounded-xl border border-glass-border bg-base-raised p-4">
           <div className="flex items-center gap-2 text-sm font-semibold text-ink"><ShieldCheck className="h-4 w-4 text-brand-500" />Two-factor authentication</div>
           <p className="mt-1 text-xs leading-5 text-ink-muted">{recovery ? "Use one of your single-use recovery codes." : "Enter the code from your authenticator app."}</p>
