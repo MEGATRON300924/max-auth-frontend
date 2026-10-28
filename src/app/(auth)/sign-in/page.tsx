@@ -159,17 +159,18 @@ export default function SignInPage() {
   };
 
   const clientName = getClientName();
-  const signInTitle = clientName ? `Sign in with ${clientName}` : "Sign in with MAX Account";
-  const signInDescription = clientName ? `Use your MAX Account to continue to ${clientName}.` : "Use your MAX Account to continue to MAX services and apps.";
+  const signInTitle = clientName ? "You’re about to sign in to:" : "Sign in with MAX Account";
+  const signInDescription = clientName ? "Continue securely with your MAX Account." : "Use your MAX Account to continue to MAX services and apps.";
 
   return (
-    <main className="min-h-screen bg-[#f8f9fa] px-4 py-8 text-[#202124] dark:bg-[#202124] dark:text-[#e8eaed] sm:py-12">
-      <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-[450px] items-center justify-center">
-        <section className="w-full rounded-[16px] border border-[#dadce0] bg-white px-7 py-9 shadow-sm dark:border-[#5f6368] dark:bg-[#292a2d] sm:px-10 sm:py-10">
+    <main className="min-h-screen bg-[#f8f9fa] px-3 py-5 text-[#202124] dark:bg-[#202124] dark:text-[#e8eaed] sm:px-4 sm:py-10">
+      <div className="mx-auto flex min-h-[calc(100vh-2.5rem)] w-full max-w-[450px] flex-col items-center justify-center sm:min-h-[calc(100vh-5rem)]">
+        <section className="w-full rounded-[16px] border border-[#dadce0] bg-white px-4 py-6 shadow-sm dark:border-[#5f6368] dark:bg-[#292a2d] sm:px-10 sm:py-10">
           <div className="text-center">
             <div className="mx-auto flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-[#dadce0] bg-white dark:border-[#5f6368]"><img src="/logo.png" alt="MAX" className="h-9 w-9 object-contain" /></div>
-            <h1 className="mt-5 text-[24px] font-normal tracking-[-0.01em]">{step === "choose" ? signInTitle : mfaRequired ? "Verify it’s you" : "Enter your password"}</h1>
-            <p className="mt-2 text-[15px] leading-6 text-[#5f6368] dark:text-[#bdc1c6]">
+            <h1 className="mt-4 text-[21px] font-normal tracking-[-0.01em] sm:text-[24px]">{step === "choose" ? signInTitle : mfaRequired ? "Verify it’s you" : "Enter your password"}</h1>
+            {step === "choose" && clientName && <p className="mt-2 break-words text-lg font-semibold text-[#202124] dark:text-[#e8eaed]">{clientName}</p>}
+            <p className="mt-2 text-[14px] leading-6 text-[#5f6368] dark:text-[#bdc1c6]">
               {step === "choose" ? signInDescription : mfaRequired ? (useRecoveryCode ? "Enter a recovery code to finish signing in." : "Enter the 6-digit code from your authenticator app.") : "Verify your MAX Account to continue securely."}
             </p>
           </div>
@@ -178,18 +179,18 @@ export default function SignInPage() {
             <div className="mt-8">
               <div className="space-y-2">
                 {rememberedAccounts.map((account, index) => (
-                  <div key={account.toLowerCase()} className="group flex w-full items-center gap-3 rounded-xl border border-[#dadce0] bg-white px-3 py-3 transition-colors hover:bg-[#f8f9fa] dark:border-[#5f6368] dark:bg-transparent dark:hover:bg-[#303134]">
-                    <button type="button" onClick={() => beginWithAccount(account)} className="flex min-w-0 flex-1 items-center gap-3 text-left">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f1f3f4] dark:bg-[#3c4043]"><img src="/logo.png" alt="" className="h-7 w-7 rounded-full object-contain" /></div>
-                      <div className="min-w-0 flex-1"><p className="truncate text-sm font-medium">{account}</p><p className="mt-0.5 text-sm text-[#5f6368] dark:text-[#bdc1c6]">{index === 0 ? "Last used" : "Remembered on this device"}</p></div>
-                      <span className="text-sm font-medium text-[#0b57d0] dark:text-[#8ab4f8]">Continue</span>
+                  <div key={account.toLowerCase()} className="group flex w-full items-center gap-2 rounded-xl border border-[#dadce0] bg-white px-2.5 py-2.5 transition-colors hover:bg-[#f8f9fa] dark:border-[#5f6368] dark:bg-transparent dark:hover:bg-[#303134] sm:gap-3 sm:px-3 sm:py-3">
+                    <button type="button" onClick={() => beginWithAccount(account)} className="flex min-w-0 flex-1 items-center gap-2 text-left sm:gap-3">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#dadce0] bg-[#f8f9fa] dark:border-[#5f6368] dark:bg-[#303134] sm:h-10 sm:w-10"><img src="/user.png" alt="" className="h-full w-full rounded-full object-cover" /></div>
+                      <div className="min-w-0 flex-1"><p className="break-all text-[13px] font-medium leading-5 sm:text-sm">{account}</p><p className="mt-0.5 text-sm text-[#5f6368] dark:text-[#bdc1c6]">{index === 0 ? "Last used" : "Remembered on this device"}</p></div>
+                      <span className="shrink-0 text-xs font-medium text-[#0b57d0] dark:text-[#8ab4f8] sm:text-sm">Continue</span>
                     </button>
-                    <button type="button" onClick={() => forgetAccount(account)} aria-label={`Forget ${account}`} title="Forget this account" className="rounded-full px-2 py-1 text-xs text-[#5f6368] hover:bg-[#e8eaed] dark:text-[#bdc1c6] dark:hover:bg-[#3c4043]">Remove</button>
+                    <button type="button" onClick={() => forgetAccount(account)} aria-label={`Forget ${account}`} title="Forget this account" className="shrink-0 rounded-full px-1.5 py-1 text-[11px] text-[#5f6368] hover:bg-[#e8eaed] dark:text-[#bdc1c6] dark:hover:bg-[#3c4043] sm:px-2 sm:text-xs">Remove</button>
                   </div>
                 ))}
                 <button type="button" onClick={useAnotherAccount} className="flex w-full items-center gap-3 rounded-xl border border-dashed border-[#dadce0] px-3 py-3 text-left transition-colors hover:bg-[#f8f9fa] dark:border-[#5f6368] dark:hover:bg-[#303134]"><div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f1f3f4] dark:bg-[#3c4043]"><UserRound className="h-5 w-5 text-[#5f6368] dark:text-[#bdc1c6]" /></div><div className="min-w-0 flex-1"><p className="text-sm font-medium">Use another MAX Account</p><p className="mt-0.5 text-sm text-[#5f6368] dark:text-[#bdc1c6]">Sign in with a different email or username</p></div><span className="text-lg text-[#5f6368]">›</span></button>
               </div>
-              <div className="my-7 flex items-center gap-3"><div className="h-px flex-1 bg-[#dadce0] dark:bg-[#5f6368]" /><span className="text-xs text-[#5f6368] dark:text-[#bdc1c6]">OR</span><div className="h-px flex-1 bg-[#dadce0] dark:bg-[#5f6368]" /></div>
+              <div className="my-5 flex items-center gap-3 sm:my-7"><div className="h-px flex-1 bg-[#dadce0] dark:bg-[#5f6368]" /><span className="text-xs text-[#5f6368] dark:text-[#bdc1c6]">OR</span><div className="h-px flex-1 bg-[#dadce0] dark:bg-[#5f6368]" /></div>
               <GoogleSignInButton />
               <p className="mt-7 text-center text-sm text-[#5f6368] dark:text-[#bdc1c6]">Don&apos;t have a MAX Account? <Link href="/create-account" className="font-medium text-[#0b57d0] hover:underline dark:text-[#8ab4f8]">Create one</Link></p>
             </div>
@@ -214,6 +215,11 @@ export default function SignInPage() {
             </div>
           )}
         </section>
+        <footer className="mt-5 flex w-full flex-wrap items-center justify-center gap-x-4 gap-y-2 pb-2 text-xs text-[#5f6368] dark:text-[#bdc1c6]">
+          <Link href="/terms-of-service" className="hover:underline">Terms and Conditions</Link>
+          <span aria-hidden="true">·</span>
+          <Link href="/privacy-policy" className="hover:underline">Privacy Policy</Link>
+        </footer>
       </div>
     </main>
   );
