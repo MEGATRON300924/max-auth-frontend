@@ -163,7 +163,7 @@ export default function CreateAccountPage() {
   return (
     <AuthCard
       title={stepTitles[step]}
-      subtitle={stepDescriptions[step]}
+      subtitle={step === 2 && showAlmostEighteen ? "A quick note about your age and the protections on your MAX Account." : stepDescriptions[step]}
       footer={<><span>Already have a MAX Account? </span><Link href="/sign-in" className="font-medium text-brand-400 hover:text-brand-300">Sign in</Link></>}
     >
       <div className="mb-7">
