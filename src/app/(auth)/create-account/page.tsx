@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Mail, Lock, UserRound, AtSign, ArrowLeft, ArrowRight, CalendarCheck, Sparkles } from "lucide-react";
+import { Mail, Lock, UserRound, AtSign, ArrowLeft, ArrowRight, CalendarDays, Sparkles } from "lucide-react";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { PasswordStrengthMeter } from "@/components/auth/PasswordStrengthMeter";
 import { Input } from "@/components/ui/Input";
@@ -18,6 +18,21 @@ const LAST_ACCOUNT_KEY = "max-auth:last-account";
 const ACCOUNTS_KEY = "max-auth:accounts";
 const STEP_COUNT = 5;
 
+function calculateAge(dateOfBirth: string): number | null {
+  const match = /^(\\d{4})-(\\d{2})-(\\d{2})$/.exec(dateOfBirth);
+  if (!match) return null;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const dob = new Date(year, month - 1, day);
+  if (dob.getFullYear() !== year || dob.getMonth() !== month - 1 || dob.getDate() !== day) return null;
+  const today = new Date();
+  if (dob > new Date(today.getFullYear(), today.getMonth(), today.getDate())) return null;
+  let age = today.getFullYear() - year;
+  if (today.getMonth() < month - 1 || (today.getMonth() === month - 1 && today.getDate() < day)) age -= 1;
+  return age;
+}
+
 export default function CreateAccountPage() {
   const { register } = useAuth();
   const { showToast } = useToast();
@@ -27,7 +42,9 @@ export default function CreateAccountPage() {
   const [fullName, setFullName] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
   const [ageConfirmed, setAgeConfirmed] = useState(false);
+  const [showAlmostEighteen, setShowAlmostEighteen] = useState(false);
   const [ageGroup, setAgeGroup] = useState<"UNDER_16" | "AGE_16_17" | "AGE_18_PLUS">("AGE_18_PLUS");
   const [parentEmail, setParentEmail] = useState("");
   const [email, setEmail] = useState("");
@@ -41,7 +58,7 @@ export default function CreateAccountPage() {
   const stepDescriptions = [
     "Enter your name to get your MAX Account started.",
     "Choose your display name and a unique username. You can change your display name later.",
-    "Choose your age group so MAX can apply the right protections and approval steps.",
+    "Enter your date of birth so MAX can apply the right protections and approval steps.",
     "Use an email address you can access. We'll send you a verification link.",
     "Choose a password you don't use for another account.",
   ];
@@ -53,8 +70,10 @@ export default function CreateAccountPage() {
     if (step === 1 && !displayName.trim()) errors.displayName = "Tell MAX what to call you.";
     if (step === 1 && displayName.trim().length > 64) errors.displayName = "Keep your display name to 64 characters or fewer.";
     if (step === 1 && !isValidUsername(username)) errors.username = "Use 3–32 letters, numbers, underscores, or periods.";
-    if (step === 2 && !ageConfirmed) errors.age = "Please confirm your age group before continuing.";
-    if (step === 2 && ageGroup !== "AGE_18_PLUS" && !isValidEmail(parentEmail)) errors.parentEmail = "Enter a valid parent or guardian email address.";
+    if (step === 2 && calculateAge(dateOfBirth) === null) errors.dateOfBirth = "Choose a valid date of birth that is not in the future.";
+    if (step === 2 && !ageConfirmed) errors.age = "Please confirm that your date of birth is correct.";
+    if (step === 3 && ageGroup !== "AGE_18_PLUS" && !isValidEmail(parentEmail)) errors.parentEmail = "Enter a valid parent or guardian email address.";
+    if (step === 3 && ageGroup !== "AGE_18_PLUS" && parentEmail.trim().toLowerCase() === email.trim().toLowerCase() && isValidEmail(email)) errors.parentEmail = "Use a parent or guardian email address, not your own.";
     if (step === 3 && !isValidEmail(email)) errors.email = "Enter a valid email address.";
     if (step === 4 && !getPasswordStrength(password).meetsMinimum) errors.password = "Use at least 8 characters, including a letter and a number.";
     setFieldErrors(errors);
@@ -64,12 +83,24 @@ export default function CreateAccountPage() {
   const goNext = () => {
     setError(null);
     if (!validateStep()) return;
+    if (step === 2) {
+      const age = calculateAge(dateOfBirth);
+      if (age === null) return;
+      const nextAgeGroup = age < 16 ? "UNDER_16" : age < 18 ? "AGE_16_17" : "AGE_18_PLUS";
+      setAgeGroup(nextAgeGroup);
+      if (nextAgeGroup === "AGE_16_17" && !showAlmostEighteen) {
+        setShowAlmostEighteen(true);
+        return;
+      }
+      setShowAlmostEighteen(false);
+    }
     setStep((currentStep) => Math.min(currentStep + 1, STEP_COUNT - 1));
   };
 
   const goBack = () => {
     setError(null);
     setFieldErrors({});
+    if (step === 2 && showAlmostEighteen) { setShowAlmostEighteen(false); return; }
     setStep((currentStep) => Math.max(currentStep - 1, 0));
   };
 
@@ -168,39 +199,49 @@ export default function CreateAccountPage() {
 
         {step === 2 && (
           <div className="space-y-4">
-            <div className="flex items-start gap-3 rounded-2xl border border-glass-border bg-base-raised p-4">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface text-ink-muted"><CalendarCheck className="h-5 w-5" /></div>
-              <div>
-                <p className="text-sm font-medium text-ink">A safer MAX experience</p>
-                <p className="mt-1 text-sm leading-6 text-ink-muted">Choose the age group that applies to you. If you're under 18, we'll ask a parent or guardian to approve your account before it can be used.</p>
+            {showAlmostEighteen ? (
+              <div className="py-3">
+                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-500/10 text-brand-500"><Sparkles className="h-6 w-6" /></div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-500">Your MAX account</p>
+                <h2 className="mt-2 text-2xl font-semibold tracking-tight text-ink sm:text-3xl">You're almost 18 🎉</h2>
+                <p className="mt-3 text-sm leading-6 text-ink-muted">Based on the date of birth you entered, you're 16–17 years old. A parent or guardian must approve your account, and some MAX services may remain restricted until you turn 18.</p>
+                <div className="mt-5 rounded-2xl border border-glass-border bg-base-raised p-4">
+                  <p className="text-sm font-medium text-ink">One more family safety step</p>
+                  <p className="mt-1 text-sm leading-6 text-ink-muted">On the next screen, enter a parent or guardian's email address so we can send them an approval request.</p>
+                </div>
               </div>
-            </div>
-            <div className="space-y-2">
-              {([
-                ["UNDER_16", "Under 16", "A parent or guardian must approve your account."],
-                ["AGE_16_17", "16–17 years old", "You're almost 18 🎉 Some services may remain restricted until you turn 18."],
-                ["AGE_18_PLUS", "18 or older", "Continue with the standard account setup."]
-              ] as const).map(([value, label, description]) => (
-                <label key={value} className={ageGroup === value ? "flex cursor-pointer items-start gap-3 rounded-2xl border border-brand-500 bg-brand-500/5 p-4 transition-colors" : "flex cursor-pointer items-start gap-3 rounded-2xl border border-glass-border p-4 transition-colors hover:bg-surface"}>
-                  <input type="radio" name="ageGroup" value={value} checked={ageGroup === value} onChange={() => setAgeGroup(value)} className="mt-1 h-4 w-4 border-glass-border text-brand-600 focus:ring-brand-500" />
-                  <span><span className="block text-sm font-semibold text-ink">{label}</span><span className="mt-1 block text-xs leading-5 text-ink-muted">{description}</span></span>
+            ) : (
+              <>
+                <div className="flex items-start gap-3 rounded-2xl border border-glass-border bg-base-raised p-4">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface text-ink-muted"><CalendarDays className="h-5 w-5" /></div>
+                  <div>
+                    <p className="text-sm font-medium text-ink">A safer MAX experience</p>
+                    <p className="mt-1 text-sm leading-6 text-ink-muted">Choose your date of birth. MAX will calculate your age and apply the appropriate protections and approval steps.</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="dateOfBirth" className="block text-sm font-medium text-ink">Date of birth</label>
+                  <input id="dateOfBirth" name="dateOfBirth" type="date" autoComplete="bday" max={new Date().toLocaleDateString("en-CA")} value={dateOfBirth} onChange={(event) => { setDateOfBirth(event.target.value); setAgeConfirmed(false); setFieldErrors((current) => ({ ...current, dateOfBirth: "", age: "" })); }} className="h-12 w-full rounded-xl border border-glass-border bg-base px-4 text-sm text-ink outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20" required />
+                  {fieldErrors.dateOfBirth && <p role="alert" className="text-sm text-danger">{fieldErrors.dateOfBirth}</p>}
+                </div>
+                <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-glass-border p-4 transition-colors hover:bg-surface">
+                  <input type="checkbox" checked={ageConfirmed} onChange={(event) => setAgeConfirmed(event.target.checked)} className="mt-1 h-4 w-4 rounded border-glass-border text-brand-600 focus:ring-brand-500" />
+                  <span className="text-sm leading-6 text-ink">I confirm that the date of birth I entered is correct.</span>
                 </label>
-              ))}
-            </div>
-            {ageGroup !== "AGE_18_PLUS" && (
-              <Input label="Parent or guardian email" type="email" autoComplete="email" autoCapitalize="none" spellCheck={false} icon={<Mail className="h-4 w-4" />} value={parentEmail} onChange={(event) => setParentEmail(event.target.value)} error={fieldErrors.parentEmail} placeholder="parent@example.com" required />
+                {fieldErrors.age && <p role="alert" className="text-sm text-danger">{fieldErrors.age}</p>}
+                <p className="text-xs leading-5 text-ink-faint">This is an age declaration, not independent age verification. MAX does not request an ID or payment card on this screen.</p>
+              </>
             )}
-            <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-glass-border p-4 transition-colors hover:bg-surface">
-              <input type="checkbox" checked={ageConfirmed} onChange={(event) => setAgeConfirmed(event.target.checked)} className="mt-1 h-4 w-4 rounded border-glass-border text-brand-600 focus:ring-brand-500" />
-              <span className="text-sm leading-6 text-ink">I confirm that the age group I selected is correct.</span>
-            </label>
-            {fieldErrors.age && <p role="alert" className="text-sm text-danger">{fieldErrors.age}</p>}
-            <p className="text-xs leading-5 text-ink-faint">This is an age declaration, not independent age verification. MAX does not request an ID or payment card on this screen.</p>
           </div>
         )}
 
         {step === 3 && (
-          <Input label="Email address" type="email" autoComplete="email" autoCapitalize="none" spellCheck={false} icon={<Mail className="h-4 w-4" />} value={email} onChange={(event) => setEmail(event.target.value)} error={fieldErrors.email} placeholder="you@example.com" required autoFocus />
+          <div className="space-y-4">
+            {ageGroup !== "AGE_18_PLUS" && (
+              <Input label="Parent or guardian email" type="email" autoComplete="email" autoCapitalize="none" spellCheck={false} icon={<Mail className="h-4 w-4" />} value={parentEmail} onChange={(event) => setParentEmail(event.target.value)} error={fieldErrors.parentEmail} placeholder="parent@example.com" required autoFocus />
+            )}
+            <Input label="Email address" type="email" autoComplete="email" autoCapitalize="none" spellCheck={false} icon={<Mail className="h-4 w-4" />} value={email} onChange={(event) => setEmail(event.target.value)} error={fieldErrors.email} placeholder="you@example.com" required autoFocus={ageGroup === "AGE_18_PLUS"} />
+          </div>
         )}
 
         {step === 4 && (
@@ -222,7 +263,7 @@ export default function CreateAccountPage() {
             </button>
           )}
           <Button type="submit" size="lg" className="w-full rounded-full" isLoading={isLoading}>
-            {step === STEP_COUNT - 1 ? "Create account" : <>Continue <ArrowRight className="h-4 w-4" /></>}
+            {step === STEP_COUNT - 1 ? "Create account" : <>Continue <ArrowRight className="h-4 w-4" /></> }
           </Button>
         </div>
       </form>
