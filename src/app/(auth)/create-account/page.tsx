@@ -221,7 +221,7 @@ export default function CreateAccountPage() {
                 </div>
                 <div className="space-y-2">
                   <label htmlFor="dateOfBirth" className="block text-sm font-medium text-ink">Date of birth</label>
-                  <input id="dateOfBirth" name="dateOfBirth" type="date" autoComplete="bday" max={new Date().toLocaleDateString("en-CA")} value={dateOfBirth} onChange={(event) => { setDateOfBirth(event.target.value); setAgeConfirmed(false); setFieldErrors((current) => ({ ...current, dateOfBirth: "", age: "" })); }} className="h-12 w-full rounded-xl border border-glass-border bg-base px-4 text-sm text-ink outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20" required />
+                  <input id="dateOfBirth" name="dateOfBirth" type="date" autoComplete="bday" max={`${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, "0")}-${String(new Date().getDate()).padStart(2, "0")}`} value={dateOfBirth} onChange={(event) => { setDateOfBirth(event.target.value); setAgeConfirmed(false); setFieldErrors((current) => ({ ...current, dateOfBirth: "", age: "" })); }} className="h-12 w-full rounded-xl border border-glass-border bg-base px-4 text-sm text-ink outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20" required />
                   {fieldErrors.dateOfBirth && <p role="alert" className="text-sm text-danger">{fieldErrors.dateOfBirth}</p>}
                 </div>
                 <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-glass-border p-4 transition-colors hover:bg-surface">
