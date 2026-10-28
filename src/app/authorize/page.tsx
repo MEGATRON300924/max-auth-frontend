@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowRight, Check, ShieldCheck, UserRound } from "lucide-react";
+import { ArrowRight, ArrowRightLeft, Check, ShieldCheck, UserRound } from "lucide-react";
 import { useAuth } from "@/lib/auth/useAuth";
 import { authApi, type OAuthAuthorizationRequest } from "@/lib/api/auth";
 import { ApiError } from "@/lib/api/ApiError";
@@ -28,11 +28,12 @@ const SCOPE_LABELS: Record<string, { title: string; description: string }> = {
 function AuthorizeContent() {
   const params = useSearchParams();
   const router = useRouter();
-  const { user, isLoading, isAuthenticated } = useAuth();
+  const { user, isLoading, isAuthenticated, logout } = useAuth();
   const requestToken = params.get("request_token") || "";
   const [trustedRequest, setTrustedRequest] = useState<OAuthAuthorizationRequest | null>(null);
   const [isValidating, setIsValidating] = useState(true);
   const [isApproving, setIsApproving] = useState(false);
+  const [isSwitchingAccount, setIsSwitchingAccount] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -66,6 +67,20 @@ function AuthorizeContent() {
       .finally(() => { if (!cancelled) setIsValidating(false); });
     return () => { cancelled = true; };
   }, [isAuthenticated, isLoading, requestToken]);
+
+  const switchAccount = async () => {
+    if (isSwitchingAccount) return;
+    setError(null);
+    setIsSwitchingAccount(true);
+    try {
+      const returnTo = window.location.pathname + window.location.search;
+      await logout();
+      router.replace(`/sign-in?returnTo=${encodeURIComponent(returnTo)}`);
+    } catch {
+      setError("We couldn't switch accounts right now. Please try again.");
+      setIsSwitchingAccount(false);
+    }
+  };
 
   const approve = async () => {
     if (!trustedRequest || isApproving) return;
@@ -140,8 +155,17 @@ function AuthorizeContent() {
 
           <div className="mt-6 flex items-center gap-3 rounded-2xl border border-[#e3e7ed] p-3 dark:border-[#373b44]">
             <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#edf3fc] text-[#3569b7] dark:bg-[#293342] dark:text-[#9abcf6]"><UserRound className="h-5 w-5" /></div>
-            <div className="min-w-0 flex-1"><p className="truncate text-sm font-medium">{user?.displayName || user?.username || "Your MAX Account"}</p><p className="truncate text-xs text-[#667085] dark:text-[#a2a8b3]">{user?.email || "Signed-in account"}</p></div>
-            <Check className="h-4 w-4 text-[#39845a]" />
+            <button type="button" onClick={switchAccount} disabled={isSwitchingAccount} aria-label="Switch MAX account" className="min-w-0 flex-1 text-left disabled:opacity-60">
+              <p className="break-words text-sm font-medium hover:underline">{user?.displayName || user?.username || "Your MAX Account"}</p>
+              <p className="break-all text-xs text-[#667085] dark:text-[#a2a8b3] hover:underline">{user?.email || "Signed-in account"}</p>
+            </button>
+            <Check aria-hidden="true" className="h-4 w-4 shrink-0 text-[#39845a]" />
+          </div>
+          <div className="mt-2 flex justify-end">
+            <button type="button" onClick={switchAccount} disabled={isSwitchingAccount} className="inline-flex min-h-9 items-center gap-2 rounded-full border border-[#d7dce4] px-3.5 text-xs font-semibold text-[#435c7d] transition hover:bg-[#f7f8fa] disabled:cursor-wait disabled:opacity-60 dark:border-[#454a54] dark:text-[#b3c5df] dark:hover:bg-[#2b2f36]">
+              <ArrowRightLeft className="h-3.5 w-3.5" />
+              {isSwitchingAccount ? "Switching account…" : "Switch account"}
+            </button>
           </div>
 
           <div className="mt-7">
