@@ -28,7 +28,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => tokenStore.subscribe((token) => { if (!token) setUser(null); }), []);
   const login = useCallback(async (identifier: string, password: string, rememberMe = true, mfaCode?: string) => { const { user } = await authApi.login(identifier, password, rememberMe, mfaCode); setUser(user); }, []);
   const googleLogin = useCallback(async (credential: string, mfaCode?: string) => { const { user } = await authApi.google(credential, mfaCode); setUser(user); }, []);
-  const register = useCallback(async (input: { username: string; email: string; password: string; fullName: string; displayName: string; ageConfirmed: true; rememberMe?: boolean }) => { const { user } = await authApi.register(input); setUser(user); }, []);
+  const register = useCallback(async (input: { username: string; email: string; password: string; fullName: string; displayName: string; ageConfirmed: true; ageGroup: "UNDER_16" | "AGE_16_17" | "AGE_18_PLUS"; parentEmail?: string; rememberMe?: boolean }) => { const { user } = await authApi.register(input); setUser(user); }, []);
   const logout = useCallback(async () => { try { await authApi.logout(); } catch (err) { if (!(err instanceof ApiError)) throw err; } finally { setUser(null); } }, []);
   return <AuthContext.Provider value={{ user, isLoading, isAuthenticated: !!user, login, googleLogin, register, logout, refreshUser }}>{children}</AuthContext.Provider>;
 }
