@@ -168,7 +168,7 @@ export default function SignInPage() {
       <div className="mx-auto flex min-h-[calc(100vh-2.5rem)] w-full max-w-[450px] min-w-0 flex-col items-center justify-center sm:min-h-[calc(100vh-5rem)] lg:mx-0 lg:min-h-0 lg:max-w-[560px] lg:items-stretch lg:justify-start">
         <section className="w-full rounded-[20px] border border-[#262626] bg-[#141313] px-4 py-6 shadow-sm sm:px-10 sm:py-10 lg:rounded-none lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:shadow-none">
           <div className="text-center">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-[#262626] bg-[#141313] lg:hidden"><img src="/logo.png" alt="MAX" className="h-9 w-9 object-contain" /></div>
+            <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-[#262626] bg-[#141313] shadow-[0_0_28px_rgba(59,130,246,0.12)]"><img src="/logo.png" alt="MAX AI logo" className="h-11 w-11 object-contain" /></div>
             <h1 className="mt-4 text-[30px] font-bold tracking-[-0.04em] text-white sm:text-[36px] lg:mt-0">{step === "choose" ? signInTitle : mfaRequired ? "Verify it’s you" : "Enter your password"}</h1>
             {step === "choose" && clientName && <p className="mt-2 break-words text-lg font-semibold text-[#202124] dark:text-[#e8eaed]">{clientName}</p>}
             <p className="mt-2 text-[14px] leading-6 text-[#a1a1a6] sm:text-base">
