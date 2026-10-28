@@ -13,7 +13,7 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   login: (identifier: string, password: string, rememberMe?: boolean, mfaCode?: string) => Promise<void>;
   googleLogin: (credential: string, mfaCode?: string) => Promise<void>;
-  register: (input: { username: string; email: string; password: string; fullName: string; displayName: string; ageConfirmed: true; rememberMe?: boolean }) => Promise<void>;
+  register: (input: { username: string; email: string; password: string; fullName: string; displayName: string; ageConfirmed: true; ageGroup: "UNDER_16" | "AGE_16_17" | "AGE_18_PLUS"; parentEmail?: string; rememberMe?: boolean }) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
