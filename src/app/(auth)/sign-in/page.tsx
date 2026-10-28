@@ -163,9 +163,9 @@ export default function SignInPage() {
   const signInDescription = clientName ? "Continue securely with your MAX Account." : "Use your MAX Account to continue to MAX services and apps.";
 
   return (
-    <main className="min-h-screen bg-[#f8f9fa] px-3 py-5 text-[#202124] dark:bg-[#202124] dark:text-[#e8eaed] sm:px-4 sm:py-10 lg:flex lg:p-0 lg:bg-white lg:text-[#202124] dark:lg:bg-white dark:lg:text-[#202124]">
-      <div className="flex min-h-[calc(100vh-2.5rem)] w-full items-center justify-center sm:min-h-[calc(100vh-5rem)] lg:min-h-screen lg:w-1/2 lg:px-10 lg:py-8">
-      <div className="mx-auto flex min-h-[calc(100vh-2.5rem)] w-full max-w-[450px] flex-col items-center justify-center sm:min-h-[calc(100vh-5rem)] lg:min-h-0 lg:max-w-[480px]">
+    <main className="min-h-screen w-full max-w-none overflow-x-hidden bg-[#f8f9fa] px-3 py-5 text-[#202124] dark:bg-[#202124] dark:text-[#e8eaed] sm:px-4 sm:py-10 lg:grid lg:grid-cols-2 lg:p-0 lg:bg-white lg:text-[#202124] dark:lg:bg-white dark:lg:text-[#202124]">
+      <div className="flex min-h-[calc(100vh-2.5rem)] w-full min-w-0 items-center justify-center sm:min-h-[calc(100vh-5rem)] lg:min-h-screen lg:px-8 lg:py-8 xl:px-12 2xl:px-16">
+      <div className="mx-auto flex min-h-[calc(100vh-2.5rem)] w-full max-w-[450px] min-w-0 flex-col items-center justify-center sm:min-h-[calc(100vh-5rem)] lg:min-h-0 lg:max-w-[560px]">
         <section className="w-full rounded-[16px] border border-[#dadce0] bg-white px-4 py-6 shadow-sm dark:border-[#5f6368] dark:bg-[#292a2d] sm:px-10 sm:py-10 lg:rounded-none lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:shadow-none dark:lg:bg-transparent">
           <div className="text-center">
             <div className="mx-auto flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border border-[#dadce0] bg-white dark:border-[#5f6368]"><img src="/logo.png" alt="MAX" className="h-9 w-9 object-contain" /></div>
@@ -223,7 +223,7 @@ export default function SignInPage() {
         </footer>
       </div>
       </div>
-      <aside aria-label="The MAX AI Ecosystem" className="relative hidden min-h-screen w-1/2 overflow-hidden lg:flex lg:flex-col lg:items-center lg:justify-center bg-[radial-gradient(ellipse_at_52%_38%,#1554d5_0%,#0b2b79_34%,#06153f_72%,#030817_100%)]">
+      <aside aria-label="The MAX AI Ecosystem" className="relative hidden min-h-screen w-full min-w-0 overflow-hidden lg:flex lg:flex-col lg:items-center lg:justify-center bg-[radial-gradient(ellipse_at_52%_38%,#1554d5_0%,#0b2b79_34%,#06153f_72%,#030817_100%)]">
         <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-[42%] h-[34rem] w-[34rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-500/30 blur-[110px]" />
         <div className="absolute inset-0 flex items-center justify-center pb-24">
           <video
@@ -237,7 +237,7 @@ export default function SignInPage() {
             aria-label="MAX animated orb"
           />
         </div>
-        <h2 className="absolute bottom-[9%] z-10 px-6 text-center text-4xl font-black tracking-[-0.045em] text-white xl:text-5xl 2xl:text-6xl">
+        <h2 className="absolute bottom-[7%] z-10 w-full max-w-full px-4 text-center text-3xl font-black leading-[1.05] tracking-[-0.045em] text-white xl:px-6 xl:text-5xl 2xl:text-6xl">
           <span className="text-sky-300">The </span><span><span className="text-pink-400">M</span><span className="text-rose-400">a</span><span className="text-red-500">x</span></span><span className="text-white"> AI Ecosystem</span>
         </h2>
       </aside>
