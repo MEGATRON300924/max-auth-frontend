@@ -224,10 +224,10 @@ export default function SignInPage() {
       </div>
       </div>
       <aside aria-label="The MAX AI Ecosystem" className="relative hidden min-h-screen w-1/2 overflow-hidden lg:flex lg:flex-col lg:items-center lg:justify-center bg-[radial-gradient(ellipse_at_52%_38%,#1554d5_0%,#0b2b79_34%,#06153f_72%,#030817_100%)]">
-        <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-[42%] h-[24rem] w-[24rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-500/25 blur-[90px]" />
-        <div className="absolute inset-0 flex items-center justify-center pb-16">
+        <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-[42%] h-[34rem] w-[34rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-500/30 blur-[110px]" />
+        <div className="absolute inset-0 flex items-center justify-center pb-24">
           <video
-            className="relative z-10 h-[min(48vh,420px)] w-[min(48vh,420px)] object-contain drop-shadow-[0_0_42px_rgba(45,126,255,0.55)]"
+            className="relative z-10 h-[min(68vh,680px)] w-[min(68vh,680px)] max-h-[78%] max-w-[92%] object-contain drop-shadow-[0_0_42px_rgba(45,126,255,0.55)]"
             src="https://www.max-ai.name.ng/max-orb.webm"
             autoPlay
             muted
@@ -237,7 +237,7 @@ export default function SignInPage() {
             aria-label="MAX animated orb"
           />
         </div>
-        <h2 className="absolute bottom-[13%] z-10 px-6 text-center text-3xl font-black tracking-[-0.04em] text-white xl:text-4xl">
+        <h2 className="absolute bottom-[9%] z-10 px-6 text-center text-4xl font-black tracking-[-0.045em] text-white xl:text-5xl 2xl:text-6xl">
           <span className="text-sky-300">The </span><span><span className="text-pink-400">M</span><span className="text-rose-400">a</span><span className="text-red-500">x</span></span><span className="text-white"> AI Ecosystem</span>
         </h2>
       </aside>
