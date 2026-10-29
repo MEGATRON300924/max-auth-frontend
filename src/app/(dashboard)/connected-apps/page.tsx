@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, Link2, RefreshCw, Shield, Unlink, Clock3 } from "lucide-react";
+import { CheckCircle2, Link2, RefreshCw, Shield, Unlink, Clock3, Music2 } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -42,6 +42,7 @@ export default function ConnectedAppsPage() {
   const googleContactsConnected = googleScopes.has("https://www.googleapis.com/auth/contacts.readonly");
   const googleYouTubeConnected = googleScopes.has("https://www.googleapis.com/auth/youtube.readonly");
   const spotify = useMemo(() => accounts.data?.find((a) => a.provider === "SPOTIFY") ?? null, [accounts.data]);
+  const youtubeMusic = useMemo(() => accounts.data?.find((a) => a.provider === "YOUTUBE_MUSIC") ?? null, [accounts.data]);
   const discord = useMemo(() => accounts.data?.find((a) => a.provider === "DISCORD") ?? null, [accounts.data]);
   const microsoft = useMemo(() => accounts.data?.find((a) => a.provider === "MICROSOFT") ?? null, [accounts.data]);
   const github = useMemo(() => accounts.data?.find((a) => a.provider === "GITHUB") ?? null, [accounts.data]);
@@ -54,6 +55,7 @@ export default function ConnectedAppsPage() {
     const result = params.get("spotify");
     const googleConnect = params.get("connect") === "google";
     const googleCalendarResult = params.get("google_calendar");
+    const youtubeMusicResult = params.get("youtube_music");
     const discordResult = params.get("discord");
     const microsoftResult = params.get("microsoft");
     const githubResult = params.get("github");
@@ -108,6 +110,14 @@ export default function ConnectedAppsPage() {
       window.history.replaceState({}, "", "/connected-apps");
     } else if (googleCalendarResult === "error") {
       showToast({ title: "Google connection failed", description: "Google services could not be connected. You can safely try again.", variant: "error" });
+      window.history.replaceState({}, "", "/connected-apps");
+    }
+    if (youtubeMusicResult === "connected") {
+      showToast({ title: "YouTube Music connected", description: "Your Google account is linked for YouTube-powered music discovery in MAX.", variant: "success" });
+      accounts.refetch();
+      window.history.replaceState({}, "", "/connected-apps");
+    } else if (youtubeMusicResult === "error") {
+      showToast({ title: "YouTube Music connection failed", description: "Google could not connect YouTube Music. You can safely try again.", variant: "error" });
       window.history.replaceState({}, "", "/connected-apps");
     }
     if (googleConnect) {
@@ -166,6 +176,15 @@ export default function ConnectedAppsPage() {
       window.location.assign(authorizationUrl);
     } catch (err) {
       showToast({ title: "Couldn't start Spotify connection", description: err instanceof ApiError ? err.message : "Please try again.", variant: "error" });
+    }
+  }
+
+  async function connectYouTubeMusic() {
+    try {
+      const { authorizationUrl } = await connectedAccountsApi.youTubeMusicConnect();
+      window.location.assign(authorizationUrl);
+    } catch (err) {
+      showToast({ title: "Couldn't start YouTube Music connection", description: err instanceof ApiError ? err.message : "Please try again.", variant: "error" });
     }
   }
 
@@ -259,6 +278,22 @@ export default function ConnectedAppsPage() {
                 <Button size="sm" variant="ghost" onClick={() => setUnlinkId(spotify.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button>
               </div>
             ) : <Button size="sm" onClick={connectSpotify}><Link2 className="h-3.5 w-3.5" /> Connect Spotify</Button>}
+          </div>
+
+          <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#FF0033]/10 text-[#FF4D67]"><Music2 className="h-5 w-5" /></div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-ink">YouTube Music</p>
+              <p className="text-xs text-ink-faint">Link your Google account for YouTube-powered music discovery and account-aware recommendations. Playback in MAX uses the official YouTube player.</p>
+              {youtubeMusic && <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-ink-faint"><span className="inline-flex items-center gap-1"><Clock3 className="h-3.5 w-3.5" />{expiryLabel(youtubeMusic.tokenExpiresAt)}</span><span>Linked {new Date(youtubeMusic.linkedAt).toLocaleDateString()}</span></div>}
+            </div>
+            {youtubeMusic ? (
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="success"><CheckCircle2 className="mr-1 h-3.5 w-3.5" />Connected</Badge>
+                <Button size="sm" variant="secondary" onClick={connectYouTubeMusic} disabled={busy}><RefreshCw className="h-3.5 w-3.5" /> Reconnect</Button>
+                <Button size="sm" variant="ghost" onClick={() => setUnlinkId(youtubeMusic.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button>
+              </div>
+            ) : <Button size="sm" onClick={connectYouTubeMusic}><Link2 className="h-3.5 w-3.5" /> Connect YouTube Music</Button>}
           </div>
 
           <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
