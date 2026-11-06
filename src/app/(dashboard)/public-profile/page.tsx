@@ -18,6 +18,7 @@ export default function PublicProfilePage() {
   const [displayName, setDisplayName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [photoFailed, setPhotoFailed] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -76,7 +77,7 @@ export default function PublicProfilePage() {
                 label="Profile photo URL"
                 icon={<Camera className="h-4 w-4" />}
                 value={avatarUrl}
-                onChange={(event) => setAvatarUrl(event.target.value)}
+                onChange={(event) => { setAvatarUrl(event.target.value); setPhotoFailed(false); }}
                 placeholder="https://example.com/photo.jpg"
                 type="url"
               />
@@ -93,12 +94,12 @@ export default function PublicProfilePage() {
               Profile preview
             </p>
             <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border border-glass-border bg-base-raised text-xl font-semibold text-ink">
-              {photo ? (
+              {photo && !photoFailed ? (
                 <img
                   src={photo}
                   alt=""
                   className="h-full w-full object-cover"
-                  onError={(event) => { event.currentTarget.style.display = "none"; }}
+                  onError={() => setPhotoFailed(true)}
                 />
               ) : (
                 getInitials(name)
