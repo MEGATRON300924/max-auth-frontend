@@ -25,6 +25,30 @@ function display(value: unknown) {
   return "";
 }
 
+async function spotlightRequest(path: string, init: RequestInit = {}): Promise<Response> {
+  let token = tokenStore.get() || await apiClient.silentRefresh();
+  if (!token) throw new Error("Your MAX Account session could not be renewed. Sign in again.");
+
+  const send = (accessToken: string) => fetch(API_URL + path, {
+    ...init,
+    headers: {
+      Accept: "application/json",
+      ...(init.body ? { "Content-Type": "application/json" } : {}),
+      ...(init.headers || {}),
+      Authorization: "Bearer " + accessToken,
+    },
+    cache: "no-store",
+  });
+
+  let response = await send(token);
+  if (response.status === 401) {
+    token = await apiClient.silentRefresh();
+    if (!token) throw new Error("Your MAX Account session has expired. Sign in again.");
+    response = await send(token);
+  }
+  return response;
+}
+
 export default function SpotlightReviewPage() {
   const [items, setItems] = useState<Contribution[]>([]);
   const [loading, setLoading] = useState(true);
@@ -43,12 +67,7 @@ export default function SpotlightReviewPage() {
         setItems([]);
         return;
       }
-      const token = tokenStore.get();
-      if (!token) throw new Error("Your MAX Account session is not ready. Refresh the page and try again.");
-      const response = await fetch(API_URL + "/admin/contributions?status=PENDING", {
-        headers: { Authorization: "Bearer " + token, Accept: "application/json" },
-        cache: "no-store",
-      });
+      const response = await spotlightRequest("/admin/contributions?status=PENDING");
       const body = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(body.message || "The review queue could not be loaded.");
       setItems(Array.isArray(body.contributions) ? body.contributions.filter((entry: Contribution) => entry.contributionType === "ENTITY_CREATE") : []);
@@ -62,15 +81,12 @@ export default function SpotlightReviewPage() {
   useEffect(() => { void load(); }, [load]);
 
   const review = async (item: Contribution, decision: "APPROVE" | "REJECT") => {
-    const token = tokenStore.get();
-    if (!token) { setError("Your MAX Account session has expired. Sign in again."); return; }
     setBusyId(item.id);
     setError("");
     setNotice("");
     try {
-      const response = await fetch(API_URL + "/admin/contributions/" + encodeURIComponent(item.id) + "/review", {
+      const response = await spotlightRequest("/admin/contributions/" + encodeURIComponent(item.id) + "/review", {
         method: "POST",
-        headers: { Authorization: "Bearer " + token, "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({ decision, reason: reasonById[item.id] || "" }),
       });
       const body = await response.json().catch(() => ({}));
