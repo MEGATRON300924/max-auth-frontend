@@ -51,7 +51,7 @@ export default function SpotlightReviewPage() {
       });
       const body = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(body.message || "The review queue could not be loaded.");
-      setItems(Array.isArray(body.contributions) ? body.contributions : []);
+      setItems(Array.isArray(body.contributions) ? body.contributions.filter((entry: Contribution) => entry.contributionType === "ENTITY_CREATE") : []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "The review queue could not be loaded.");
     } finally {
@@ -97,13 +97,13 @@ export default function SpotlightReviewPage() {
 
       <div className="mb-5 flex items-center gap-2 text-sm text-ink-muted">
         <Clock3 className="h-4 w-4" />
-        {loading ? "Loading submissions…" : items.length + " pending " + (items.length === 1 ? "submission" : "submissions")}
+        {loading ? "Loading submissions…" : items.length + " pending profile " + (items.length === 1 ? "suggestion" : "suggestions")}
       </div>
 
       {loading ? (
         <Card><CardContent><p className="py-5 text-sm text-ink-muted">Loading the editorial queue…</p></CardContent></Card>
       ) : items.length === 0 ? (
-        <Card><CardContent><div className="py-10 text-center"><Check className="mx-auto h-7 w-7 text-ink-faint" /><h2 className="mt-3 text-base font-semibold text-ink">You’re all caught up</h2><p className="mt-1 text-sm text-ink-muted">New profile suggestions will appear here when submitted.</p></div></CardContent></Card>
+        <Card><CardContent><div className="py-10 text-center"><Check className="mx-auto h-7 w-7 text-ink-faint" /><h2 className="mt-3 text-base font-semibold text-ink">You’re all caught up</h2><p className="mt-1 text-sm text-ink-muted">New profile suggestions will appear here after users submit them for review.</p></div></CardContent></Card>
       ) : (
         <div className="space-y-4">
           {items.map((item) => {
