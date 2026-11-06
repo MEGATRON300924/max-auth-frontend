@@ -17,8 +17,6 @@ type Contribution = {
   status: string;
   createdAt: string;
 };
-type QueueResponse = { contributions: Contribution[] };
-
 const API_URL = (process.env.NEXT_PUBLIC_SPOTLIGHT_API_URL || "https://max-spotlight-graph-api.onrender.com/api/v1").replace(/\\/$/, "");
 
 function display(value: unknown) {
