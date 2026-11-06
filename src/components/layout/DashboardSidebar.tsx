@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   Home,
   User,
+  ContactRound,
   ShieldCheck,
   KeyRound,
   Laptop,
@@ -39,6 +40,7 @@ const groups: SidebarGroup[] = [
     items: [
       { href: "/dashboard", label: "Home", icon: Home },
       { href: "/profile", label: "Personal info", icon: User },
+      { href: "/public-profile", label: "Public profile", icon: ContactRound },
       { href: "/security", label: "Security & sign-in", icon: ShieldCheck },
       { href: "/passkeys", label: "Password & passkeys", icon: KeyRound },
       { href: "/devices", label: "Your devices", icon: Laptop },
