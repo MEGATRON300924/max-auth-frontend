@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
   Home,
   User,
-  ContactRound,
   ShieldCheck,
   KeyRound,
   Laptop,
@@ -18,9 +18,11 @@ import {
   Link2,
   Code2,
   Building2,
+  ClipboardCheck,
 } from "lucide-react";
 import { MaxLogo } from "./MaxLogo";
 import { useAuth } from "@/lib/auth/useAuth";
+import { apiClient } from "@/lib/api/client";
 import { cn } from "@/lib/utils/cn";
 
 type SidebarItem = {
@@ -40,7 +42,6 @@ const groups: SidebarGroup[] = [
     items: [
       { href: "/dashboard", label: "Home", icon: Home },
       { href: "/profile", label: "Personal info", icon: User },
-      { href: "/public-profile", label: "Public profile", icon: ContactRound },
       { href: "/security", label: "Security & sign-in", icon: ShieldCheck },
       { href: "/passkeys", label: "Password & passkeys", icon: KeyRound },
       { href: "/devices", label: "Your devices", icon: Laptop },
@@ -69,8 +70,25 @@ const groups: SidebarGroup[] = [
 export function DashboardSidebar({ className }: { className?: string }) {
   const pathname = usePathname();
   const { user } = useAuth();
-  const visibleGroups = user?.isAdmin
-    ? [...groups, { label: "Administration", items: [{ href: "/admin", label: "Admin console", icon: ShieldCheck }, { href: "/admin/organisations", label: "Organisation review", icon: Building2 }] }]
+  const [canReviewSpotlight, setCanReviewSpotlight] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    apiClient.get<{ permissions?: { spotlightEntities?: { canReview?: boolean } } }>("/profile/permissions")
+      .then((result) => { if (active) setCanReviewSpotlight(result.permissions?.spotlightEntities?.canReview === true); })
+      .catch(() => { if (active) setCanReviewSpotlight(false); });
+    return () => { active = false; };
+  }, []);
+
+  const administrationItems: SidebarItem[] = [
+    ...(user?.isAdmin ? [
+      { href: "/admin", label: "Admin console", icon: ShieldCheck },
+      { href: "/admin/organisations", label: "Organisation review", icon: Building2 },
+    ] : []),
+    ...(canReviewSpotlight ? [{ href: "/spotlight-review", label: "Spotlight review", icon: ClipboardCheck }] : []),
+  ];
+  const visibleGroups = administrationItems.length
+    ? [...groups, { label: "Administration", items: administrationItems }]
     : groups;
 
   return (
