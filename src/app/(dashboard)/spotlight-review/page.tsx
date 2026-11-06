@@ -143,7 +143,7 @@ export default function SpotlightReviewPage() {
                   </label>
                   <div className="mt-4 flex flex-wrap justify-end gap-2 border-t border-glass-border pt-4">
                     <Button variant="danger" size="sm" disabled={Boolean(busyId)} onClick={() => void review(item, "REJECT")}><X className="h-4 w-4" />Reject</Button>
-                    <Button size="sm" disabled={Boolean(busyId)} isLoading={busyId === item.id && false} onClick={() => void review(item, "APPROVE")}><Check className="h-4 w-4" />Approve & publish</Button>
+                    <Button size="sm" disabled={Boolean(busyId)} onClick={() => void review(item, "APPROVE")}><Check className="h-4 w-4" />Approve & publish</Button>
                   </div>
                 </CardContent>
               </Card>
