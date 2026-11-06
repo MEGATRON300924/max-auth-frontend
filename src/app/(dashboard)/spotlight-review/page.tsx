@@ -17,7 +17,7 @@ type Contribution = {
   status: string;
   createdAt: string;
 };
-const API_URL = (process.env.NEXT_PUBLIC_SPOTLIGHT_API_URL || "https://max-spotlight-graph-api.onrender.com/api/v1").replace(/\\/$/, "");
+const API_URL = (process.env.NEXT_PUBLIC_SPOTLIGHT_API_URL || "https://max-spotlight-graph-api.onrender.com/api/v1").replace(/\/$/, "");
 
 function display(value: unknown) {
   if (typeof value === "string" || typeof value === "number") return String(value);
