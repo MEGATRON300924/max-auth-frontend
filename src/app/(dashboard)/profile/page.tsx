@@ -34,6 +34,13 @@ export default function ProfilePage() {
       setCountry(user.country ?? "");
       setLanguage(user.language ?? "");
       setTimezone(user.timezone ?? "");
+      if (user.avatarUrl) {
+        try {
+          const key = "max-auth:account-avatars";
+          const stored = JSON.parse(window.localStorage.getItem(key) || "{}") as Record<string, string>;
+          window.localStorage.setItem(key, JSON.stringify({ ...stored, [user.email.toLowerCase()]: user.avatarUrl, [user.username.toLowerCase()]: user.avatarUrl }));
+        } catch {}
+      }
     }
   }, [user]);
 
@@ -64,8 +71,13 @@ export default function ProfilePage() {
     setAvatarPreview(previewUrl);
     setIsUploadingAvatar(true);
     try {
-      await profileApi.uploadAvatar(file);
+      const result = await profileApi.uploadAvatar(file);
       await refreshUser();
+      try {
+        const key = "max-auth:account-avatars";
+        const stored = JSON.parse(window.localStorage.getItem(key) || "{}") as Record<string, string>;
+        window.localStorage.setItem(key, JSON.stringify({ ...stored, [user.email.toLowerCase()]: result.avatarUrl, [user.username.toLowerCase()]: result.avatarUrl }));
+      } catch {}
       setAvatarPreview(null);
       showToast({ title: "Profile picture updated", variant: "success" });
     } catch (err) {
