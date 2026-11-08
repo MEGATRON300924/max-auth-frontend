@@ -1,6 +1,5 @@
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
-import { MaxLogo } from "@/components/layout/MaxLogo";
 import type { MaxUser } from "@/types/api";
 
 const tierLabels: Record<MaxUser["subscriptionTier"], string> = {
@@ -21,7 +20,17 @@ export function WelcomeCard({ user }: { user: MaxUser }) {
       <div className="border-b border-glass-border px-6 py-7 sm:px-8 sm:py-8">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
-            <MaxLogo size={48} showWordmark={false} href="" className="shrink-0" />
+            <img
+              src={user.avatarUrl || "/user.png"}
+              alt={`${displayName} profile picture`}
+              onError={(event) => {
+                if (event.currentTarget.src !== new URL("/user.png", window.location.origin).href) {
+                  event.currentTarget.src = "/user.png";
+                }
+              }}
+              referrerPolicy="no-referrer"
+              className="h-12 w-12 shrink-0 rounded-full border border-glass-border bg-base-raised object-cover"
+            />
             <div>
               <p className="text-sm text-ink-muted">{greeting}, {displayName}</p>
               <h1 className="mt-1 text-[28px] font-semibold tracking-[-0.025em] text-ink sm:text-[32px]">Your MAX Account</h1>
