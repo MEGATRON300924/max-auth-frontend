@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { apiClient } from "@/lib/api/client";
 import { tokenStore } from "@/lib/api/tokenStore";
 
+type Claim = { id: string; legalName: string | null; displayName: string | null; documentType: string | null; documentNumberMasked: string | null; contactEmail: string | null; contactPhone: string | null; createdAt: string; entity: { name: string }; socialProfiles: { platform: string; url: string }[] | null; reviewItems: { id: string; category: string; platform: string | null; status: string }[] };
 type Contribution = {
   id: string;
   entityId: string | null;
@@ -51,6 +52,7 @@ async function spotlightRequest(path: string, init: RequestInit = {}): Promise<R
 
 export default function SpotlightReviewPage() {
   const [items, setItems] = useState<Contribution[]>([]);
+  const [claims, setClaims] = useState<Claim[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [busyId, setBusyId] = useState("");
@@ -71,6 +73,10 @@ export default function SpotlightReviewPage() {
       const body = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(body.message || "The review queue could not be loaded.");
       setItems(Array.isArray(body.contributions) ? body.contributions.filter((entry: Contribution) => entry.contributionType === "ENTITY_CREATE") : []);
+      const claimResponse = await spotlightRequest("/admin/claims?status=PENDING");
+      const claimBody = await claimResponse.json().catch(() => ({}));
+      if (!claimResponse.ok) throw new Error(claimBody.message || "The claim review queue could not be loaded.");
+      setClaims(Array.isArray(claimBody.claims) ? claimBody.claims : []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "The review queue could not be loaded.");
     } finally {
@@ -111,6 +117,15 @@ export default function SpotlightReviewPage() {
       {notice && <div role="status" className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{notice}</div>}
       {error && <div role="alert" className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
 
+
+      <section className="mb-10">
+        <div className="mb-4 flex items-center justify-between"><div><h2 className="text-lg font-semibold text-ink">Profile claims</h2><p className="mt-1 text-sm text-ink-muted">Review identity, documents, contact details and social ownership separately.</p></div><span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800">{claims.length} pending</span></div>
+        {claims.length === 0 ? <Card><CardContent><p className="py-6 text-center text-sm text-ink-muted">No pending profile claims.</p></CardContent></Card> : <div className="space-y-4">{claims.map(claim => <Card key={claim.id}><CardHeader><div><CardTitle>{claim.entity?.name || "Profile claim"}</CardTitle><p className="mt-1 text-xs text-ink-muted">Submitted {new Date(claim.createdAt).toLocaleString()}</p></div></CardHeader><CardContent>
+          <div className="grid gap-3 text-sm sm:grid-cols-2"><p>Legal name<br/><strong>{claim.legalName || "—"}</strong></p><p>Display name<br/><strong>{claim.displayName || "—"}</strong></p><p>ID document<br/><strong>{claim.documentType || "—"} · {claim.documentNumberMasked || "Masked"}</strong></p><p>Contact<br/><strong>{claim.contactEmail || "—"} · {claim.contactPhone || "—"}</strong></p></div>
+          <div className="mt-4 space-y-2">{claim.reviewItems.map(item => <div key={item.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-glass-border p-3"><div><strong className="text-sm">{item.category === "SOCIAL" ? item.platform + " ownership" : item.category.replaceAll("_"," ")}</strong><p className="text-xs text-ink-muted">{item.status}</p>{item.category === "SOCIAL" && claim.socialProfiles?.filter(p => p.platform === item.platform).map(p => <a key={p.url} href={p.url} target="_blank" rel="noreferrer" className="text-xs underline">Open submitted profile</a>)}</div><div className="flex gap-2"><Button size="sm" variant="danger" disabled={item.status !== "PENDING" || Boolean(busyId)} onClick={async () => { setBusyId(item.id); try { const r=await spotlightRequest("/admin/claims/"+claim.id+"/items/"+item.id+"/review",{method:"POST",body:JSON.stringify({decision:"REJECT"})}); if(!r.ok) throw new Error("Review failed"); setClaims(v=>v.map(x=>x.id!==claim.id?x:{...x,reviewItems:x.reviewItems.map(y=>y.id===item.id?{...y,status:"REJECTED"}:y)})); } catch(e) { setError(e instanceof Error?e.message:"Review failed"); } finally {setBusyId("");} }}><X className="h-3.5 w-3.5"/>Reject</Button><Button size="sm" disabled={item.status !== "PENDING" || Boolean(busyId)} onClick={async () => { setBusyId(item.id); try { const r=await spotlightRequest("/admin/claims/"+claim.id+"/items/"+item.id+"/review",{method:"POST",body:JSON.stringify({decision:"APPROVE"})}); if(!r.ok) throw new Error("Review failed"); setClaims(v=>v.map(x=>x.id!==claim.id?x:{...x,reviewItems:x.reviewItems.map(y=>y.id===item.id?{...y,status:"APPROVED"}:y)})); } catch(e) { setError(e instanceof Error?e.message:"Review failed"); } finally {setBusyId("");} }}><Check className="h-3.5 w-3.5"/>Approve</Button></div></div>)}</div>
+          <div className="mt-4 flex justify-end border-t border-glass-border pt-4"><Button disabled={Boolean(busyId)} onClick={async()=>{setBusyId(claim.id);try{const r=await spotlightRequest("/admin/claims/"+claim.id+"/approve-all",{method:"POST",body:JSON.stringify({})});const b=await r.json().catch(()=>({}));if(!r.ok)throw new Error(b.message||"Approval failed");setClaims(v=>v.filter(x=>x.id!==claim.id));setNotice("Claim approved and profile access granted.");}catch(e){setError(e instanceof Error?e.message:"Approval failed");}finally{setBusyId("");}}}><Check className="h-4 w-4"/>Approve all & grant access</Button></div>
+        </CardContent></Card>)}</div>}
+      </section>
       <div className="mb-5 flex items-center gap-2 text-sm text-ink-muted">
         <Clock3 className="h-4 w-4" />
         {loading ? "Loading submissions…" : items.length + " pending profile " + (items.length === 1 ? "suggestion" : "suggestions")}
