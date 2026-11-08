@@ -12,6 +12,7 @@ import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 
 const LAST_ACCOUNT_KEY = "max-auth:last-account";
 const ACCOUNTS_KEY = "max-auth:accounts";
+const ACCOUNT_AVATARS_KEY = "max-auth:account-avatars";
 const MAX_REMEMBERED_ACCOUNTS = 5;
 const RETURN_TO_KEY = "max-auth:oauth-return-to";
 type SignInStep = "choose" | "credentials";
@@ -58,6 +59,7 @@ export default function SignInPage() {
   const [step, setStep] = useState<SignInStep>("choose");
   const [identifier, setIdentifier] = useState("");
   const [rememberedAccounts, setRememberedAccounts] = useState<string[]>([]);
+  const [rememberedAvatars, setRememberedAvatars] = useState<Record<string, string>>({});
   const [password, setPassword] = useState("");
   const [mfaCode, setMfaCode] = useState("");
   const [mfaRequired, setMfaRequired] = useState(false);
@@ -88,6 +90,13 @@ export default function SignInPage() {
 
   useEffect(() => {
     try {
+      const savedAvatars = window.localStorage.getItem(ACCOUNT_AVATARS_KEY);
+      if (savedAvatars) {
+        const parsedAvatars: unknown = JSON.parse(savedAvatars);
+        if (parsedAvatars && typeof parsedAvatars === "object" && !Array.isArray(parsedAvatars)) {
+          setRememberedAvatars(Object.fromEntries(Object.entries(parsedAvatars).filter((entry): entry is [string, string] => typeof entry[1] === "string" && entry[1].length > 0)));
+        }
+      }
       const savedList = window.localStorage.getItem(ACCOUNTS_KEY);
       const legacy = window.localStorage.getItem(LAST_ACCOUNT_KEY);
       let accounts: string[] = [];
@@ -136,6 +145,16 @@ export default function SignInPage() {
     try {
       const account = identifier.trim();
       await login(account, password, rememberMe, mfaRequired ? mfaCode.trim() : undefined);
+      // Cache only the public avatar URL for this remembered account so the account picker
+      // can show the same profile image on the next visit without exposing account data.
+      try {
+        const { user: signedInUser } = await (await import("@/lib/api/profile")).profileApi.get();
+        if (signedInUser.avatarUrl) {
+          const nextAvatars = { ...rememberedAvatars, [account.toLowerCase()]: signedInUser.avatarUrl };
+          setRememberedAvatars(nextAvatars);
+          window.localStorage.setItem(ACCOUNT_AVATARS_KEY, JSON.stringify(nextAvatars));
+        }
+      } catch {}
       const destination = getDestination();
       try {
         if (rememberMe) {
@@ -182,7 +201,7 @@ export default function SignInPage() {
                 {rememberedAccounts.map((account, index) => (
                   <div key={account.toLowerCase()} className="group flex w-full items-center gap-2 rounded-[16px] border border-[#292929] bg-[#121212] px-2.5 py-2.5 transition-colors hover:border-[#444] hover:bg-[#191919] sm:gap-3 sm:px-3 sm:py-3">
                     <button type="button" onClick={() => beginWithAccount(account)} className="flex min-w-0 flex-1 items-center gap-2 text-left sm:gap-3">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#333] bg-[#202020] sm:h-10 sm:w-10"><img src="/user.png" alt="" className="h-full w-full rounded-full object-cover" /></div>
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#333] bg-[#202020] sm:h-10 sm:w-10"><img src={rememberedAvatars[account.toLowerCase()] || "/user.png"} alt="" referrerPolicy="no-referrer" onError={(event) => { event.currentTarget.src = "/user.png"; }} className="h-full w-full rounded-full object-cover" /></div>
                       <div className="min-w-0 flex-1"><p className="break-all text-[13px] font-medium leading-5 sm:text-sm">{account}</p><p className="mt-0.5 text-sm text-[#a1a1a6]">{index === 0 ? "Last used" : "Remembered on this device"}</p></div>
                       <span className="shrink-0 text-xs font-medium text-[#60a5fa] sm:text-sm">Continue</span>
                     </button>
