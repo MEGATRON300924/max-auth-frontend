@@ -2,7 +2,7 @@
 
 import { tokenStore } from "@/lib/api/tokenStore";
 
-const API_URL = (process.env.NEXT_PUBLIC_MAX_HOME_API_URL || "https://max-home-backend.onrender.com/api/v1").replace(/\\/$/, "");
+const API_URL = process.env.NEXT_PUBLIC_MAX_HOME_API_URL || "https://max-home-backend.onrender.com/api/v1";
 
 export interface MaxHome {
   id: string;
