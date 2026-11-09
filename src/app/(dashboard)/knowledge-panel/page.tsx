@@ -71,19 +71,21 @@ export default function KnowledgePanelPage() {
 
   const uploadImage = async () => {
     if(!imageFile||!profile)return;
-    if(!CLOUDINARY_CLOUD||!CLOUDINARY_PRESET){setError("Cloudinary upload is not configured for this dashboard. Add the Cloudinary cloud name and unsigned upload preset to the MAX Auth frontend environment.");return;}
     setUploading(true);setError("");setNotice("");
     try{
-      const data=new FormData();data.append("file",imageFile);data.append("upload_preset",CLOUDINARY_PRESET);data.append("folder","max-spotlight/"+profile.publicId);
-      const response=await fetch("https://api.cloudinary.com/v1_1/"+encodeURIComponent(CLOUDINARY_CLOUD)+"/image/upload",{method:"POST",body:data});
-      const uploaded=await response.json();if(!response.ok||!uploaded.secure_url)throw new Error(uploaded.error?.message||"Cloudinary could not upload this image.");
+      if(!["image/jpeg","image/png","image/webp","image/avif"].includes(imageFile.type)||imageFile.size>10*1024*1024) throw new Error("Choose a JPG, PNG, WebP or AVIF image up to 10 MB.");
+      const signed=await apiClient.post<{cloudName:string;apiKey:string;uploadUrl:string;signature:string;timestamp:number;uploadParams:Record<string,string>;maxBytes:number;allowedFormats:string[]}>("/profile/avatar/sign-spotlight",{entityPublicId:profile.publicId});
+      const data=new FormData();Object.entries(signed.uploadParams).forEach(([key,value])=>data.append(key,value));
+      data.append("api_key",signed.apiKey);data.append("signature",signed.signature);data.append("file",imageFile);
+      const response=await fetch(signed.uploadUrl,{method:"POST",body:data});const uploaded=await response.json();
+      if(!response.ok||!uploaded?.secure_url)throw new Error(uploaded?.error?.message||"Cloudinary upload failed.");
       await submit("/me/managed-entities/"+encodeURIComponent(profile.publicId)+"/media",{url:uploaded.secure_url,title:imageTitle||imageFile.name,altText,creator,attribution,licence},"Your image was uploaded to Cloudinary and submitted for editorial review.");
       setImageFile(null);setImagePreview("");setImageTitle("");setAltText("");setCreator("");setAttribution("");setLicence("");
     }catch(err){setError(err instanceof Error?err.message:"Image upload failed.");}
     finally{setUploading(false);}
   };
 
-  const updateSocial=(index:number,key:keyof SocialProfile,value:string)=>setSocials(current=>current.map((item,i)=>i===index?{...item,[key]:value}:item));
+    const updateSocial=(index:number,key:keyof SocialProfile,value:string)=>setSocials(current=>current.map((item,i)=>i===index?{...item,[key]:value}:item));
   const addSocial=()=>setSocials(current=>[...current,{platform:"INSTAGRAM",handle:"",url:""}]);
   const removeSocial=(index:number)=>setSocials(current=>current.filter((_,i)=>i!==index));
 
