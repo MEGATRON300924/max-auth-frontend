@@ -13,7 +13,8 @@ const CLOUDINARY_CLOUD = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "";
 const CLOUDINARY_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "";
 const PLATFORMS = ["INSTAGRAM","FACEBOOK","X","TIKTOK","YOUTUBE","LINKEDIN","THREADS","OTHER"] as const;
 type Platform = typeof PLATFORMS[number];
-type SocialProfile = { platform: Platform; handle: string; url: string };\ntype FactDraft = { property: string; value: string; sourceUrl: string; sourceTitle: string; publisher: string; sourceKind: "OFFICIAL"|"NEWS"|"PUBLIC_REFERENCE"|"OTHER" };
+type SocialProfile = { platform: Platform; handle: string; url: string };
+type FactDraft = { property: string; value: string; sourceUrl: string; sourceTitle: string; publisher: string; sourceKind: "OFFICIAL"|"NEWS"|"PUBLIC_REFERENCE"|"OTHER" };
 type Profile = { publicId: string; name: string; kind: string; canonicalSlug: string; description: string | null; updatedAt: string; role: string; aliases: { id: string; value: string }[]; media: { id: string; role: string; mediaAsset: { title: string | null; sourceUrl: string | null; storageUrl: string | null; attribution: string | null } }[]; socialAccounts?: { platform: Platform; handle: string | null; profileUrl: string; status?: string }[]; facts?: { property: string; value: unknown; evidence: { source: { url: string; title: string | null; publisher: string | null; kind: string } }[] }[] };
 type Contribution = { id: string; contributionType: string; status: string; createdAt: string };
 
@@ -37,7 +38,9 @@ export default function KnowledgePanelPage() {
   const [profile,setProfile] = useState<Profile|null>(null);
   const [submissions,setSubmissions] = useState<Contribution[]>([]);
   const [name,setName] = useState(""); const [description,setDescription] = useState(""); const [aliases,setAliases] = useState("");
-  const [socials,setSocials] = useState<SocialProfile[]>([]);\n  const [publishedFacts,setPublishedFacts] = useState<{property:string;value:string;sourceUrl:string}[]>([]);\n  const [newFacts,setNewFacts] = useState<FactDraft[]>([]);
+  const [socials,setSocials] = useState<SocialProfile[]>([]);
+  const [publishedFacts,setPublishedFacts] = useState<{property:string;value:string;sourceUrl:string}[]>([]);
+  const [newFacts,setNewFacts] = useState<FactDraft[]>([]);
   const [imageFile,setImageFile] = useState<File|null>(null); const [imagePreview,setImagePreview] = useState("");
   const [imageRole,setImageRole] = useState<"PROFILE"|"COVER"|"GALLERY">("GALLERY"); const [imageTitle,setImageTitle] = useState(""); const [altText,setAltText] = useState(""); const [creator,setCreator] = useState(""); const [attribution,setAttribution] = useState(""); const [licence,setLicence] = useState("");
   const [loading,setLoading] = useState(true); const [busy,setBusy] = useState(false); const [uploading,setUploading] = useState(false);
@@ -53,7 +56,9 @@ export default function KnowledgePanelPage() {
         const detailResponse=await request("/me/managed-entities/"+encodeURIComponent(first.publicId)); const detail=await detailResponse.json().catch(()=>({}));
         if(!detailResponse.ok) throw new Error(detail.message||"Your knowledge panel could not be loaded.");
         const value:Profile=detail.entity; setProfile(value); setName(value.name); setDescription(value.description||""); setAliases(value.aliases.map(item=>item.value).join(", "));
-        setSocials(Array.isArray(value.socialAccounts)?value.socialAccounts.map(s=>({platform:s.platform,handle:s.handle||"",url:s.profileUrl||""})):[]);\n        setPublishedFacts(Array.isArray(value.facts)?value.facts.map(f=>({property:f.property,value:typeof f.value==="string"?f.value:JSON.stringify(f.value),sourceUrl:f.evidence?.[0]?.source?.url||""})):[]);\n        setNewFacts([]);
+        setSocials(Array.isArray(value.socialAccounts)?value.socialAccounts.map(s=>({platform:s.platform,handle:s.handle||"",url:s.profileUrl||""})):[]);
+        setPublishedFacts(Array.isArray(value.facts)?value.facts.map(f=>({property:f.property,value:typeof f.value==="string"?f.value:JSON.stringify(f.value),sourceUrl:f.evidence?.[0]?.source?.url||""})):[]);
+        setNewFacts([]);
       } else {setProfile(null);setSocials([]);}
       const cr=await request("/me/contributions"); const cb=await cr.json().catch(()=>({}));
       if(cr.ok) setSubmissions(Array.isArray(cb.contributions)?cb.contributions:[]);
@@ -87,7 +92,10 @@ export default function KnowledgePanelPage() {
 
     const updateSocial=(index:number,key:keyof SocialProfile,value:string)=>setSocials(current=>current.map((item,i)=>i===index?{...item,[key]:value}:item));
   const addSocial=()=>setSocials(current=>[...current,{platform:"INSTAGRAM",handle:"",url:""}]);
-  const removeSocial=(index:number)=>setSocials(current=>current.filter((_,i)=>i!==index));\n  const addFact=()=>setNewFacts(current=>[...current,{property:"",value:"",sourceUrl:"",sourceTitle:"",publisher:"",sourceKind:"OTHER"}]);\n  const updateFact=(index:number,key:keyof FactDraft,value:string)=>setNewFacts(current=>current.map((item,i)=>i===index?{...item,[key]:value}:item));\n  const removeFact=(index:number)=>setNewFacts(current=>current.filter((_,i)=>i!==index));
+  const removeSocial=(index:number)=>setSocials(current=>current.filter((_,i)=>i!==index));
+  const addFact=()=>setNewFacts(current=>[...current,{property:"",value:"",sourceUrl:"",sourceTitle:"",publisher:"",sourceKind:"OTHER"}]);
+  const updateFact=(index:number,key:keyof FactDraft,value:string)=>setNewFacts(current=>current.map((item,i)=>i===index?{...item,[key]:value}:item));
+  const removeFact=(index:number)=>setNewFacts(current=>current.filter((_,i)=>i!==index));
 
   return <div className="space-y-5">
     <PageHeader title="Knowledge Panel" description="Manage your public identity, social presence and media on MAX Spotlight." action={<Button variant="secondary" onClick={()=>void load()} disabled={loading||busy||uploading}><RefreshCw className="h-4 w-4"/>Refresh</Button>}/>
