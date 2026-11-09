@@ -22,7 +22,8 @@ import {
 } from "lucide-react";
 import { MaxLogo } from "./MaxLogo";
 import { useAuth } from "@/lib/auth/useAuth";
-import { apiClient } from "@/lib/api/client";\nimport { tokenStore } from "@/lib/api/tokenStore";
+import { apiClient } from "@/lib/api/client";
+import { tokenStore } from "@/lib/api/tokenStore";
 import { cn } from "@/lib/utils/cn";
 
 type SidebarItem = {
@@ -77,7 +78,7 @@ export function DashboardSidebar({ className }: { className?: string }) {
     apiClient.get<{ permissions?: { spotlightEntities?: { canReview?: boolean } } }>("/profile/permissions")
       .then((result) => { if (active) setCanReviewSpotlight(result.permissions?.spotlightEntities?.canReview === true); })
       .catch(() => { if (active) setCanReviewSpotlight(false); });
-    const spotlightApi=(process.env.NEXT_PUBLIC_SPOTLIGHT_API_URL || "https://max-spotlight-graph-api.onrender.com/api/v1").replace(/\\/$/,"");
+    const spotlightApi=(process.env.NEXT_PUBLIC_SPOTLIGHT_API_URL || "https://max-spotlight-graph-api.onrender.com/api/v1").replace(/\/$/,"");
     const checkOwnerAccess=async()=>{
       try {
         const token=tokenStore.get() || await apiClient.silentRefresh();
