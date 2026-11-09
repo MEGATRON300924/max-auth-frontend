@@ -14,7 +14,7 @@ const CLOUDINARY_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || ""
 const PLATFORMS = ["INSTAGRAM","FACEBOOK","X","TIKTOK","YOUTUBE","LINKEDIN","THREADS","OTHER"] as const;
 type Platform = typeof PLATFORMS[number];
 type SocialProfile = { platform: Platform; handle: string; url: string };
-type Profile = { publicId: string; name: string; kind: string; canonicalSlug: string; description: string | null; updatedAt: string; role: string; aliases: { id: string; value: string }[]; media: { id: string; role: string; mediaAsset: { title: string | null; sourceUrl: string | null; storageUrl: string | null; attribution: string | null } }[]; socialAccounts?: SocialProfile[] };
+type Profile = { publicId: string; name: string; kind: string; canonicalSlug: string; description: string | null; updatedAt: string; role: string; aliases: { id: string; value: string }[]; media: { id: string; role: string; mediaAsset: { title: string | null; sourceUrl: string | null; storageUrl: string | null; attribution: string | null } }[]; socialAccounts?: { platform: Platform; handle: string | null; profileUrl: string; status?: string }[] };
 type Contribution = { id: string; contributionType: string; status: string; createdAt: string };
 
 const inputClass = "mt-2 w-full rounded-xl border border-glass-border bg-base px-3 py-2.5 text-sm text-ink outline-none focus:border-brand-400";
