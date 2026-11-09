@@ -90,7 +90,7 @@ export default function KnowledgePanelPage() {
     finally{setUploading(false);}
   };
 
-    const updateSocial=(index:number,key:keyof SocialProfile,value:string)=>setSocials(current=>current.map((item,i)=>i===index?{...item,[key]:value}:item));
+    const updateSocial=(index:number,key:keyof SocialProfile,value:string)=>setSocials(current=>current.map((item,i)=>i===index?({...item,[key]:value} as FactDraft):item));
   const addSocial=()=>setSocials(current=>[...current,{platform:"INSTAGRAM",handle:"",url:""}]);
   const removeSocial=(index:number)=>setSocials(current=>current.filter((_,i)=>i!==index));
   const addFact=()=>setNewFacts(current=>[...current,{property:"",value:"",sourceUrl:"",sourceTitle:"",publisher:"",sourceKind:"OTHER"}]);
