@@ -71,7 +71,8 @@ const groups: SidebarGroup[] = [
 export function DashboardSidebar({ className }: { className?: string }) {
   const pathname = usePathname();
   const { user } = useAuth();
-  const [canReviewSpotlight, setCanReviewSpotlight] = useState(false);\n  const [canManageKnowledgePanel, setCanManageKnowledgePanel] = useState(false);
+  const [canReviewSpotlight, setCanReviewSpotlight] = useState(false);
+  const [canManageKnowledgePanel, setCanManageKnowledgePanel] = useState(false);
 
   useEffect(() => {
     let active = true;
