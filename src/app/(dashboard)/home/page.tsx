@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { ArrowUpRight, Home, Users, Radio, CreditCard, RefreshCw, Wifi, WifiOff, Smartphone, Monitor, Tv, Speaker, House } from "lucide-react";
+import { ArrowUpRight, Home, Users, Radio, CreditCard, RefreshCw, Wifi, WifiOff, Smartphone, Monitor, Tv, Speaker, House, DoorOpen } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
