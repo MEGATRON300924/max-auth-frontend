@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { MaxLogo } from "./MaxLogo";
 import { useAuth } from "@/lib/auth/useAuth";
-import { apiClient } from "@/lib/api/client";
+import { apiClient } from "@/lib/api/client";\nimport { tokenStore } from "@/lib/api/tokenStore";
 import { cn } from "@/lib/utils/cn";
 
 type SidebarItem = {
@@ -70,13 +70,25 @@ const groups: SidebarGroup[] = [
 export function DashboardSidebar({ className }: { className?: string }) {
   const pathname = usePathname();
   const { user } = useAuth();
-  const [canReviewSpotlight, setCanReviewSpotlight] = useState(false);
+  const [canReviewSpotlight, setCanReviewSpotlight] = useState(false);\n  const [canManageKnowledgePanel, setCanManageKnowledgePanel] = useState(false);
 
   useEffect(() => {
     let active = true;
     apiClient.get<{ permissions?: { spotlightEntities?: { canReview?: boolean } } }>("/profile/permissions")
       .then((result) => { if (active) setCanReviewSpotlight(result.permissions?.spotlightEntities?.canReview === true); })
       .catch(() => { if (active) setCanReviewSpotlight(false); });
+    const spotlightApi=(process.env.NEXT_PUBLIC_SPOTLIGHT_API_URL || "https://max-spotlight-graph-api.onrender.com/api/v1").replace(/\\/$/,"");
+    const checkOwnerAccess=async()=>{
+      try {
+        const token=tokenStore.get() || await apiClient.silentRefresh();
+        if(!token) return;
+        const response=await fetch(spotlightApi+"/me/managed-entities",{headers:{Accept:"application/json",Authorization:"Bearer "+token},cache:"no-store"});
+        if(!response.ok) return;
+        const body=await response.json();
+        if(active) setCanManageKnowledgePanel(Array.isArray(body.entities) && body.entities.length>0);
+      } catch { if(active) setCanManageKnowledgePanel(false); }
+    };
+    void checkOwnerAccess();
     return () => { active = false; };
   }, []);
 
@@ -86,7 +98,7 @@ export function DashboardSidebar({ className }: { className?: string }) {
       { href: "/admin/organisations", label: "Organisation review", icon: Building2 },
     ] : []),
     ...(canReviewSpotlight ? [{ href: "/spotlight-review", label: "Spotlight review", icon: ClipboardCheck }] : []),
-    { href: "/knowledge-panel", label: "Knowledge Panel", icon: Sparkles },
+    ...(canManageKnowledgePanel ? [{ href: "/knowledge-panel", label: "Knowledge Panel", icon: Sparkles }] : []),
   ];
   const visibleGroups = administrationItems.length
     ? [...groups, { label: "Administration", items: administrationItems }]
