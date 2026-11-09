@@ -53,7 +53,7 @@ export default function KnowledgePanelPage() {
         const detailResponse=await request("/me/managed-entities/"+encodeURIComponent(first.publicId)); const detail=await detailResponse.json().catch(()=>({}));
         if(!detailResponse.ok) throw new Error(detail.message||"Your knowledge panel could not be loaded.");
         const value:Profile=detail.entity; setProfile(value); setName(value.name); setDescription(value.description||""); setAliases(value.aliases.map(item=>item.value).join(", "));
-        setSocials(Array.isArray(value.socialAccounts)?value.socialAccounts.map(s=>({...s})):[]);
+        setSocials(Array.isArray(value.socialAccounts)?value.socialAccounts.map(s=>({platform:s.platform,handle:s.handle||"",url:s.profileUrl||""})):[]);
       } else {setProfile(null);setSocials([]);}
       const cr=await request("/me/contributions"); const cb=await cr.json().catch(()=>({}));
       if(cr.ok) setSubmissions(Array.isArray(cb.contributions)?cb.contributions:[]);
