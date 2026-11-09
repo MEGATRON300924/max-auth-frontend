@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { ExternalLink, ImagePlus, RefreshCw, Save, Trash2, UploadCloud, Globe2, Plus } from "lucide-react";
+import { ExternalLink, ImagePlus, RefreshCw, Save, Trash2, UploadCloud, Plus } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
