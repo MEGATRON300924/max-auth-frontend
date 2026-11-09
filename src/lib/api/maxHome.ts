@@ -12,12 +12,30 @@ export interface MaxHome {
   city?: string | null;
   country?: string | null;
   family_banner_data?: string | null;
+  address_line1?: string | null;
+  address_line2?: string | null;
+  state_region?: string | null;
+  postal_code?: string | null;
 }
 
 export interface MaxHomeMember {
   user_id: string;
   role: string;
   created_at: string;
+  profile?: {
+    userId: string;
+    username: string;
+    displayName: string;
+    avatarUrl: string | null;
+  } | null;
+}
+
+export interface MaxHomeRoom {
+  id: string;
+  home_id: string;
+  name: string;
+  room_type?: string | null;
+  sort_order?: number;
 }
 
 export interface MaxHomeDevice {
@@ -52,5 +70,6 @@ async function request<T>(path: string): Promise<T> {
 export const maxHomeApi = {
   getHomes: () => request<{ homes: MaxHome[] }>("/homes"),
   getMembers: (homeId: string) => request<{ members: MaxHomeMember[] }>(`/homes/${encodeURIComponent(homeId)}/members`),
+  getRooms: (homeId: string) => request<{ rooms: MaxHomeRoom[] }>(`/homes/${encodeURIComponent(homeId)}/rooms`),
   getDevices: (homeId: string) => request<{ devices: MaxHomeDevice[] }>(`/homes/${encodeURIComponent(homeId)}/devices`),
 };
