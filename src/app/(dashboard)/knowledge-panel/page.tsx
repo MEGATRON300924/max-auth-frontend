@@ -57,7 +57,7 @@ export default function KnowledgePanelPage() {
         if(!detailResponse.ok) throw new Error(detail.message||"Your knowledge panel could not be loaded.");
         const value:Profile=detail.entity; setProfile(value); setName(value.name); setDescription(value.description||""); setAliases(value.aliases.map(item=>item.value).join(", "));
         setSocials(Array.isArray(value.socialAccounts)?value.socialAccounts.map(s=>({platform:s.platform,handle:s.handle||"",url:s.profileUrl||""})):[]);
-        setPublishedFacts(Array.isArray(value.facts)?value.facts.map(f=>({property:f.property,value:typeof f.value==="string"?f.value:JSON.stringify(f.value),sourceUrl:f.evidence?.[0]?.source?.url||""})):[]);
+        setPublishedFacts(Array.isArray(value.facts)?value.facts.map(f=>({property:f.property,value:typeof f.value==="string"?f.value:JSON.stringify(f.value)||"",sourceUrl:f.evidence?.[0]?.source?.url||""})):[]);
         setNewFacts([]);
       } else {setProfile(null);setSocials([]);}
       const cr=await request("/me/contributions"); const cb=await cr.json().catch(()=>({}));
