@@ -1,5 +1,5 @@
 import { apiClient } from "./client";
-import type { AuditLogEntry, ConnectedAccount, OAuthClient, OAuthConsent, OAuthClientConfig, OAuthClientConfigUpdate, OAuthPermission } from "@/types/api";
+import type { AuditLogEntry, ConnectedAccount, GitHubAppInstallation, OAuthClient, OAuthConsent, OAuthClientConfig, OAuthClientConfigUpdate, OAuthPermission } from "@/types/api";
 
 export const securityApi = { auditLogs() { return apiClient.get<{ logs: AuditLogEntry[] }>("/security/audit-logs"); } };
 export const connectedAccountsApi = {
@@ -15,6 +15,9 @@ export const connectedAccountsApi = {
   discordGuilds() { return apiClient.get<{ guilds: Array<Record<string, unknown>> }>("/connected-accounts/discord/guilds"); },
   microsoftConnect() { return apiClient.get<{ authorizationUrl: string }>("/connected-accounts/microsoft/connect"); },
   githubConnect() { return apiClient.get<{ authorizationUrl: string }>("/connected-accounts/github/connect"); },
+  githubAppInstall() { return apiClient.get<{ authorizationUrl: string }>("/connected-accounts/github/app/install"); },
+  githubAppInstallations() { return apiClient.get<{ installations: GitHubAppInstallation[] }>("/connected-accounts/github/app/installations"); },
+  githubAppEditAccess(installationId: string) { return apiClient.get<{ settingsUrl: string }>(`/connected-accounts/github/app/installations/${installationId}/edit-access`); },
   githubMe() { return apiClient.get<{ profile: Record<string, unknown> }>("/connected-accounts/github/me"); },
   githubRepos() { return apiClient.get<{ repos: Array<Record<string, unknown>> }>("/connected-accounts/github/repos"); },
   xConnect() { return apiClient.get<{ authorizationUrl: string }>("/connected-accounts/x/connect"); },

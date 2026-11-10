@@ -29,6 +29,7 @@ function expiryLabel(value: string | null) {
 export default function ConnectedAppsPage() {
   const { showToast } = useToast();
   const accounts = useAsyncData(() => connectedAccountsApi.list().then((r) => r.accounts));
+  const githubApp = useAsyncData(() => connectedAccountsApi.githubAppInstallations().then((r) => r.installations));
   const [notice, setNotice] = useState<string | null>(null);
   const [unlinkId, setUnlinkId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -59,6 +60,7 @@ export default function ConnectedAppsPage() {
     const discordResult = params.get("discord");
     const microsoftResult = params.get("microsoft");
     const githubResult = params.get("github");
+    const githubAppResult = params.get("github_app");
     const xResult = params.get("x");
     const instagramResult = params.get("instagram");
     const tiktokResult = params.get("tiktok");
@@ -102,6 +104,14 @@ export default function ConnectedAppsPage() {
       window.history.replaceState({}, "", "/connected-apps");
     } else if (githubResult === "error") {
       showToast({ title: "GitHub connection failed", description: "GitHub could not be connected. You can safely try again.", variant: "error" });
+      window.history.replaceState({}, "", "/connected-apps");
+    }
+    if (githubAppResult === "connected") {
+      showToast({ title: "GitHub access connected", description: "MAX can now work with the repositories you selected in GitHub.", variant: "success" });
+      githubApp.refetch();
+      window.history.replaceState({}, "", "/connected-apps");
+    } else if (githubAppResult === "error") {
+      showToast({ title: "GitHub access was not connected", description: "The GitHub App installation did not complete. You can try again.", variant: "error" });
       window.history.replaceState({}, "", "/connected-apps");
     }
     if (googleCalendarResult === "connected") {
@@ -163,10 +173,19 @@ export default function ConnectedAppsPage() {
 
   async function connectGithub() {
     try {
-      const { authorizationUrl } = await connectedAccountsApi.githubConnect();
+      const { authorizationUrl } = await connectedAccountsApi.githubAppInstall();
       window.location.assign(authorizationUrl);
     } catch (err) {
-      showToast({ title: "Couldn't start GitHub connection", description: err instanceof ApiError ? err.message : "Please try again.", variant: "error" });
+      showToast({ title: "Couldn't start GitHub access setup", description: err instanceof ApiError ? err.message : "Please try again.", variant: "error" });
+    }
+  }
+
+  async function editGithubAccess(installationId: string) {
+    try {
+      const { settingsUrl } = await connectedAccountsApi.githubAppEditAccess(installationId);
+      window.location.assign(settingsUrl);
+    } catch (err) {
+      showToast({ title: "Couldn't open GitHub access settings", description: err instanceof ApiError ? err.message : "Please try again.", variant: "error" });
     }
   }
 
@@ -326,19 +345,32 @@ export default function ConnectedAppsPage() {
             ) : <Button size="sm" onClick={connectMicrosoft}><Link2 className="h-3.5 w-3.5" /> Connect Microsoft</Button>}
           </div>
 
-          <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
+          <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-start">
             <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-ink/10"><img src="/brands/github.svg" alt="" className="h-5 w-5 dark:invert" /></div>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold text-ink">GitHub</p>
-              <p className="text-xs text-ink-faint">Connect your GitHub identity so MAX can use the GitHub permissions granted to your MAX connection.</p>
-              {github && <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-ink-faint"><span>Linked {new Date(github.linkedAt).toLocaleDateString()}</span><Badge variant="success">Identity</Badge><Badge variant="success">Repositories</Badge></div>}
+              <p className="text-xs text-ink-faint">Give MAX access to the repositories you choose. You can grant access to all repositories or select repositories in GitHub.</p>
+              {githubApp.data?.length ? (
+                <div className="mt-3 space-y-2">
+                  {githubApp.data.map((installation) => (
+                    <div key={installation.id} className="flex flex-col gap-2 rounded-xl border border-glass-border p-3 sm:flex-row sm:items-center">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-semibold text-ink">{installation.accountLogin} <span className="font-normal text-ink-faint">· {installation.accountType}</span></p>
+                        <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-ink-faint">
+                          <Badge variant={installation.suspended ? "warning" : "success"}>{installation.suspended ? "Suspended" : "Connected"}</Badge>
+                          <Badge variant="neutral">{installation.repositorySelection === "all" ? "All repositories" : "Selected repositories"}</Badge>
+                        </div>
+                      </div>
+                      <Button size="sm" variant="secondary" onClick={() => editGithubAccess(installation.installationId)} disabled={busy}>Edit access</Button>
+                    </div>
+                  ))}
+                </div>
+              ) : github && <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-ink-faint"><Badge variant="success">GitHub identity linked</Badge><span>Repository access still needs to be enabled.</span></div>}
             </div>
-            {github ? (
-              <div className="flex flex-wrap gap-2">
-                <Button size="sm" variant="secondary" onClick={connectGithub} disabled={busy}><RefreshCw className="h-3.5 w-3.5" /> Reconnect</Button>
-                <Button size="sm" variant="ghost" onClick={() => setUnlinkId(github.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button>
-              </div>
-            ) : <Button size="sm" onClick={connectGithub}><Link2 className="h-3.5 w-3.5" /> Connect GitHub</Button>}
+            <div className="flex flex-wrap gap-2">
+              <Button size="sm" onClick={connectGithub} disabled={busy}><Link2 className="h-3.5 w-3.5" /> {githubApp.data?.length ? "Add GitHub access" : "Connect GitHub"}</Button>
+              {github && <Button size="sm" variant="ghost" onClick={() => setUnlinkId(github.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink identity</Button>}
+            </div>
           </div>
 
           <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
