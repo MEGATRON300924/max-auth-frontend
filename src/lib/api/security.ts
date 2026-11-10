@@ -1,5 +1,5 @@
 import { apiClient } from "./client";
-import type { AuditLogEntry, ConnectedAccount, OAuthClient, OAuthConsent, OAuthClientConfig, OAuthClientConfigUpdate, OAuthPermission } from "@/types/api";
+import type { AuditLogEntry, ConnectedAccount, GitHubAppInstallation, OAuthClient, OAuthConsent, OAuthClientConfig, OAuthClientConfigUpdate, OAuthPermission } from "@/types/api";
 
 export const securityApi = { auditLogs() { return apiClient.get<{ logs: AuditLogEntry[] }>("/security/audit-logs"); } };
 export const connectedAccountsApi = {
