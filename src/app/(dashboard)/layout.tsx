@@ -3,11 +3,13 @@
 import { ProtectedRoute } from "@/lib/auth/ProtectedRoute";
 import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import { DashboardHeader } from "@/components/layout/DashboardHeader";
+import { GlobalSiteNav } from "@/components/GlobalSiteNav";
 
 export default function DashboardGroupLayout({ children }: { children: React.ReactNode }) {
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-base text-ink">
+        <GlobalSiteNav />
         <div className="mx-auto flex min-h-screen w-full max-w-[1600px]">
           <DashboardSidebar className="hidden lg:flex" />
           <div className="flex min-w-0 flex-1 flex-col">

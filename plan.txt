@@ -1,0 +1,37 @@
+# MAX Auth Frontend — Implementation Plan
+
+## Current task: Shared MAX website navigation (2026-11-14)
+
+### Request
+Add the same top navigation used by the main MAX website to the authenticated Socials / Connected Apps experience at https://api.max-ai.name.ng/connected-apps. Use consistent inline SVG icons and links for Socials, Chat MAX, Status, News, Beta, Contact, Reviews, and Waitlist.
+
+### Implementation
+- Added a shared `GlobalSiteNav` component with the same eight destinations and matching inline SVG path artwork used by the main MAX website.
+- Added responsive desktop and mobile navigation with active-route indication.
+- Mounted the shared navigation in the authenticated dashboard layout, so the Socials page and other account dashboard pages receive the same site-level navigation.
+- Preserved the existing dashboard sidebar, header, and `ProtectedRoute` authentication boundary.
+
+### Verification
+- Source-level review completed for route destinations, icon consistency, responsive layout, and layout composition.
+- Next.js production build and browser visual QA: pending.
+- Live deployment: pending.
+
+### Commits
+- Navigation component: pending.
+- Dashboard layout integration: pending.
+
+### Next steps
+- Run the Next.js build and test the connected-apps route at desktop and mobile widths.
+- Confirm Vercel deployment before considering the navigation live.
+
+## Follow-up: MAX Auth session restoration across first-party pages (2026-11-14)
+
+- Main-site pages now attempt the existing OAuth refresh-token restoration first, then fall back to a credentialed POST to the host-only MAX Auth /api/v1/auth/refresh endpoint.
+- After refresh, the page reads /api/v1/auth/me with the returned session access token and restores the profile without exposing the refresh cookie to sibling subdomains.
+- The frontend API client already uses credentials: include for MAX Auth API calls, so the Socials/Connected Apps portal retains its existing secure cookie-refresh flow.
+- The cross-subdomain behavior still requires a browser test with an active MAX Auth session and the production cookie settings.
+
+### CI update (2026-11-14)
+- PR #20: https://github.com/MEGATRON300924/max-auth-frontend/pull/20.
+- GitHub CI run #201: dependency installation and the Next.js application build passed. The critical dependency vulnerability audit failed; this PR does not change package manifests or lockfiles.
+- Navigation is not live until PR #20 is merged and a successful Vercel deployment is confirmed.
