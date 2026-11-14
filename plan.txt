@@ -30,3 +30,8 @@ Add the same top navigation used by the main MAX website to the authenticated So
 - After refresh, the page reads /api/v1/auth/me with the returned session access token and restores the profile without exposing the refresh cookie to sibling subdomains.
 - The frontend API client already uses credentials: include for MAX Auth API calls, so the Socials/Connected Apps portal retains its existing secure cookie-refresh flow.
 - The cross-subdomain behavior still requires a browser test with an active MAX Auth session and the production cookie settings.
+
+### CI update (2026-11-14)
+- PR #20: https://github.com/MEGATRON300924/max-auth-frontend/pull/20.
+- GitHub CI run #201: dependency installation and the Next.js application build passed. The critical dependency vulnerability audit failed; this PR does not change package manifests or lockfiles.
+- Navigation is not live until PR #20 is merged and a successful Vercel deployment is confirmed.
