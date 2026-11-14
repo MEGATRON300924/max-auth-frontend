@@ -1,0 +1,25 @@
+# MAX Auth Frontend — Implementation Plan
+
+## Current task: Shared MAX website navigation (2026-11-14)
+
+### Request
+Add the same top navigation used by the main MAX website to the authenticated Socials / Connected Apps experience at https://api.max-ai.name.ng/connected-apps. Use consistent inline SVG icons and links for Socials, Chat MAX, Status, News, Beta, Contact, Reviews, and Waitlist.
+
+### Implementation
+- Added a shared `GlobalSiteNav` component with the same eight destinations and matching inline SVG path artwork used by the main MAX website.
+- Added responsive desktop and mobile navigation with active-route indication.
+- Mounted the shared navigation in the authenticated dashboard layout, so the Socials page and other account dashboard pages receive the same site-level navigation.
+- Preserved the existing dashboard sidebar, header, and `ProtectedRoute` authentication boundary.
+
+### Verification
+- Source-level review completed for route destinations, icon consistency, responsive layout, and layout composition.
+- Next.js production build and browser visual QA: pending.
+- Live deployment: pending.
+
+### Commits
+- Navigation component: pending.
+- Dashboard layout integration: pending.
+
+### Next steps
+- Run the Next.js build and test the connected-apps route at desktop and mobile widths.
+- Confirm Vercel deployment before considering the navigation live.
