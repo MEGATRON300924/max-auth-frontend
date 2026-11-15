@@ -136,3 +136,13 @@ Restructure MAX Auth as a professional identity/developer platform, not a generi
 - Removed the last glass-edge class reference and remaining brand-blue emphasis from the public landing page.
 - Normalized MAX Home dashboard icon containers, action buttons and list surfaces to theme tokens instead of brand-blue and translucent white fills.
 - Verified the supplied SVG assets are used in the appropriate sidebar/security contexts, with dark-theme inversion for legibility.
+
+
+### Dependency security remediation (2026-11-15)
+- The original CI build now passes; the separate audit exposed a critical Next.js 16.4.0 advisory and a high-severity Zod advisory.
+- Removed Zod as a direct dependency because repository source has no Zod imports or usage.
+- Ran the non-breaking npm audit fix path and refreshed the committed lockfile. Next.js is now locked to 16.4.6; the resolved Zod package is 4.6.7 and no longer vulnerable.
+- Critical dependency audit passed.
+- Production dependency high-severity audit passed.
+- Production Next.js build passed after the dependency refresh.
+- The temporary dependency-refresh workflow is being removed; normal PR CI will verify the committed dependency lock.
