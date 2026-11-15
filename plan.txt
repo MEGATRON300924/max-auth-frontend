@@ -109,3 +109,15 @@ Restructure MAX Auth as a professional identity/developer platform, not a generi
 - CI run 43730325759 failed at TypeScript: src/app/not-found.tsx passed variant="subtle" to AuroraBackground, whose component takes no props. Replaced the decorated 404 layout with a flat theme-token layout.
 - CI also reported 11 dependency vulnerabilities (9 moderate, 1 high, 1 critical). This is separate from the TypeScript failure and must be assessed after the build passes.
 - Changes added to PR #21. Merge remains pending successful verification.
+
+
+### Final user icon mappings (2026-11-15)
+- `pay-svgrepo-com.svg`: Payments & subscriptions side navigation item.
+- `password-minimalistic-input-svgrepo-com.svg`: Security & sign-in side navigation item.
+- `home-smile-svgrepo-com.svg`: Account Overview side navigation item.
+- `devices-svgrepo-com (1).svg`: Your devices side navigation item.
+- `privacy-dashboard-svgrepo-com.svg`: Data & privacy side navigation item.
+- `security-svgrepo-com.svg`: Security page header action.
+- `verified-check-svgrepo-com.svg`: Verified account status.
+- `max_home.png`: MAX Home side navigation and MAX Home dashboard banner.
+- The SVGs are dark navy/black artwork, so they are inverted on dark themes and retain their original dark appearance on the Blue & White theme.
