@@ -138,17 +138,6 @@
   .surface-subtle { @apply border border-glass-border bg-base; }
 }
 
-/* Legacy class names remain available while their appearance is deliberately flat. */
-.liquid-glass {
-  background: rgb(var(--base-raised));
-  border: 1px solid rgb(var(--border));
-  box-shadow: none;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-}
-.aurora-canvas { background: rgb(var(--base)); }
-.glass-edge { position: relative; isolation: isolate; }
-.glass-edge::before { content: none; }
 
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar { display: none; }
