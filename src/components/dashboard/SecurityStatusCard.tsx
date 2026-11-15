@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ShieldCheck, ShieldAlert, ChevronRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/Card";
 import type { MaxUser } from "@/types/api";
@@ -12,7 +13,7 @@ export function SecurityStatusCard({ user }: { user: MaxUser }) {
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-3">
             <div className={"flex h-10 w-10 shrink-0 items-center justify-center rounded-xl " + (verified ? "bg-success-subtle text-success" : "bg-warning-subtle text-warning")}>
-              {verified ? <ShieldCheck className="h-5 w-5" /> : <ShieldAlert className="h-5 w-5" />}
+              {verified ? <Image src="/verified-check-svgrepo-com.svg" alt="Verified" width={22} height={22} className="h-[22px] w-[22px] object-contain dark:brightness-0 dark:invert" /> : <ShieldAlert className="h-5 w-5" />}
             </div>
             <div>
               <h3 className="font-display text-sm font-semibold text-ink">{verified ? "Account secure" : "Action recommended"}</h3>
