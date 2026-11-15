@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Check, Fingerprint, KeyRound, ShieldCheck, Smartphone } from "lucide-react";
+import { ArrowRight, Fingerprint, KeyRound, ShieldCheck, Smartphone } from "lucide-react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { Button } from "@/components/ui/Button";
@@ -46,7 +46,7 @@ export default function LandingPage() {
 
             <div className="relative mx-auto w-full max-w-[560px]">
               <div className="relative border border-glass-border bg-base-raised p-5 sm:p-7">
-                <div className="flex items-center justify-between border-b border-glass-border pb-4">
+                <div className="border-b border-glass-border pb-4">
                   <div><p className="text-xs font-semibold text-ink-faint">MAX AUTH</p><p className="mt-1 text-sm font-bold">Identity overview</p></div>
                 </div>
                 <div className="my-5 border border-glass-border bg-base p-4 font-mono text-xs leading-7 text-ink-muted"><p><span className="text-ink-faint">01</span> <span className="text-ink">const</span> auth = createMaxAuthClient(&#123;</p><p><span className="text-ink-faint">02</span> &nbsp;clientId: <span className="text-ink">&quot;YOUR_CLIENT_ID&quot;</span>,</p><p><span className="text-ink-faint">03</span> &nbsp;redirectUri: <span className="text-ink">&quot;https://your-app.com/callback&quot;</span>,</p><p><span className="text-ink-faint">04</span> &nbsp;scopes: [<span className="text-ink">&quot;openid&quot;</span>, <span className="text-ink">&quot;profile&quot;</span>],</p><p><span className="text-ink-faint">05</span> &#125;);</p><p className="mt-3 border-t border-glass-border pt-3 text-ink">OAuth 2.0 · OpenID Connect · PKCE</p></div>
