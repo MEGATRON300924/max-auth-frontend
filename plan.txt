@@ -130,3 +130,9 @@ Restructure MAX Auth as a professional identity/developer platform, not a generi
 - Removed backdrop blur and glass shadows from modal, toast and tag input components. Modal overlays remain opaque for legibility.
 - Replaced the global 404 aurora effect and removed liquid-glass legacy CSS.
 - Remaining audit targets: search the full application for residual `backdrop-blur`, `liquid-glass`, `glass-edge`, and gradient utility classes before merge.
+
+
+### Follow-up visual audit (2026-11-15)
+- Removed the last glass-edge class reference and remaining brand-blue emphasis from the public landing page.
+- Normalized MAX Home dashboard icon containers, action buttons and list surfaces to theme tokens instead of brand-blue and translucent white fills.
+- Verified the supplied SVG assets are used in the appropriate sidebar/security contexts, with dark-theme inversion for legibility.
