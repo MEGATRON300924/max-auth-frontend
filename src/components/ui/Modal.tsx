@@ -42,7 +42,7 @@ export function Modal({ open, onClose, title, description, children, className }
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/70"
             onClick={onClose}
             aria-hidden="true"
           />
@@ -57,7 +57,7 @@ export function Modal({ open, onClose, title, description, children, className }
             exit={{ opacity: 0, scale: 0.96, y: 8 }}
             transition={{ type: "spring", stiffness: 380, damping: 32 }}
             className={cn(
-              "relative w-full max-w-md rounded-2xl border border-glass-border bg-base-overlay/95 p-6 shadow-glass backdrop-blur-2xl focus:outline-none",
+              "relative w-full max-w-md rounded-md border border-glass-border bg-base-overlay p-6 shadow-none focus:outline-none",
               className
             )}
           >
@@ -71,7 +71,7 @@ export function Modal({ open, onClose, title, description, children, className }
               <button
                 onClick={onClose}
                 aria-label="Close dialog"
-                className="rounded-lg p-1.5 text-ink-faint hover:bg-white/5 hover:text-ink transition-colors"
+                className="rounded-md p-1.5 text-ink-faint hover:bg-glass-hover hover:text-ink transition-colors"
               >
                 <X className="h-4.5 w-4.5" />
               </button>
