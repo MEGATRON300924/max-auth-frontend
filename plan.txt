@@ -181,7 +181,7 @@ Restructure MAX Auth as a professional identity/developer platform, not a generi
 - Landing hero badge and proof row removed.
 - Removed the Protected status and the static Devices / Sessions / 2FA figures; added a Get Started link to account creation.
 - Shared site navigation now contains Socials, Chat MAX, Status, News, Beta and Contact only. Removed the MAX AI brand/logo block, Reviews and Waitlist; centered the remaining desktop navigation and mobile menu control.
-- Replaced the loading spinner with a monochrome animated line-art MAX monogram inside a hand-drawn orbit. The full-screen loading state is used by the protected dashboard while auth state is restored; reduced-motion preferences are respected by the existing global rule.
+- Replaced the loading spinner with a monochrome animated line-art MAX monogram inside a hand-drawn orbit. The full-screen loading state is used by the protected dashboard while auth state is restored; a reduced-motion override leaves the sketch mark static and visible.
 - The Cloudflare screenshot is present in the repository under `public/Screenshot 2026-11-15 150634.png`; direct visual inspection was unavailable in this session, so the loading animation follows the user's written direction rather than tracing the screenshot.
 
 ### Verification
