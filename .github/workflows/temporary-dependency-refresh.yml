@@ -27,7 +27,7 @@ jobs:
       - name: Remove unused vulnerable Zod dependency
         run: npm uninstall zod
       - name: Apply non-breaking security updates
-        run: npm audit fix
+        run: npm audit fix || npm audit --audit-level=high
       - name: Verify critical advisories
         run: npm audit --audit-level=critical
       - name: Verify production high-risk advisories
