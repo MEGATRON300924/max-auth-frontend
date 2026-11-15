@@ -3,7 +3,6 @@ import { ArrowRight, Check, Fingerprint, KeyRound, ShieldCheck, Smartphone } fro
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
 
 const products = [
   ["MAX AI", "Your intelligent assistant and the brain of the ecosystem."],
@@ -32,7 +31,6 @@ export default function LandingPage() {
         <section className="relative border-b border-glass-border/70 px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
           <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.05fr_.95fr] lg:gap-20">
             <div className="max-w-2xl">
-              <Badge variant="neutral" className="mb-6"><ShieldCheck className="h-3.5 w-3.5" /> MAX identity platform</Badge>
               <h1 className="font-display text-4xl font-bold leading-[1.08] tracking-[-0.035em] sm:text-6xl">
                 One account for
                 <span className="block text-ink">everything MAX.</span>
@@ -44,24 +42,19 @@ export default function LandingPage() {
                 <Link href="/create-account"><Button size="lg">Create your MAX Account <ArrowRight className="h-4 w-4" /></Button></Link>
                 <Link href="/sign-in"><Button size="lg" variant="secondary">Sign in</Button></Link>
               </div>
-              <div className="mt-7 flex flex-wrap gap-x-6 gap-y-2 text-xs font-medium text-ink-faint">
-                <span className="inline-flex items-center gap-2"><Check className="h-3.5 w-3.5 text-success" /> One account</span>
-                <span className="inline-flex items-center gap-2"><Check className="h-3.5 w-3.5 text-success" /> Secure sessions</span>
-                <span className="inline-flex items-center gap-2"><Check className="h-3.5 w-3.5 text-success" /> Developer ready</span>
-              </div>
             </div>
 
             <div className="relative mx-auto w-full max-w-[560px]">
               <div className="relative border border-glass-border bg-base-raised p-5 sm:p-7">
                 <div className="flex items-center justify-between border-b border-glass-border pb-4">
                   <div><p className="text-xs font-semibold text-ink-faint">MAX AUTH</p><p className="mt-1 text-sm font-bold">Identity overview</p></div>
-                  <span className="flex items-center gap-2 text-xs font-semibold text-success"><span className="h-2 w-2 rounded-full bg-success" /> Protected</span>
                 </div>
                 <div className="my-5 border border-glass-border bg-base p-4 font-mono text-xs leading-7 text-ink-muted"><p><span className="text-ink-faint">01</span> <span className="text-ink">const</span> auth = createMaxAuthClient(&#123;</p><p><span className="text-ink-faint">02</span> &nbsp;clientId: <span className="text-ink">&quot;YOUR_CLIENT_ID&quot;</span>,</p><p><span className="text-ink-faint">03</span> &nbsp;redirectUri: <span className="text-ink">&quot;https://your-app.com/callback&quot;</span>,</p><p><span className="text-ink-faint">04</span> &nbsp;scopes: [<span className="text-ink">&quot;openid&quot;</span>, <span className="text-ink">&quot;profile&quot;</span>],</p><p><span className="text-ink-faint">05</span> &#125;);</p><p className="mt-3 border-t border-glass-border pt-3 text-ink">OAuth 2.0 · OpenID Connect · PKCE</p></div>
-                <div className="grid grid-cols-3 gap-2 border-t border-glass-border pt-4">
-                  <div><p className="text-[10px] uppercase tracking-wider text-ink-faint">Devices</p><p className="mt-1 text-lg font-bold">04</p></div>
-                  <div><p className="text-[10px] uppercase tracking-wider text-ink-faint">Sessions</p><p className="mt-1 text-lg font-bold">02</p></div>
-                  <div><p className="text-[10px] uppercase tracking-wider text-ink-faint">2FA</p><p className="mt-1 text-lg font-bold">Ready</p></div>
+                <div className="flex items-center justify-between gap-4 border-t border-glass-border pt-5">
+                  <p className="max-w-[15rem] text-xs leading-5 text-ink-muted">One identity for your MAX products and developer applications.</p>
+                  <Link href="/create-account" className="shrink-0">
+                    <Button size="sm">Get Started <ArrowRight className="h-4 w-4" /></Button>
+                  </Link>
                 </div>
               </div>
             </div>
