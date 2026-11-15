@@ -100,3 +100,12 @@ Restructure MAX Auth as a professional identity/developer platform, not a generi
 - Draft PR #21: https://github.com/MEGATRON300924/max-auth-frontend/pull/21.
 - CI run #205 (GitHub Actions run 43730325759) was triggered from the PR head. Dependency installation is in progress; build and security audit steps have not started yet.
 - PR reports mergeable and remains a draft. No merge or production deployment has been performed.
+
+
+### User SVG icon integration and CI fix (2026-11-15)
+- Confirmed user assets exist on main: verified-check-svgrepo-com.svg, pay-svgrepo-com.svg, privacy-dashboard-svgrepo-com.svg, devices-svgrepo-com (1).svg, password-minimalistic-input-svgrepo-com.svg, security-svgrepo-com.svg, home-smile-svgrepo-com.svg, and max_home.png.
+- Wired supplied assets into the sidebar: home-smile for Overview, password icon for Security & sign-in, devices icon for Your devices, privacy icon for Data & privacy, pay icon for Payments & subscriptions, and max_home.png for MAX Home. The Home dashboard page now displays max_home.png.
+- Removed the old liquid-glass CSS compatibility definitions and aurora decoration from the 404 page.
+- CI run 43730325759 failed at TypeScript: src/app/not-found.tsx passed variant="subtle" to AuroraBackground, whose component takes no props. Replaced the decorated 404 layout with a flat theme-token layout.
+- CI also reported 11 dependency vulnerabilities (9 moderate, 1 high, 1 critical). This is separate from the TypeScript failure and must be assessed after the build passes.
+- Changes added to PR #21. Merge remains pending successful verification.
