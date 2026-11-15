@@ -66,7 +66,7 @@ const groups: SidebarGroup[] = [
       { href: "/connected-apps", label: "Connected apps", icon: Link2 },
     ],
   },
-]
+];
 
 export function DashboardSidebar({ className }: { className?: string }) {
   const pathname = usePathname();
