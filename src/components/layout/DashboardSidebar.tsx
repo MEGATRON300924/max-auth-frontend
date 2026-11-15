@@ -12,7 +12,6 @@ import {
   Database,
   Users,
   CreditCard,
-  Sparkles,
   Mic2,
   House,
   Link2,
@@ -39,9 +38,16 @@ type SidebarGroup = {
 
 const groups: SidebarGroup[] = [
   {
+    label: "Developer",
+    items: [
+      { href: "/developer", label: "Applications", icon: Code2 },
+      { href: "/developer/docs", label: "Documentation", icon: KeyRound },
+    ],
+  },
+  {
     label: "Account",
     items: [
-      { href: "/dashboard", label: "Home", icon: Home },
+      { href: "/dashboard", label: "Overview", icon: Home },
       { href: "/profile", label: "Personal info", icon: User },
       { href: "/security", label: "Security & sign-in", icon: ShieldCheck },
       { href: "/passkeys", label: "Password & passkeys", icon: KeyRound },
@@ -54,19 +60,13 @@ const groups: SidebarGroup[] = [
   {
     label: "MAX services",
     items: [
-      { href: "/ai-personalization", label: "MAX AI", icon: Sparkles },
+      { href: "/ai-personalization", label: "MAX AI", icon: Database },
       { href: "/voice", label: "MAX Voice", icon: Mic2 },
       { href: "/home", label: "MAX Home", icon: House },
       { href: "/connected-apps", label: "Connected apps", icon: Link2 },
     ],
   },
-  {
-    label: "Developer",
-    items: [
-      { href: "/developer", label: "Developer platform", icon: Code2 },
-    ],
-  },
-];
+]
 
 export function DashboardSidebar({ className }: { className?: string }) {
   const pathname = usePathname();
@@ -100,7 +100,7 @@ export function DashboardSidebar({ className }: { className?: string }) {
       { href: "/admin/organisations", label: "Organisation review", icon: Building2 },
     ] : []),
     ...(canReviewSpotlight ? [{ href: "/spotlight-review", label: "Spotlight review", icon: ClipboardCheck }] : []),
-    ...(canManageKnowledgePanel ? [{ href: "/knowledge-panel", label: "Knowledge Panel", icon: Sparkles }] : []),
+    ...(canManageKnowledgePanel ? [{ href: "/knowledge-panel", label: "Knowledge Panel", icon: Database }] : []),
   ];
   const visibleGroups = administrationItems.length
     ? [...groups, { label: "Administration", items: administrationItems }]
