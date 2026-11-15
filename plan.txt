@@ -146,3 +146,13 @@ Restructure MAX Auth as a professional identity/developer platform, not a generi
 - Production dependency high-severity audit passed.
 - Production Next.js build passed after the dependency refresh.
 - The temporary dependency-refresh workflow is being removed; normal PR CI will verify the committed dependency lock.
+
+
+### PR #21 merged (2026-11-15)
+- Pull request: https://github.com/MEGATRON300924/max-auth-frontend/pull/21
+- Status: merged using squash merge.
+- Merge commit: 8570fda1fc44a023cbb6395aaeb2f066f6e4903c
+- Final PR CI run #215 (43731915095): passed production build, critical dependency audit and production high-severity audit.
+- Temporary dependency-refresh workflow was removed before merge.
+- Main branch now contains the user-supplied SVG mappings, MAX Home artwork, flat-surface redesign and dependency security refresh.
+- No manual production deployment was performed in this task.
