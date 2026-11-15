@@ -41,3 +41,48 @@ Add the same top navigation used by the main MAX website to the authenticated So
 - Vercel production deployment dpl_H3jnBFanvvS1tnQU2qfUkDLMQScV was accepted and is building the exact merge commit. Final state and custom domain alias are pending.
 - Deployment URL: https://max-auth-frontend-evv39o1lx-megatron300924s-projects.vercel.app.
 - Next.js compilation and TypeScript phase are being checked; runtime and navigation verification remain pending.
+
+
+## Current task: Developer-focused MAX Auth UI and theme system (2026-11-15)
+
+### Request
+Restructure MAX Auth as a professional identity/developer platform, not a generic AI product. Remove futuristic colours, gradients, glow, blur, orb-led visuals and liquid-glass styling. Black & White is the default. User is preparing replacement SVG icons; keep the icon layer replaceable and do not create decorative artwork.
+
+### Theme system
+- Black & White (default)
+- Black & Blue
+- Blue & White
+- Graphite
+- Midnight
+- Shared CSS tokens cover surfaces, text, borders and theme-aware accent/foreground colours. Theme selection is saved in local storage and applied before hydration.
+
+### Implemented on branch `feat/developer-focused-theme-system`
+- Replaced global aurora/liquid-glass styles with flat theme-token surfaces.
+- Added five persistent themes and a selector in Settings.
+- Removed aurora effects from auth layout and replaced the sign-in animated orb panel with identity-platform information.
+- Restyled dashboard header, sidebar, cards, shared buttons and developer documentation shell.
+- Prioritized Developer navigation and added a direct Documentation link.
+- Restyled developer application management and OAuth client detail panels.
+- Expanded the dashboard workspace for developer-oriented tables and configuration.
+- Kept icons replaceable pending user-provided SVG assets.
+
+### Commits
+- Theme foundation: 3927945f3e7c6f190358af50c46e089cb6823375
+- Auth layout cleanup: 280c81c8e292f427d469a21677eabfe0d0e32add
+- Aurora component cleanup: 9c42260b1b625a526f9185cf5508b726ac04d9b5
+- Theme boot: 62bad936cc78d607838c99ec052ad2c3e3cc1b59
+- Settings themes: 61bbb8a2784e086b0791adfd6e8f0cc749a3e40c
+- Dashboard theme/layout work: f21a41a855eb4c5d6725958e575c81c670f225db, 6307335ac0e31c010d69a024db722cd91fd4336b, 3afd1b77bf16768814ba5c552c6e42ac076ad6d3, bb8194ba3a5ed883585dcfbdb31f7837a161927a
+- Shared UI and auth cleanup: feede2c8ff7b8b70195f6f5a258342d806b8d41d, 0af357649e98e3c2b7ec178559f0e83b496492a7, 1d6ba00c5b8998db7b85c536a59dddcff2efd420, 7baa998a58e8f872818af8ea2e3c26e419d76d69, 683c3f6a68569ed6ec1d0f372ffceb27c47b8298
+- Sign-in and developer pages: da52433ed6dd2d6459aa1de93d738c0d3d466ee7, eddf48e375ec538e2931c2a198660d344d6e955b, 659f6cf8444d9f4655efeb6a9bf06c19e65b8c5b
+
+### Verification
+- Source review completed for shared theme tokens, layout and developer surfaces.
+- Production build, lint, browser visual QA and OAuth regression checks: pending.
+- No merge or production deployment.
+
+### Next steps
+- Run CI/build and lint; fix errors before PR review.
+- Audit remaining auth/account routes and form controls for hard-coded colours.
+- Integrate the user's SVG icon set once supplied.
+- Prepare a draft PR after the UI pass; do not merge or deploy without explicit approval.
