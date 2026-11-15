@@ -186,10 +186,10 @@ Restructure MAX Auth as a professional identity/developer platform, not a generi
 
 ### Verification
 - Source-level checks confirm requested hero labels, stats and nav links are removed.
-- GitHub Actions CI run #221 (`43745749995`) is running the production build and dependency audits.
+- GitHub Actions CI run #222 (`43745803626`) passed the production build, critical dependency audit and production high-severity dependency audit.
 - Vercel preview deployment was rejected by the account's daily build limit (`api-deployments-free-per-day`, over 100 deployments); no additional deployment attempts will be made during the limit window.
-- Browser layout and reduced-motion checks: pending.
-- Live deployment: pending until the Vercel deployment limit resets.
+- Browser-level visual QA and OAuth regression checks: pending; the Vercel daily deployment limit prevents a preview build in this window.
+- Production deployment: not attempted; wait for the Vercel deployment limit to reset before deploying.
 
 ### Next steps
 - Run CI and review the rendered landing page, desktop/mobile navigation, and dashboard loading state.
