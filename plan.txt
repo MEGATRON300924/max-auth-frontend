@@ -94,3 +94,9 @@ Restructure MAX Auth as a professional identity/developer platform, not a generi
 - Completed remaining sign-in input, helper-text and account-picker token cleanup.
 - Latest follow-up commits: a22fb0c13a964b1209a376e4e4afa7c37fe1f300, c1a8696dd13957ce481544ac810e255e88a1cf67, b06e18e642b0f36a989fc5163a165b3e3edf7600.
 - Build and lint verification remain pending.
+
+
+### Draft review and CI (2026-11-15)
+- Draft PR #21: https://github.com/MEGATRON300924/max-auth-frontend/pull/21.
+- CI run #205 (GitHub Actions run 43730325759) was triggered from the PR head. Dependency installation is in progress; build and security audit steps have not started yet.
+- PR reports mergeable and remains a draft. No merge or production deployment has been performed.
