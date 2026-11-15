@@ -84,7 +84,7 @@ export default function SecurityPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Security" description="Manage your password, protections, and account activity." />
+      <PageHeader title="Security" description="Manage your password, protections, and account activity." action={<img src="/security-svgrepo-com.svg" alt="" width={30} height={30} className="h-[30px] w-[30px] object-contain dark:brightness-0 dark:invert" />} />
 
       {user && user.verificationStatus !== "VERIFIED" && (
         <Alert variant="warning" title="Your email isn't verified yet">

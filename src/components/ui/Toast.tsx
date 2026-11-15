@@ -39,7 +39,7 @@ export function ToastViewport() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.15 } }}
               transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              className="pointer-events-auto flex items-start gap-3 rounded-xl border border-glass-border bg-base-overlay/95 p-4 shadow-glass backdrop-blur-xl"
+              className="pointer-events-auto flex items-start gap-3 rounded-md border border-glass-border bg-base-overlay p-4 shadow-none"
               role="status"
             >
               <Icon className={cn("h-5 w-5 shrink-0 mt-0.5", colors[toast.variant])} aria-hidden="true" />

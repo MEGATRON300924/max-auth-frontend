@@ -24,11 +24,11 @@ export function TagInput({ tags, onChange, placeholder }: { tags: string[]; onCh
   };
 
   return (
-    <div className="flex min-h-11 flex-wrap items-center gap-2 rounded-xl border border-glass-border bg-glass px-3 py-2 backdrop-blur-md focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-500/30">
+    <div className="flex min-h-11 flex-wrap items-center gap-2 rounded-md border border-glass-border bg-base-raised px-3 py-2 focus-within:border-ink-faint focus-within:ring-0">
       {tags.map((tag) => (
-        <span key={tag} className="flex items-center gap-1.5 rounded-full bg-brand-500/15 px-2.5 py-1 text-xs font-medium text-brand-300">
+        <span key={tag} className="flex items-center gap-1.5 rounded-sm border border-glass-border bg-base px-2.5 py-1 text-xs font-medium text-ink-muted">
           {tag}
-          <button type="button" onClick={() => onChange(tags.filter((t) => t !== tag))} aria-label={`Remove ${tag}`} className="hover:text-white">
+          <button type="button" onClick={() => onChange(tags.filter((t) => t !== tag))} aria-label={`Remove ${tag}`} className="hover:text-ink">
             <X className="h-3 w-3" />
           </button>
         </span>
