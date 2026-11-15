@@ -107,28 +107,28 @@ export function DashboardSidebar({ className }: { className?: string }) {
     : groups;
 
   return (
-    <aside className={cn("flex h-full w-[280px] shrink-0 flex-col bg-transparent", className)}>
-      <div className="px-6 pb-5 pt-7">
+    <aside className={cn("flex h-full w-[250px] shrink-0 flex-col border-r border-glass-border bg-base", className)}>
+      <div className="border-b border-glass-border px-5 pb-5 pt-6">
         <Link href="/dashboard" className="inline-flex items-center gap-2.5">
           <MaxLogo size={31} showWordmark={false} />
-          <span className="text-[22px] font-normal tracking-[-0.03em] text-ink">MAX Account</span>
+          <span className="text-[16px] font-semibold tracking-tight text-ink">MAX Auth</span>
         </Link>
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 pb-8" aria-label="MAX Account">
         {visibleGroups.map((group) => (
-          <div key={group.label} className="mb-7 last:mb-0">
-            <p className="mb-2 px-4 text-xs font-medium text-ink-muted">{group.label}</p>
-            <div className="space-y-1">
+          <div key={group.label} className="mb-5 last:mb-0">
+            <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-faint">{group.label}</p>
+            <div className="space-y-0.5">
               {group.items.map(({ href, label, icon: Icon }) => {
                 const active = href === "/dashboard"
                   ? pathname === "/dashboard"
                   : pathname === href || pathname.startsWith(`${href}/`);
                 const className = cn(
-                  "flex min-h-11 items-center gap-3 rounded-full px-4 text-sm font-medium transition-colors",
+                  "flex min-h-10 items-center gap-3 border-l-2 px-3 text-[13px] font-medium transition-colors",
                   active
-                    ? "bg-brand-100 text-brand-800 dark:bg-brand-500/15 dark:text-brand-200"
-                    : "text-ink-muted hover:bg-base-raised hover:text-ink"
+                    ? "border-ink bg-glass-hover text-ink"
+                    : "border-transparent text-ink-muted hover:bg-glass-hover hover:text-ink"
                 );
 
                 return (
@@ -148,8 +148,8 @@ export function DashboardSidebar({ className }: { className?: string }) {
         ))}
       </nav>
 
-      <div className="px-7 pb-7">
-        <p className="text-xs leading-5 text-ink-faint">One MAX Account for your MAX services.</p>
+      <div className="border-t border-glass-border px-5 py-4">
+        <p className="text-[11px] leading-5 text-ink-faint">Identity & developer platform</p>
       </div>
     </aside>
   );
