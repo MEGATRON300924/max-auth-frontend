@@ -121,3 +121,12 @@ Restructure MAX Auth as a professional identity/developer platform, not a generi
 - `verified-check-svgrepo-com.svg`: Verified account status.
 - `max_home.png`: MAX Home side navigation and MAX Home dashboard banner.
 - The SVGs are dark navy/black artwork, so they are inverted on dark themes and retain their original dark appearance on the Blue & White theme.
+
+
+### Global flat-surface pass (2026-11-15)
+- Rebuilt the public landing page's hero panel as a developer/OAuth code sample instead of an abstract identity illustration.
+- Removed the remaining liquid-glass class use, decorative blur, gradient developer CTA and decorative illustration imports from the landing page.
+- Reworked the public site header and mobile menu as solid, bordered surfaces.
+- Removed backdrop blur and glass shadows from modal, toast and tag input components. Modal overlays remain opaque for legibility.
+- Replaced the global 404 aurora effect and removed liquid-glass legacy CSS.
+- Remaining audit targets: search the full application for residual `backdrop-blur`, `liquid-glass`, `glass-edge`, and gradient utility classes before merge.
