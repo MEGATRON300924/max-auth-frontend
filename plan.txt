@@ -35,3 +35,9 @@ Add the same top navigation used by the main MAX website to the authenticated So
 - PR #20: https://github.com/MEGATRON300924/max-auth-frontend/pull/20.
 - GitHub CI run #201: dependency installation and the Next.js application build passed. The critical dependency vulnerability audit failed; this PR does not change package manifests or lockfiles.
 - Navigation is not live until PR #20 is merged and a successful Vercel deployment is confirmed.
+
+### Production release (2026-11-15)
+- PR #20 squash-merged as 715f939f98fe785b523d6e3c853c8a2eb154bee7.
+- Vercel production deployment dpl_H3jnBFanvvS1tnQU2qfUkDLMQScV was accepted and is building the exact merge commit. Final state and custom domain alias are pending.
+- Deployment URL: https://max-auth-frontend-evv39o1lx-megatron300924s-projects.vercel.app.
+- Next.js compilation and TypeScript phase are being checked; runtime and navigation verification remain pending.
