@@ -16,6 +16,7 @@ const config: Config = {
           border: "rgb(var(--border) / <alpha-value>)",
           hover: "rgb(var(--surface-hover) / <alpha-value>)",
         },
+        accent: { DEFAULT: "rgb(var(--accent) / <alpha-value>)", foreground: "rgb(var(--accent-foreground) / <alpha-value>)" },
         brand: {
           50: "rgb(var(--accent) / 0.06)",
           100: "rgb(var(--accent) / 0.12)",
