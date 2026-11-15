@@ -86,3 +86,11 @@ Restructure MAX Auth as a professional identity/developer platform, not a generi
 - Audit remaining auth/account routes and form controls for hard-coded colours.
 - Integrate the user's SVG icon set once supplied.
 - Prepare a draft PR after the UI pass; do not merge or deploy without explicit approval.
+
+
+### Follow-up cleanup (2026-11-15)
+- Developer navigation now leads with Applications and Documentation.
+- Normalized the developer documentation endpoint and branding panels to theme tokens.
+- Completed remaining sign-in input, helper-text and account-picker token cleanup.
+- Latest follow-up commits: a22fb0c13a964b1209a376e4e4afa7c37fe1f300, c1a8696dd13957ce481544ac810e255e88a1cf67, b06e18e642b0f36a989fc5163a165b3e3edf7600.
+- Build and lint verification remain pending.
