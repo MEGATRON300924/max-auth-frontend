@@ -93,21 +93,21 @@ export default function LandingPage() {
         <section id="security" className="border-y border-glass-border bg-base-raised px-4 py-20 sm:px-6 lg:px-8">
           <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[.8fr_1.2fr] lg:items-start">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[.18em] text-brand-600 dark:text-brand-400">Security</p>
+              <p className="text-xs font-bold uppercase tracking-[.18em] text-ink-muted text-ink-muted">Security</p>
               <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">The account is the boundary.</h2>
               <p className="mt-4 text-sm leading-6 text-ink-muted">MAX Auth keeps identity, sessions and security controls together so every MAX product can focus on what it actually does.</p>
             </div>
             <div className="grid gap-px overflow-hidden rounded-md border border-glass-border bg-glass-border sm:grid-cols-2">
               {security.map(([Icon, title, desc]) => {
                 const SecurityIcon = Icon as typeof ShieldCheck;
-                return <div key={title as string} className="bg-base-raised p-6"><SecurityIcon className="h-5 w-5 text-brand-600 dark:text-brand-400" /><h3 className="mt-5 text-sm font-bold">{title as string}</h3><p className="mt-2 text-xs leading-5 text-ink-muted">{desc as string}</p></div>;
+                return <div key={title as string} className="bg-base-raised p-6"><SecurityIcon className="h-5 w-5 text-ink-muted text-ink-muted" /><h3 className="mt-5 text-sm font-bold">{title as string}</h3><p className="mt-2 text-xs leading-5 text-ink-muted">{desc as string}</p></div>;
               })}
             </div>
           </div>
         </section>
 
         <section id="developers" className="px-4 py-20 sm:px-6 lg:px-8">
-          <div className="glass-edge relative mx-auto max-w-7xl overflow-hidden rounded-md border border-glass-border bg-base-raised p-8 text-ink shadow-none sm:p-12">
+          <div className=" relative mx-auto max-w-7xl overflow-hidden rounded-md border border-glass-border bg-base-raised p-8 text-ink shadow-none sm:p-12">
             <div className="max-w-2xl">
               <p className="text-xs font-bold uppercase tracking-[.18em] text-ink-faint">For developers</p>
               <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">Continue with MAX AI.</h2>
