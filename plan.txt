@@ -212,3 +212,24 @@ Restructure MAX Auth as a professional identity/developer platform, not a generi
 - Pending GitHub Actions production build and dependency audits.
 - Pending Vercel preview deployment and browser visual check of the ecosystem grid.
 - No changes to OAuth, authentication, dashboard theme behavior or backend APIs.
+
+
+## Current task: Restore original MAX sign-in orb and ecosystem panel (2026-11-16)
+
+### Request
+- Restore the original animated MAX orb and “The MAX AI Ecosystem” side panel on /sign-in, removed during the developer-focused UI redesign.
+- Keep the updated account picker, credential/MFA flow, theme-token form controls, and authentication behavior unchanged.
+
+### Implementation
+- Compared the sign-in layout with the pre-PR #21 version at commit fbcf09ec9fcc142d38a70d5318ab0d1a711f35bf.
+- Restored the original right-side ecosystem panel, animated orb video, and multicolour “The MAX AI Ecosystem” heading.
+- Kept the current sign-in form and account selection, OAuth return handling, Google sign-in, password login, MFA, and responsive behavior intact.
+- Work is isolated on branch `fix/restore-sign-in-orb-ecosystem-panel`; no production deployment or merge has been performed.
+
+### Verification
+- Source-level replacement check passed: original panel label, orb video source, and ecosystem heading are present.
+- GitHub Actions and Vercel preview/browser verification: pending.
+- Panel remains hidden on smaller screens, matching the original responsive behavior.
+
+### Next steps
+- Run CI, review the PR diff, and verify the preview before merging.

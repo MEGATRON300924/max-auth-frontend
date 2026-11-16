@@ -242,18 +242,14 @@ export default function SignInPage() {
         </footer>
       </div>
       </div>
-      <aside aria-label="MAX Auth information" className="hidden min-h-screen border-l border-glass-border bg-base-raised px-12 py-16 lg:flex lg:flex-col lg:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-faint">MAX AUTH / IDENTITY PLATFORM</p>
-          <h2 className="mt-8 max-w-xl text-4xl font-semibold leading-tight tracking-tight text-ink">One identity. A connected set of services.</h2>
-          <p className="mt-5 max-w-lg text-sm leading-7 text-ink-muted">Sign in securely and manage access to applications across The MAX AI Ecosystem.</p>
+      <aside aria-label="The MAX AI Ecosystem" className="relative hidden min-h-screen w-full min-w-0 overflow-hidden lg:my-[19px] lg:mr-4 lg:flex lg:flex-col lg:items-center lg:justify-center lg:rounded-[34px] lg:border lg:border-[rgba(34,211,238,.35)] lg:bg-[radial-gradient(ellipse_at_52%_38%,#1554d5_0%,#0b2b79_34%,#06153f_72%,#030817_100%)] lg:shadow-[inset_0_0_40px_rgba(20,184,166,.12)]">
+        <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-[42%] h-[34rem] w-[34rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-500/30 blur-[110px]" />
+        <div className="absolute inset-0 flex items-center justify-center pb-24">
+          <video className="relative z-10 h-[min(68vh,680px)] w-[min(68vh,680px)] max-h-[78%] max-w-[92%] object-contain drop-shadow-[0_0_42px_rgba(45,126,255,0.55)]" src="https://www.max-ai.name.ng/max-orb.webm" autoPlay muted loop playsInline preload="auto" aria-label="MAX animated orb" />
         </div>
-        <div className="border-t border-glass-border pt-5">
-          <div className="grid grid-cols-2 gap-5 text-xs">
-            <div><p className="text-ink-faint">AUTHORIZATION</p><p className="mt-2 font-mono text-ink">OAuth 2.0 / OIDC</p></div>
-            <div><p className="text-ink-faint">SECURITY</p><p className="mt-2 font-mono text-ink">PKCE · MFA · Sessions</p></div>
-          </div>
-        </div>
+        <h2 className="absolute bottom-[7%] z-10 w-full max-w-full px-4 text-center text-3xl font-black leading-[1.05] tracking-[-0.045em] text-white xl:px-6 xl:text-4xl 2xl:text-5xl">
+          <span className="text-sky-300">The </span><span><span className="text-pink-400">M</span><span className="text-rose-400">a</span><span className="text-red-500">x</span></span><span className="text-white"> AI Ecosystem</span>
+        </h2>
       </aside>
     </main>
   );
