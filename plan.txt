@@ -166,3 +166,30 @@ Restructure MAX Auth as a professional identity/developer platform, not a generi
 - Vercel confirmed api.max-ai.name.ng is assigned as a production alias to this deployment.
 - Build compiled successfully with Next.js 16.4.6; the final deployment state is READY.
 - Browser-level visual and OAuth regression testing remain outstanding; user should hard-refresh or open a fresh private window to verify the updated UI.
+
+
+## Current task: Landing page refinement and MAX sketch loading screen (2026-11-15)
+
+### Request
+- Remove the MAX identity platform shield badge from the public landing hero.
+- Remove the One account / Secure sessions / Developer ready proof row.
+- Remove the Protected status and Devices / Sessions / 2FA metric strip from the code panel; replace the metrics with a clear Get Started action.
+- Keep the shared top navigation but remove its MAX AI brand block, Reviews and Waitlist links, and center the remaining links.
+- Replace the generic dashboard loading spinner with a restrained monochrome sketch animation inspired by the MAX mark.
+
+### Implementation on `feat/landing-cleanup-and-sketch-loader`
+- Landing hero badge and proof row removed.
+- Removed the Protected status and the static Devices / Sessions / 2FA figures; added a Get Started link to account creation.
+- Shared site navigation now contains Socials, Chat MAX, Status, News, Beta and Contact only. Removed the MAX AI brand/logo block, Reviews and Waitlist; centered the remaining desktop navigation and mobile menu control.
+- Replaced the loading spinner with a monochrome animated line-art MAX monogram inside a hand-drawn orbit. The full-screen loading state is used by the protected dashboard while auth state is restored; a reduced-motion override leaves the sketch mark static and visible.
+- The Cloudflare screenshot is present in the repository under `public/Screenshot 2026-11-15 150634.png`; direct visual inspection was unavailable in this session, so the loading animation follows the user's written direction rather than tracing the screenshot.
+
+### Verification
+- Source-level checks confirm requested hero labels, stats and nav links are removed.
+- GitHub Actions CI run #222 (`43745803626`) passed the production build, critical dependency audit and production high-severity dependency audit.
+- Vercel preview deployment was rejected by the account's daily build limit (`api-deployments-free-per-day`, over 100 deployments); no additional deployment attempts will be made during the limit window.
+- Browser-level visual QA and OAuth regression checks: pending; the Vercel daily deployment limit prevents a preview build in this window.
+- Production deployment: not attempted; wait for the Vercel deployment limit to reset before deploying.
+
+### Next steps
+- Run CI and review the rendered landing page, desktop/mobile navigation, and dashboard loading state.

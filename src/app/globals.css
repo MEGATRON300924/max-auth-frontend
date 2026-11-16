@@ -143,3 +143,40 @@
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 }
+
+
+/* Monochrome hand-drawn MAX mark used during authentication and dashboard loading. */
+.max-sketch-spinner { overflow: visible; }
+.max-sketch-orbit,
+.max-sketch-mark {
+  stroke: currentColor;
+  stroke-width: 1.15;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 220;
+  stroke-dashoffset: 220;
+  animation: max-sketch-draw 2.8s cubic-bezier(.55,.08,.35,1) infinite;
+}
+.max-sketch-orbit-secondary {
+  opacity: .42;
+  animation-delay: .16s;
+}
+.max-sketch-mark {
+  stroke-width: 1.45;
+  animation-delay: .34s;
+}
+@keyframes max-sketch-draw {
+  0% { stroke-dashoffset: 220; opacity: .35; }
+  48%, 76% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: -220; opacity: .35; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .max-sketch-orbit,
+  .max-sketch-mark {
+    animation: none;
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
