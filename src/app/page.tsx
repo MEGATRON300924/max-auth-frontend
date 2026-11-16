@@ -1,18 +1,26 @@
 import Link from "next/link";
-import { ArrowRight, Fingerprint, KeyRound, ShieldCheck, Smartphone } from "lucide-react";
+import Image from "next/image";
+import { ArrowRight, Fingerprint, KeyRound, ShieldCheck, Smartphone, WandSparkles, WalletCards, type LucideIcon } from "lucide-react";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { Button } from "@/components/ui/Button";
 
-const products = [
-  ["MAX AI", "Your intelligent assistant and the brain of the ecosystem."],
-  ["MAX Cloud", "Files, data and sync across your devices."],
-  ["MAX Home", "A single control layer for your connected home."],
-  ["MAX Music", "Your music experience, connected to your account."],
-  ["MAX Browser", "A private browser built around your MAX identity."],
-  ["MAX Studio", "Creative tools for building and making."],
-  ["MAX Security", "Account protection across the ecosystem."],
-  ["MAX Pay", "A simpler way to manage ecosystem payments."],
+type Product = {
+  name: string;
+  description: string;
+  logo?: string;
+  Icon?: LucideIcon;
+};
+
+const products: Product[] = [
+  { name: "MAX AI", description: "Your intelligent assistant and the brain of the ecosystem.", logo: "/ecosystem/max-ai.png" },
+  { name: "MAX Cloud", description: "Files, data and sync across your devices.", logo: "/ecosystem/max-cloud.png" },
+  { name: "MAX Home", description: "A single control layer for your connected home.", logo: "/ecosystem/max-home.png" },
+  { name: "MAX Music", description: "Your music experience, connected to your account.", logo: "/ecosystem/max-music.png" },
+  { name: "MAX Browser", description: "A private browser built around your MAX identity.", logo: "/ecosystem/max-browser.png" },
+  { name: "MAX Studio", description: "Creative tools for building and making.", Icon: WandSparkles },
+  { name: "MAX Security", description: "Account protection across the ecosystem.", Icon: ShieldCheck },
+  { name: "MAX Pay", description: "A simpler way to manage ecosystem payments.", Icon: WalletCards },
 ];
 
 const security = [
@@ -81,13 +89,17 @@ export default function LandingPage() {
               <p className="mt-3 text-sm leading-6 text-ink-muted">One MAX Account connects the products you use without turning every screen into another sign-in flow.</p>
             </div>
             <div className="grid grid-cols-1 gap-px overflow-hidden border border-glass-border bg-base sm:grid-cols-2 lg:grid-cols-4">
-              {products.map(([name, desc]) => (
+              {products.map(({ name, description, logo, Icon }) => (
                 <div key={name} className="group bg-base-raised p-6 transition-colors duration-150 hover:bg-glass-hover">
-                  <div className="mb-8 flex h-11 w-11 items-center justify-center rounded-md border border-glass-border bg-base text-ink-muted">
-                    <span className="font-mono text-xs font-semibold tracking-tight">{(name as string).replace("MAX ", "") .slice(0, 2).toUpperCase()}</span>
+                  <div className="mb-8 flex h-12 w-12 items-center justify-center border border-glass-border bg-base p-1.5">
+                    {logo ? (
+                      <Image src={logo} alt={name + " logo"} width={40} height={40} className="h-full w-full object-contain" />
+                    ) : Icon ? (
+                      <Icon className="h-6 w-6 text-ink-muted" strokeWidth={1.65} aria-hidden="true" />
+                    ) : null}
                   </div>
                   <h3 className="font-display text-sm font-bold">{name}</h3>
-                  <p className="mt-2 text-xs leading-5 text-ink-muted">{desc}</p>
+                  <p className="mt-2 text-xs leading-5 text-ink-muted">{description}</p>
                   <div className="mt-6 h-px w-8 bg-ink-faint transition-all group-hover:w-14" />
                 </div>
               ))}
@@ -98,6 +110,8 @@ export default function LandingPage() {
         <section id="security" className="border-y border-glass-border bg-base-raised px-4 py-20 sm:px-6 lg:px-8">
           <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[.8fr_1.2fr] lg:items-start">
             <div>
+              <p className="text-xs font-bold uppercase tracking-[.18em] text-ink-muted">Security</p>
+              <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">The account is the boundary.</h2>
               <p className="text-xs font-bold uppercase tracking-[.18em] text-ink-muted text-ink-muted">Security</p>
               <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">Secured By The Tron Forge Limited.</h2>
               <p className="mt-4 text-sm leading-6 text-ink-muted">MAX Auth keeps identity, sessions and security controls together so every MAX product can focus on what it actually does.</p>
@@ -105,14 +119,14 @@ export default function LandingPage() {
             <div className="grid gap-px overflow-hidden rounded-md border border-glass-border bg-glass-border sm:grid-cols-2">
               {security.map(([Icon, title, desc]) => {
                 const SecurityIcon = Icon as typeof ShieldCheck;
-                return <div key={title as string} className="bg-base-raised p-6"><SecurityIcon className="h-5 w-5 text-ink-muted text-ink-muted" /><h3 className="mt-5 text-sm font-bold">{title as string}</h3><p className="mt-2 text-xs leading-5 text-ink-muted">{desc as string}</p></div>;
+                return <div key={title as string} className="bg-base-raised p-6"><SecurityIcon className="h-5 w-5 text-ink-muted" /><h3 className="mt-5 text-sm font-bold">{title as string}</h3><p className="mt-2 text-xs leading-5 text-ink-muted">{desc as string}</p></div>;
               })}
             </div>
           </div>
         </section>
 
         <section id="developers" className="px-4 py-20 sm:px-6 lg:px-8">
-          <div className=" relative mx-auto max-w-7xl overflow-hidden rounded-md border border-glass-border bg-base-raised p-8 text-ink shadow-none sm:p-12">
+          <div className="relative mx-auto max-w-7xl overflow-hidden rounded-md border border-glass-border bg-base-raised p-8 text-ink shadow-none sm:p-12">
             <div className="max-w-2xl">
               <p className="text-xs font-bold uppercase tracking-[.18em] text-ink-faint">For developers</p>
               <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">Continue with MAX AI.</h2>
