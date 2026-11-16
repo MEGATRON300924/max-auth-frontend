@@ -193,3 +193,22 @@ Restructure MAX Auth as a professional identity/developer platform, not a generi
 
 ### Next steps
 - Run CI and review the rendered landing page, desktop/mobile navigation, and dashboard loading state.
+
+
+## Current task: MAX ecosystem product logos on landing page (2026-11-16)
+
+### Request
+- Replace the two-letter product abbreviations in the public landing-page ecosystem grid with actual product marks/icons.
+- Reuse the corresponding MAX product artwork from the `MEGATRON300924/max-web` repository, including the MAX Home icon.
+- Explain how users change the dashboard theme.
+
+### Implementation
+- Copied the existing MAX brand mark and MAX Cloud, MAX Home, MAX Music and MAX Browser artwork from `max-web` into `public/ecosystem/` in this repository.
+- Updated the ecosystem grid to render the copied local product images with accessible alt text.
+- MAX Studio, MAX Security and MAX Pay do not currently have dedicated image logo assets in `max-web`; use restrained matching interface glyphs (WandSparkles, ShieldCheck and WalletCards) rather than inventing letter-based logos.
+- Existing dashboard theme selector is in Settings → Workspace appearance. Users can choose Black & White, Black & Blue, Blue & White, Graphite or Midnight; selection applies immediately and persists in local storage on that device.
+
+### Verification
+- Pending GitHub Actions production build and dependency audits.
+- Pending Vercel preview deployment and browser visual check of the ecosystem grid.
+- No changes to OAuth, authentication, dashboard theme behavior or backend APIs.
