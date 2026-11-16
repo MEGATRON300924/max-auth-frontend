@@ -40,11 +40,23 @@ export default function LandingPage() {
           <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.05fr_.95fr] lg:gap-20">
             <div className="max-w-2xl">
               <h1 className="font-display text-4xl font-bold leading-[1.08] tracking-[-0.035em] sm:text-6xl">
-                One account for
-                <span className="block text-ink">everything MAX.</span>
-              </h1>
+  One account for
+  <span className="block text-ink">
+    Max AI
+    <video
+      src="/max-orb.webm"
+      autoPlay
+      loop
+      muted
+      playsInline
+      aria-hidden="true"
+      className="ml-2 inline-block h-8 w-8 align-middle sm:ml-3 sm:h-12 sm:w-12"
+    />
+    .
+  </span>
+</h1>
               <p className="mt-6 max-w-xl text-base leading-7 text-ink-muted sm:text-lg">
-                MAX Auth is the secure identity behind The MAX AI Ecosystem. Sign in once, manage your security in one place, and move between MAX products without creating separate accounts.
+                MAX Auth is the secure identity behind The MAX AI Ecosystem. Sign in once, manage your security in one place, and move between MAX products without creating separate accounts, personalise Max AI With your Social Media Platforms And Do Many More.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link href="/create-account"><Button size="lg">Create your MAX Account <ArrowRight className="h-4 w-4" /></Button></Link>
@@ -55,7 +67,7 @@ export default function LandingPage() {
             <div className="relative mx-auto w-full max-w-[560px]">
               <div className="relative border border-glass-border bg-base-raised p-5 sm:p-7">
                 <div className="border-b border-glass-border pb-4">
-                  <div><p className="text-xs font-semibold text-ink-faint">MAX AUTH</p><p className="mt-1 text-sm font-bold">Identity overview</p></div>
+                  <div><p className="text-xs font-semibold text-ink-faint">Max Auth</p><p className="mt-1 text-sm font-bold">Identity overview</p></div>
                 </div>
                 <div className="my-5 border border-glass-border bg-base p-4 font-mono text-xs leading-7 text-ink-muted"><p><span className="text-ink-faint">01</span> <span className="text-ink">const</span> auth = createMaxAuthClient(&#123;</p><p><span className="text-ink-faint">02</span> &nbsp;clientId: <span className="text-ink">&quot;YOUR_CLIENT_ID&quot;</span>,</p><p><span className="text-ink-faint">03</span> &nbsp;redirectUri: <span className="text-ink">&quot;https://your-app.com/callback&quot;</span>,</p><p><span className="text-ink-faint">04</span> &nbsp;scopes: [<span className="text-ink">&quot;openid&quot;</span>, <span className="text-ink">&quot;profile&quot;</span>],</p><p><span className="text-ink-faint">05</span> &#125;);</p><p className="mt-3 border-t border-glass-border pt-3 text-ink">OAuth 2.0 · OpenID Connect · PKCE</p></div>
                 <div className="flex items-center justify-between gap-4 border-t border-glass-border pt-5">
@@ -100,6 +112,8 @@ export default function LandingPage() {
             <div>
               <p className="text-xs font-bold uppercase tracking-[.18em] text-ink-muted">Security</p>
               <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">The account is the boundary.</h2>
+              <p className="text-xs font-bold uppercase tracking-[.18em] text-ink-muted text-ink-muted">Security</p>
+              <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">Secured By The Tron Forge Limited.</h2>
               <p className="mt-4 text-sm leading-6 text-ink-muted">MAX Auth keeps identity, sessions and security controls together so every MAX product can focus on what it actually does.</p>
             </div>
             <div className="grid gap-px overflow-hidden rounded-md border border-glass-border bg-glass-border sm:grid-cols-2">
