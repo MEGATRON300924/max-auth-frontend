@@ -32,9 +32,21 @@ export default function LandingPage() {
           <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.05fr_.95fr] lg:gap-20">
             <div className="max-w-2xl">
               <h1 className="font-display text-4xl font-bold leading-[1.08] tracking-[-0.035em] sm:text-6xl">
-                One account for
-                <span className="block text-ink">Max AI.</span>
-              </h1>
+  One account for
+  <span className="block text-ink">
+    Max AI
+    <video
+      src="/max-orb.webm"
+      autoPlay
+      loop
+      muted
+      playsInline
+      aria-hidden="true"
+      className="ml-2 inline-block h-8 w-8 align-middle sm:ml-3 sm:h-12 sm:w-12"
+    />
+    .
+  </span>
+</h1>
               <p className="mt-6 max-w-xl text-base leading-7 text-ink-muted sm:text-lg">
                 MAX Auth is the secure identity behind The MAX AI Ecosystem. Sign in once, manage your security in one place, and move between MAX products without creating separate accounts, personalise Max AI With your Social Media Platforms And Do Many More.
               </p>
