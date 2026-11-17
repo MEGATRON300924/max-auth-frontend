@@ -413,4 +413,6 @@ Use the newly added `public/rQmYn01.svg` MAX AI logo as the animated mark for th
 - Updated the completion function to receive the freshly returned Google credential directly; the MFA continuation still uses the credential retained in component state.
 - Fix commit: `a7b30439203f663967c347421977206730ffa82a`.
 - TypeScript/Next.js build, browser sign-in, MFA and same-MAX-user-ID regression checks: pending.
-- No merge or production deployment performed.
+- PR #29 merged into `main` on 2026-11-17 (merge commit `003f10d64f2c230503d83af13af21bbecb49efe0`).
+- GitHub combined commit status reports Vercel check `success`; this confirms the reported Vercel check only, not a live Google sign-in test.
+- Production rollout/live browser test and same-MAX-user-ID verification remain pending.
