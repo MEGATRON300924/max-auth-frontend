@@ -340,9 +340,15 @@ Use the newly added `public/rQmYn01.svg` MAX AI logo as the animated mark for th
 
 ### Commits
 - Refresh coordination and bounded retry: `bcbe604365a8912e06abd0892a77e2980ddaf5b8`.
-- Plan update: pending.
+- Plan update: `60f107a9031d77819a5233181ec626f12ef9406f` (this section's initial plan commit; final follow-up below).
 
 ### Next steps
 - Run CI and verify refresh behavior in multiple tabs and across MAX product origins.
 - Coordinate deployment with the backend concurrency-grace change.
 - Merge/deploy only after review and explicit approval.
+
+
+### PR and CI checkpoint
+- PR #27: https://github.com/MEGATRON300924/max-auth-frontend/pull/27 (open; not merged).
+- Latest implementation/plan head at PR creation: `60f107a9031d77819a5233181ec626f12ef9406f`.
+- GitHub Actions CI run #44043808149: in progress at checkpoint.
