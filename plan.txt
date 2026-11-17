@@ -357,3 +357,12 @@ Use the newly added `public/rQmYn01.svg` MAX AI logo as the animated mark for th
 ### Follow-up refinement
 - Automatic refresh after a 401 now runs only when the failed request actually carried an access token. Unauthenticated 401 responses no longer trigger refresh-cookie requests; initial session bootstrap still calls `silentRefresh` explicitly.
 - Latest API-client commit: `b4aaa041bbda40c51efc4e200df9d7898b6e19e1`.
+
+### CI failure fix (2026-11-17)
+- PR #27 CI run #248 (GitHub Actions run 44043998656) failed during the TypeScript phase of npm run build; application compilation itself succeeded.
+- Root cause: TypeScript inferred an invalid nested Promise union from the Web Locks request and its catch fallback, and could not narrow the module-level nullable refreshPromise on return.
+- Updated silentRefresh() to explicitly type the coordinated refresh as Promise<string | null>, await the Web Locks request in an async wrapper, await the fallback refresh, and return the initialized shared promise with a non-null assertion.
+- Fix commit: 9f0e5e4bb061b083694f310d189744c5f552ad09.
+- CI rerun/build verification: pending.
+- No merge or deployment performed.
+- Next: verify the new PR CI run; inspect any subsequent build or dependency-audit failures before considering merge.
