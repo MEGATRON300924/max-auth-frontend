@@ -285,3 +285,30 @@ Remove the fictional `createMaxAuthClient()` call from the public homepage hero 
 ### Next steps
 - Run CI for the updated main branch and inspect the Vercel deployment before treating the hero update as live.
 - Verify the rendered hero at desktop and mobile widths.
+
+
+## Current task: MAX SVG loading animation (2026-11-17)
+
+### Request
+Use the newly added `public/rQmYn01.svg` MAX AI logo as the animated mark for the full loading screen and for loading states within MAX Auth screens.
+
+### Implementation on `feat/max-logo-loading-animation`
+- Replaced the temporary hand-drawn MAX monogram/orbit spinner with the supplied MAX AI SVG silhouette.
+- Added a restrained monochrome animation: the logo remains crisp while a soft highlight sweeps across its silhouette and the mark gently breathes.
+- Kept the full-screen protected-workspace loading screen and its existing copy/layout.
+- Updated the shared button loading indicator to use the same animated MAX SVG, covering auth form submission states without changing form or authentication behavior.
+- Existing auth pages that use the shared `Spinner` now inherit the same animation; reduced-motion preferences render a steady logo without animation.
+- The SVG is referenced from `/rQmYn01.svg`; no duplicate logo asset or fabricated vector paths were added.
+
+### Verification
+- Source-level integration completed for the shared spinner, full-screen loader and shared button loading state.
+- Production build, lint, GitHub Actions and browser QA: pending.
+- No merge or production deployment has been performed.
+
+### Commits
+- Implementation and plan update: pending.
+
+### Next steps
+- Run CI and inspect the PR diff.
+- Verify the animation on dark and light themes, narrow screens, and reduced-motion settings.
+- Merge/deploy only after review and explicit approval.
