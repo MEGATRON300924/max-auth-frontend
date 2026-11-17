@@ -4,6 +4,7 @@ import { ArrowRight, Fingerprint, KeyRound, ShieldCheck, Smartphone, WandSparkle
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { Button } from "@/components/ui/Button";
+import { DeveloperIntegration } from "@/components/landing/DeveloperIntegration";
 
 type Product = {
   name: string;
@@ -125,14 +126,14 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="developers" className="px-4 py-20 sm:px-6 lg:px-8">
-          <div className="relative mx-auto max-w-7xl overflow-hidden rounded-md border border-glass-border bg-base-raised p-8 text-ink shadow-none sm:p-12">
-            <div className="max-w-2xl">
+        <section id="developers" className="border-t border-glass-border px-4 py-20 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl">
+            <div className="max-w-3xl">
               <p className="text-xs font-bold uppercase tracking-[.18em] text-ink-faint">For developers</p>
-              <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">Continue with MAX AI.</h2>
-              <p className="mt-4 text-sm leading-6 text-ink-muted">OAuth and PKCE make it possible for third-party applications to use the same MAX identity layer without receiving your password.</p>
-              <Button variant="secondary" size="lg" disabled className="mt-7 border-glass-border bg-base text-ink hover:bg-glass-hover">Developer portal — coming soon</Button>
+              <h2 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">Add MAX Auth SDK to your website</h2>
+              <p className="mt-4 text-sm leading-6 text-ink-muted">Choose your platform to get the right MAX Auth integration starter. Connect your application with the same identity layer used across The MAX AI Ecosystem.</p>
             </div>
+            <DeveloperIntegration />
           </div>
         </section>
       </main>
