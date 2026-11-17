@@ -41,12 +41,51 @@ async function rawRequest<T>(path: string, opts: RequestOptions = {}): Promise<T
   throw new ApiError(message, code, res.status, details, requestId);
 }
 
+const ROTATION_RETRY_DELAYS_MS = [180, 360, 600];
+
+function wait(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function refreshWithRecovery(attempt = 0): Promise<string | null> {
+  try {
+    const data = await rawRequest<{ accessToken: string }>("/auth/refresh", {
+      method: "POST",
+      skipAuth: true,
+    });
+    tokenStore.set(data.accessToken);
+    return data.accessToken;
+  } catch (error) {
+    // A different tab or MAX product may have rotated the shared httpOnly
+    // cookie first. Give that response time to update the cookie, then retry.
+    if (error instanceof ApiError && error.code === "REFRESH_TOKEN_ROTATED" && attempt < ROTATION_RETRY_DELAYS_MS.length) {
+      await wait(ROTATION_RETRY_DELAYS_MS[attempt]);
+      return refreshWithRecovery(attempt + 1);
+    }
+
+    tokenStore.set(null);
+    return null;
+  }
+}
+
 function silentRefresh(): Promise<string | null> {
   if (!refreshPromise) {
-    refreshPromise = rawRequest<{ accessToken: string }>("/auth/refresh", { method: "POST", skipAuth: true })
-      .then((data) => { tokenStore.set(data.accessToken); return data.accessToken; })
-      .catch(() => { tokenStore.set(null); return null; })
-      .finally(() => { refreshPromise = null; });
+    const refresh = () => refreshWithRecovery();
+
+    // Web Locks serialize refreshes across tabs on this origin. MAX Auth's
+    // backend also handles collisions from other MAX product origins.
+    const lockManager = typeof navigator !== "undefined"
+      ? (navigator as Navigator & {
+          locks?: { request<T>(name: string, callback: () => Promise<T>): Promise<T> };
+        }).locks
+      : undefined;
+    const coordinatedRefresh = lockManager
+      ? lockManager.request("max-auth-refresh", refresh)
+      : refresh();
+
+    refreshPromise = coordinatedRefresh.finally(() => {
+      refreshPromise = null;
+    });
   }
   return refreshPromise;
 }
