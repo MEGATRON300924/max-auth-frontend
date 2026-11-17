@@ -407,3 +407,10 @@ Use the newly added `public/rQmYn01.svg` MAX AI logo as the animated mark for th
 
 ### Next steps
 - Complete the browser test against the deployed MAX Auth backend and verify the same MAX user ID is returned after signing in with the linked Google identity.
+
+### Google sign-in callback correction — 2026-11-17
+- Source review found a React state-timing bug in `GoogleSignInButton`: the Google callback called `setCredential(value)` and immediately invoked a function that read the previous render's `credential` state. The first Google sign-in attempt could therefore return without calling MAX Auth.
+- Updated the completion function to receive the freshly returned Google credential directly; the MFA continuation still uses the credential retained in component state.
+- Fix commit: `a7b30439203f663967c347421977206730ffa82a`.
+- TypeScript/Next.js build, browser sign-in, MFA and same-MAX-user-ID regression checks: pending.
+- No merge or production deployment performed.
