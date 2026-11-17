@@ -302,11 +302,17 @@ Use the newly added `public/rQmYn01.svg` MAX AI logo as the animated mark for th
 
 ### Verification
 - Source-level integration completed for the shared spinner, full-screen loader and shared button loading state.
-- Production build, lint, GitHub Actions and browser QA: pending.
+- Source review: completed for the shared spinner, full-screen loading screen, button loading indicator and reduced-motion fallback.
+- GitHub Actions: pending at PR creation.
+- Production build, lint and browser QA: pending.
 - No merge or production deployment has been performed.
 
 ### Commits
-- Implementation and plan update: pending.
+- Shared SVG spinner: `6d8be49916f9cabced49c74e9092225d96566906`.
+- Shared button loading state: `a75a1803627c1b941de8b492486ab77cc3c21489`.
+- SVG mask animation and reduced-motion styles: `e150973ea52d752775b623386c1cb74ddc3a24a1`.
+- Plan update: `9de793846f6b14cdb4276b1df410b5068f98e153`.
+- Pull request #26: https://github.com/MEGATRON300924/max-auth-frontend/pull/26 (open; not merged).
 
 ### Next steps
 - Run CI and inspect the PR diff.
