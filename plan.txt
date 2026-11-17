@@ -328,7 +328,7 @@ Use the newly added `public/rQmYn01.svg` MAX AI logo as the animated mark for th
 - Backend now responds with `REFRESH_TOKEN_ROTATED` for a just-won rotation race rather than revoking every account session.
 
 ### Implementation on `fix/refresh-token-coordination`
-- Added Web Locks coordination (`max-auth-refresh`) for tabs on the same browser origin, with a fallback for browsers without Web Locks.
+- Added Web Locks coordination (`max-auth-refresh`) for tabs on the same browser origin, with a fallback for browsers without Web Locks or when lock acquisition fails.
 - Added bounded retries for the backend's `REFRESH_TOKEN_ROTATED` response, allowing the winning request's Set-Cookie response to update the shared cookie before retry.
 - Retained the existing in-tab `refreshPromise` single-flight behavior and access-token storage model.
 - No auth endpoints, login flow, or rate limits were changed.
@@ -352,3 +352,8 @@ Use the newly added `public/rQmYn01.svg` MAX AI logo as the animated mark for th
 - PR #27: https://github.com/MEGATRON300924/max-auth-frontend/pull/27 (open; not merged).
 - Latest implementation/plan head at PR creation: `60f107a9031d77819a5233181ec626f12ef9406f`.
 - GitHub Actions CI run #44043808149: in progress at checkpoint.
+
+
+### Follow-up refinement
+- Automatic refresh after a 401 now runs only when the failed request actually carried an access token. Unauthenticated 401 responses no longer trigger refresh-cookie requests; initial session bootstrap still calls `silentRefresh` explicitly.
+- Latest API-client commit: `b4aaa041bbda40c51efc4e200df9d7898b6e19e1`.
