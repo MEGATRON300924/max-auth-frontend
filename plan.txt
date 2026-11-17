@@ -318,3 +318,31 @@ Use the newly added `public/rQmYn01.svg` MAX AI logo as the animated mark for th
 - Run CI and inspect the PR diff.
 - Verify the animation on dark and light themes, narrow screens, and reduced-motion settings.
 - Merge/deploy only after review and explicit approval.
+
+
+## Current task: Coordinate MAX Auth refresh requests across tabs and products (2026-11-17)
+
+### Root cause
+- The module-level refresh promise only coalesces requests inside one JavaScript runtime.
+- Different browser tabs and MAX product origins can concurrently send the same host-only refresh cookie to `auth.max-ai.name.ng`.
+- Backend now responds with `REFRESH_TOKEN_ROTATED` for a just-won rotation race rather than revoking every account session.
+
+### Implementation on `fix/refresh-token-coordination`
+- Added Web Locks coordination (`max-auth-refresh`) for tabs on the same browser origin, with a fallback for browsers without Web Locks.
+- Added bounded retries for the backend's `REFRESH_TOKEN_ROTATED` response, allowing the winning request's Set-Cookie response to update the shared cookie before retry.
+- Retained the existing in-tab `refreshPromise` single-flight behavior and access-token storage model.
+- No auth endpoints, login flow, or rate limits were changed.
+
+### Verification
+- Source review completed for Web Locks fallback and bounded retry handling.
+- TypeScript build, lint, GitHub Actions and browser tests: pending.
+- No merge or production deployment performed.
+
+### Commits
+- Refresh coordination and bounded retry: `bcbe604365a8912e06abd0892a77e2980ddaf5b8`.
+- Plan update: pending.
+
+### Next steps
+- Run CI and verify refresh behavior in multiple tabs and across MAX product origins.
+- Coordinate deployment with the backend concurrency-grace change.
+- Merge/deploy only after review and explicit approval.
