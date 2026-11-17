@@ -27,7 +27,8 @@ interface RequestOptions {
 
 async function rawRequest<T>(path: string, opts: RequestOptions = {}): Promise<T> {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (!opts.skipAuth) { const token = tokenStore.get(); if (token) headers.Authorization = `Bearer ${token}`; }
+  const accessToken = opts.skipAuth ? null : tokenStore.get();
+  if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
   if (opts.needsCsrf) headers["x-csrf-token"] = await getCsrfToken();
   const res = await fetch(`${API_URL}${path}`, { method: opts.method ?? "GET", headers, credentials: "include", body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined });
   const requestId = res.headers.get("x-request-id") ?? undefined;
@@ -37,7 +38,10 @@ async function rawRequest<T>(path: string, opts: RequestOptions = {}): Promise<T
   const code = json && !json.success ? json.error.code : "UNKNOWN_ERROR";
   const message = json && !json.success ? json.error.message : `Request failed with status ${res.status}`;
   const details = json && !json.success ? json.error.details : undefined;
-  if (res.status === 401 && !opts.skipAuth && !opts._retried && path !== "/auth/refresh") { const newToken = await silentRefresh(); if (newToken) return rawRequest<T>(path, { ...opts, _retried: true }); }
+  // Only renew a session when this request actually carried an access token.
+  // Unauthenticated 401s must not fan out into refresh-cookie requests; the
+  // initial session bootstrap calls silentRefresh explicitly.
+  if (res.status === 401 && accessToken && !opts._retried && path !== "/auth/refresh") { const newToken = await silentRefresh(); if (newToken) return rawRequest<T>(path, { ...opts, _retried: true }); }
   throw new ApiError(message, code, res.status, details, requestId);
 }
 
@@ -80,7 +84,7 @@ function silentRefresh(): Promise<string | null> {
         }).locks
       : undefined;
     const coordinatedRefresh = lockManager
-      ? lockManager.request("max-auth-refresh", refresh)
+      ? lockManager.request("max-auth-refresh", refresh).catch(() => refresh())
       : refresh();
 
     refreshPromise = coordinatedRefresh.finally(() => {
