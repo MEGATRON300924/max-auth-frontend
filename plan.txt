@@ -285,3 +285,36 @@ Remove the fictional `createMaxAuthClient()` call from the public homepage hero 
 ### Next steps
 - Run CI for the updated main branch and inspect the Vercel deployment before treating the hero update as live.
 - Verify the rendered hero at desktop and mobile widths.
+
+
+## Current task: MAX SVG loading animation (2026-11-17)
+
+### Request
+Use the newly added `public/rQmYn01.svg` MAX AI logo as the animated mark for the full loading screen and for loading states within MAX Auth screens.
+
+### Implementation on `feat/max-logo-loading-animation`
+- Replaced the temporary hand-drawn MAX monogram/orbit spinner with the supplied MAX AI SVG silhouette.
+- Added a restrained monochrome animation: the logo remains crisp while a soft highlight sweeps across its silhouette and the mark gently breathes.
+- Kept the full-screen protected-workspace loading screen and its existing copy/layout.
+- Updated the shared button loading indicator to use the same animated MAX SVG, covering auth form submission states without changing form or authentication behavior.
+- Existing auth pages that use the shared `Spinner` now inherit the same animation; reduced-motion preferences render a steady logo without animation.
+- The SVG is referenced from `/rQmYn01.svg`; no duplicate logo asset or fabricated vector paths were added.
+
+### Verification
+- Source-level integration completed for the shared spinner, full-screen loader and shared button loading state.
+- Source review: completed for the shared spinner, full-screen loading screen, button loading indicator and reduced-motion fallback.
+- GitHub Actions: pending at PR creation.
+- Production build, lint and browser QA: pending.
+- No merge or production deployment has been performed.
+
+### Commits
+- Shared SVG spinner: `6d8be49916f9cabced49c74e9092225d96566906`.
+- Shared button loading state: `a75a1803627c1b941de8b492486ab77cc3c21489`.
+- SVG mask animation and reduced-motion styles: `e150973ea52d752775b623386c1cb74ddc3a24a1`.
+- Plan update: `9de793846f6b14cdb4276b1df410b5068f98e153`.
+- Pull request #26: https://github.com/MEGATRON300924/max-auth-frontend/pull/26 (open; not merged).
+
+### Next steps
+- Run CI and inspect the PR diff.
+- Verify the animation on dark and light themes, narrow screens, and reduced-motion settings.
+- Merge/deploy only after review and explicit approval.
