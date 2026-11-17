@@ -260,3 +260,28 @@ Replace the generic developer CTA on the public homepage with an “Add MAX Auth
 - Run the repository production build and lint checks through CI.
 - Review the preview at desktop and mobile widths; verify selector changes and copy behavior.
 - Confirm the exact OAuth request/response contract against the backend before presenting any snippet as a complete end-to-end implementation.
+
+
+## Follow-up: Correct MAX Auth homepage hero integration example (2026-11-17)
+
+### Request
+Remove the fictional `createMaxAuthClient()` call from the public homepage hero because no official client SDK method or CDN script has been published.
+
+### Implementation
+- Replaced the misleading SDK invocation with a plain `maxAuth` OAuth configuration example.
+- The hero now shows the actual HTTPS MAX Auth authorization, token, and user-info endpoints and identifies the Authorization Code + PKCE flow.
+- Renamed the panel heading from “Identity overview” to “OAuth configuration”.
+- Preserved the hero layout, animated MAX orb, account actions, and the platform integration selector below.
+
+### Verification
+- Source-level replacement check: completed; no `createMaxAuthClient()` reference remains in the hero.
+- CI/build and browser visual QA for this follow-up: pending.
+- The platform selector PR #25 was squash-merged; Vercel reported its preview deployment Ready. Production alias for this follow-up has not yet been confirmed.
+
+### Commits
+- Hero OAuth example: 66ccc2797c7a5c7c8d3047f9bce554c0ed37418d
+- Absolute HTTPS endpoint correction: b74f2573047876c6445af6bf64d8f5f188123ea1
+
+### Next steps
+- Run CI for the updated main branch and inspect the Vercel deployment before treating the hero update as live.
+- Verify the rendered hero at desktop and mobile widths.
