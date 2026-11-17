@@ -83,15 +83,23 @@ function silentRefresh(): Promise<string | null> {
           locks?: { request<T>(name: string, callback: () => Promise<T>): Promise<T> };
         }).locks
       : undefined;
-    const coordinatedRefresh = lockManager
-      ? lockManager.request("max-auth-refresh", refresh).catch(() => refresh())
+    // Keep the result explicitly typed and await both branches so TypeScript
+    // does not infer a nested Promise union from the Web Locks callback.
+    const coordinatedRefresh: Promise<string | null> = lockManager
+      ? (async () => {
+          try {
+            return await lockManager.request<string | null>("max-auth-refresh", refresh);
+          } catch {
+            return await refresh();
+          }
+        })()
       : refresh();
 
     refreshPromise = coordinatedRefresh.finally(() => {
       refreshPromise = null;
     });
   }
-  return refreshPromise;
+  return refreshPromise!;
 }
 
 export const apiClient = {
