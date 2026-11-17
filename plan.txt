@@ -357,3 +357,38 @@ Use the newly added `public/rQmYn01.svg` MAX AI logo as the animated mark for th
 ### Follow-up refinement
 - Automatic refresh after a 401 now runs only when the failed request actually carried an access token. Unauthenticated 401 responses no longer trigger refresh-cookie requests; initial session bootstrap still calls `silentRefresh` explicitly.
 - Latest API-client commit: `b4aaa041bbda40c51efc4e200df9d7898b6e19e1`.
+
+
+## Current task: OAuth authorization account avatar and frontend build repair (2026-11-17)
+
+### Request
+- Display the user's uploaded custom MAX profile picture beside their display name and email on the OAuth `/authorize` consent page.
+- Investigate and fix the failed MAX Auth frontend production build.
+
+### Findings
+- GitHub Actions run `44043998656` for PR #27 failed after Next.js compilation, during TypeScript checking in `src/lib/api/client.ts`.
+- The Web Locks expression inferred `Promise<string | Promise<string | null> | null>`, and the nullable module-level `refreshPromise` was returned without narrowing. This was a TypeScript error, not a Next.js compilation failure.
+- PR #27 was subsequently merged with the earlier failing implementation; the TypeScript correction is included in this follow-up branch.
+- The profile page's canonical avatar field is `user.avatarUrl`; it also caches uploaded avatar URLs in localStorage under `max-auth:account-avatars`, keyed by normalized email and username.
+
+### Implementation on `fix/authorize-account-avatar`
+- OAuth consent identity row now renders `user.avatarUrl` as a circular, cropped profile image.
+- If the API profile has no avatar URL, the authorization page reads the same email/username keyed local cache used by the profile page.
+- If an image URL fails, the UI falls back to the existing `/user.png` default. If no custom image is available, the existing account icon remains visible.
+- Fixed the Web Locks refresh expression with an explicitly typed `Promise<string | null>`, an async wrapper that awaits both lock and fallback paths, and a non-null assertion after initializing the shared refresh promise.
+- Authorization approval, OAuth scopes, redirect handling and session behavior are otherwise unchanged.
+
+### Verification
+- Source-level review: completed for the avatar URL precedence, local cache fallback, image error fallback and TypeScript fix.
+- CI production build and dependency audits: pending on this branch.
+- Browser verification with an uploaded profile image: pending.
+- No merge or production deployment performed.
+
+### Commits
+- OAuth authorization avatar: `8ee95da6f81c6a2e18a6fcd4acbc3d2b5c70d43c`.
+- Web Locks TypeScript build fix: `8833b492b34696d2514a8e0fb031495efd8e4fb3`.
+
+### Next steps
+- Open a PR and confirm the production build and dependency checks pass.
+- Verify the consent page using an account with a custom avatar and one without an avatar.
+- Merge/deploy only after CI and review; no production change has been made.
