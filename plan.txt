@@ -392,3 +392,25 @@ Use the newly added `public/rQmYn01.svg` MAX AI logo as the animated mark for th
 - Open a PR and confirm the production build and dependency checks pass.
 - Verify the consent page using an account with a custom avatar and one without an avatar.
 - Merge/deploy only after CI and review; no production change has been made.
+
+## Google identity linking and sign-in audit — 2026-11-17
+
+### Source review
+- Confirmed `GoogleConnectButton` sends Google's ID-token credential to `POST /api/v1/auth/google/connect` through `connectedAccountsApi.googleConnect` while the user is authenticated.
+- Confirmed `GoogleSignInButton` sends the Google credential through the existing `googleLogin` flow and displays the create-account path only for `GOOGLE_ACCOUNT_NOT_LINKED`.
+- The frontend therefore distinguishes explicitly linking Google to an existing MAX Account from signing in with a previously linked Google identity.
+
+### Verification and limits
+- Frontend source review: completed.
+- Live browser test comparing the MAX user ID before and after Google sign-in: pending.
+- No frontend application code changed and no production deployment was performed.
+
+### Next steps
+- Complete the browser test against the deployed MAX Auth backend and verify the same MAX user ID is returned after signing in with the linked Google identity.
+
+### Google sign-in callback correction — 2026-11-17
+- Source review found a React state-timing bug in `GoogleSignInButton`: the Google callback called `setCredential(value)` and immediately invoked a function that read the previous render's `credential` state. The first Google sign-in attempt could therefore return without calling MAX Auth.
+- Updated the completion function to receive the freshly returned Google credential directly; the MFA continuation still uses the credential retained in component state.
+- Fix commit: `a7b30439203f663967c347421977206730ffa82a`.
+- TypeScript/Next.js build, browser sign-in, MFA and same-MAX-user-ID regression checks: pending.
+- No merge or production deployment performed.
