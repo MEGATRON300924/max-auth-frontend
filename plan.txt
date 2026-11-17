@@ -233,3 +233,30 @@ Restructure MAX Auth as a professional identity/developer platform, not a generi
 
 ### Next steps
 - Run CI, review the PR diff, and verify the preview before merging.
+
+
+## Current task: MAX Auth platform integration selector (2026-11-17)
+
+### Request
+Replace the generic developer CTA on the public homepage with an “Add MAX Auth SDK to your website” section and a platform selector offering JavaScript, React, Next.js, Node.js, Flutter, Android (Kotlin), iOS (Swift), and REST API.
+
+### Implementation on `feat/max-auth-integration-selector`
+- Added a responsive platform selector and code panel to the public landing page.
+- Added platform-specific OAuth integration starter snippets with copy-to-clipboard behavior and a link to developer documentation.
+- Used the confirmed MAX Auth OAuth endpoints: `/api/v1/oauth/authorize`, `/api/v1/oauth/token`, and `/api/v1/oauth/userinfo`.
+- Explicitly disclosed that published language SDK packages and CDN script tags are not available yet; snippets are starter configurations, not fictional install commands or a fabricated SDK.
+- Included security guidance that confidential client secrets must not be exposed in browser or mobile code.
+
+### Verification
+- Source-level review: completed for all eight selector entries, endpoint consistency, responsive layout, and clipboard fallback handling.
+- Next.js production build, lint, CI, and browser visual QA: pending.
+- No merge or production deployment has been performed.
+
+### Commits
+- Integration selector component: b8a07f377ccaf028321110ead56e9d6c49acc8ea
+- Landing page integration: 4888695cda240e90c00df61046b7dc34b7fcfab6
+
+### Next steps
+- Run the repository production build and lint checks through CI.
+- Review the preview at desktop and mobile widths; verify selector changes and copy behavior.
+- Confirm the exact OAuth request/response contract against the backend before presenting any snippet as a complete end-to-end implementation.
