@@ -35,6 +35,21 @@ function AuthorizeContent() {
   const [isApproving, setIsApproving] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [storedAvatarUrl, setStoredAvatarUrl] = useState<string | null>(null);
+
+  // Reuse the uploaded account-picture cache maintained by the profile page.
+  useEffect(() => {
+    if (!user || user.avatarUrl) return;
+    try {
+      const stored = JSON.parse(window.localStorage.getItem("max-auth:account-avatars") || "{}") as Record<string, string>;
+      const cachedAvatar = stored[user.email.toLowerCase()] || stored[user.username.toLowerCase()];
+      if (cachedAvatar) setStoredAvatarUrl(cachedAvatar);
+    } catch {
+      // A missing or malformed cache must never block authorization.
+    }
+  }, [user]);
+
+  const accountAvatarUrl = user?.avatarUrl || storedAvatarUrl;
 
   useEffect(() => {
     if (isLoading) return;
@@ -139,7 +154,22 @@ function AuthorizeContent() {
           </div>
 
           <div className="mt-6 flex items-center gap-3 rounded-2xl border border-[#e3e7ed] p-3 dark:border-[#373b44]">
-            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#edf3fc] text-[#3569b7] dark:bg-[#293342] dark:text-[#9abcf6]"><UserRound className="h-5 w-5" /></div>
+            <div className="h-11 w-11 shrink-0 overflow-hidden rounded-full border border-[#e3e7ed] bg-[#edf3fc] dark:border-[#454a54] dark:bg-[#293342]">
+              {accountAvatarUrl ? (
+                <img
+                  src={accountAvatarUrl}
+                  alt="MAX account profile picture"
+                  className="h-full w-full object-cover"
+                  referrerPolicy="no-referrer"
+                  onError={(event) => {
+                    event.currentTarget.onerror = null;
+                    event.currentTarget.src = "/user.png";
+                  }}
+                />
+              ) : (
+                <div className="grid h-full w-full place-items-center text-[#3569b7] dark:text-[#9abcf6]"><UserRound className="h-5 w-5" /></div>
+              )}
+            </div>
             <div className="min-w-0 flex-1"><p className="truncate text-sm font-medium">{user?.displayName || user?.username || "Your MAX Account"}</p><p className="truncate text-xs text-[#667085] dark:text-[#a2a8b3]">{user?.email || "Signed-in account"}</p></div>
             <Check className="h-4 w-4 text-[#39845a]" />
           </div>
