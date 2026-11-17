@@ -145,38 +145,59 @@
 }
 
 
-/* Monochrome hand-drawn MAX mark used during authentication and dashboard loading. */
-.max-sketch-spinner { overflow: visible; }
-.max-sketch-orbit,
-.max-sketch-mark {
-  stroke: currentColor;
-  stroke-width: 1.15;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
-  stroke-dasharray: 220;
-  stroke-dashoffset: 220;
-  animation: max-sketch-draw 2.8s cubic-bezier(.55,.08,.35,1) infinite;
-}
-.max-sketch-orbit-secondary {
-  opacity: .42;
-  animation-delay: .16s;
-}
-.max-sketch-mark {
-  stroke-width: 1.45;
-  animation-delay: .34s;
-}
-@keyframes max-sketch-draw {
-  0% { stroke-dashoffset: 220; opacity: .35; }
-  48%, 76% { stroke-dashoffset: 0; opacity: 1; }
-  100% { stroke-dashoffset: -220; opacity: .35; }
-}
 
+/* MAX identity loader: the supplied SVG is used as a mask so its silhouette stays crisp
+   while a restrained light sweep moves across the mark. */
+.max-logo-loader {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  overflow: visible;
+  isolation: isolate;
+  animation: max-logo-breathe 2.1s ease-in-out infinite;
+}
+.max-logo-loader__base,
+.max-logo-loader__shine {
+  position: absolute;
+  inset: 0;
+  display: block;
+  -webkit-mask-image: url("/rQmYn01.svg");
+  mask-image: url("/rQmYn01.svg");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+.max-logo-loader__base {
+  background: currentColor;
+  opacity: .32;
+}
+.max-logo-loader__shine {
+  background: linear-gradient(
+    108deg,
+    transparent 24%,
+    currentColor 43%,
+    #ffffff 50%,
+    currentColor 57%,
+    transparent 76%
+  );
+  background-size: 240% 100%;
+  background-position: 100% 50%;
+  animation: max-logo-sweep 1.9s cubic-bezier(.55,.08,.35,1) infinite;
+}
+@keyframes max-logo-sweep {
+  0% { background-position: 130% 50%; opacity: .2; }
+  55%, 78% { opacity: 1; }
+  100% { background-position: -130% 50%; opacity: .2; }
+}
+@keyframes max-logo-breathe {
+  0%, 100% { transform: scale(.96); }
+  50% { transform: scale(1.035); }
+}
 @media (prefers-reduced-motion: reduce) {
-  .max-sketch-orbit,
-  .max-sketch-mark {
-    animation: none;
-    stroke-dashoffset: 0;
-    opacity: 1;
-  }
+  .max-logo-loader { animation: none; }
+  .max-logo-loader__shine { display: none; }
+  .max-logo-loader__base { opacity: .82; }
 }
