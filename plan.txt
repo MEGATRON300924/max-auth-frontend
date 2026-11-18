@@ -416,3 +416,19 @@ Use the newly added `public/rQmYn01.svg` MAX AI logo as the animated mark for th
 - PR #29 merged into `main` on 2026-11-17 (merge commit `003f10d64f2c230503d83af13af21bbecb49efe0`).
 - GitHub combined commit status reports Vercel check `success`; this confirms the reported Vercel check only, not a live Google sign-in test.
 - Production rollout/live browser test and same-MAX-user-ID verification remain pending.
+
+
+## MAX Auth global Beta Tester programme — 2026-11-18
+
+### Agreed behaviour
+- Public/authenticated application page collects applicant name, devices used and MAX ecosystem products of interest; application is linked to the signed-in MAX Account and its verified account email.
+- Beta Tester is a global role granted only after approval by `zionopaaje`.
+- Add an admin-only Beta Testers workspace for application review, approved tester list and announcement publishing.
+- Announcement product dropdown offers All MAX Products plus individual ecosystem products. The selected product is a descriptive email reference only; all approved beta testers remain recipients for every announcement.
+- Announcements and in-app notification records are persisted for a later MAX WebChat integration. Do not implement max-chat connection in this task.
+- Frontend implementation, accessibility, build and browser tests: pending.
+
+### Next steps
+- Add the beta application page and admin dashboard entry/announcement composer.
+- Add authenticated tester announcement feed surface/API client contract for future MAX WebChat work, without changing the max-chat repository.
+- Run Next.js production build and CI; no merge or deployment without explicit approval.
