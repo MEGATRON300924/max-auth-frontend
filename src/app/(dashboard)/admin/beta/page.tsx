@@ -8,12 +8,13 @@ import { useToast } from "@/lib/hooks/useToast";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
-import { Check, LoaderCircle, Megaphone, RefreshCw, ShieldCheck, Users, X } from "lucide-react";
+import { Check, ClipboardCopy, LoaderCircle, Megaphone, RefreshCw, ShieldCheck, Users, X, Bug } from "lucide-react";
 
 type Applicant = { id: string; fullName: string; devices: string[]; products: string[]; status: "PENDING" | "APPROVED" | "REJECTED"; reviewNote?: string | null; createdAt: string; user: { id: string; username: string; email: string; verificationStatus: string; createdAt: string } };
 type Announcement = { id: string; title: string; body: string; productReference: string; createdAt: string; _count: { notifications: number } };
 type ApplicationResult = { applications: Applicant[]; counts: { pending: number; approved: number; rejected: number }; products: string[] };
 type AnnouncementResult = { announcements: Announcement[]; products: string[] };
+type IssueReport = { id: string; source: string; product: string; category: string; severity: string; title: string; description: string; stepsToReproduce?: string | null; expectedBehaviour?: string | null; actualBehaviour?: string | null; conversationId?: string | null; messageId?: string | null; userMessage?: string | null; assistantResponse?: string | null; errorMessage?: string | null; pageUrl?: string | null; model?: string | null; clientMetadata?: string | null; status: "OPEN" | "TRIAGED" | "IN_PROGRESS" | "RESOLVED" | "WONT_FIX"; adminNote?: string | null; createdAt: string; user: { id: string; username: string; email: string }; reviewedBy?: { username: string } | null };
 const productLabel = (value: string) => value === "ALL_MAX_PRODUCTS" ? "All MAX Products" : value;
 const dateLabel = (value: string) => new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
 
@@ -21,11 +22,15 @@ export default function BetaAdminPage() {
   const { user, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const { showToast } = useToast();
-  const [tab, setTab] = useState<"applications" | "announcements">("applications");
+  const [tab, setTab] = useState<"applications" | "announcements" | "reports">("applications");
   const [data, setData] = useState<ApplicationResult | null>(null);
   const [announcements, setAnnouncements] = useState<AnnouncementResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState<{ id: string; status: "APPROVED" | "REJECTED" } | null>(null);
+  const [reviewNote, setReviewNote] = useState("");
+  const [reports, setReports] = useState<IssueReport[]>([]);
+  const [reportsLoading, setReportsLoading] = useState(false);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [productReference, setProductReference] = useState("ALL_MAX_PRODUCTS");
@@ -48,17 +53,44 @@ export default function BetaAdminPage() {
   }, [isOwner]);
   useEffect(() => { void load(); }, [load]);
 
-  const review = async (application: Applicant, status: "APPROVED" | "REJECTED") => {
-    const note = status === "REJECTED" ? window.prompt("Optional note for the applicant:", "") : "";
-    if (note === null) return;
-    if (!window.confirm(status === "APPROVED" ? `Approve @${application.user.username} as a global Beta Tester?` : `Reject @${application.user.username}'s application?`)) return;
+  const review = async (application: Applicant, status: "APPROVED" | "REJECTED", note = "") => {
     setBusyId(application.id);
     try {
       const result = await apiClient.patch<{ emailSent: boolean }>(`/admin/beta/applications/${encodeURIComponent(application.id)}/review`, { status, ...(note.trim() ? { note: note.trim() } : {}) });
+      setData(previous => previous ? {
+        ...previous,
+        applications: previous.applications.map(item => item.id === application.id ? { ...item, status, reviewNote: note.trim() || null } : item),
+        counts: { pending: Math.max(0, previous.counts.pending - 1), approved: previous.counts.approved + (status === "APPROVED" ? 1 : 0), rejected: previous.counts.rejected + (status === "REJECTED" ? 1 : 0) },
+      } : previous);
+      setConfirming(null); setReviewNote("");
       showToast({ title: status === "APPROVED" ? "Beta Tester approved" : "Application rejected", description: result.emailSent ? "The applicant was emailed." : "The application was updated; email delivery did not complete.", variant: result.emailSent ? "success" : "error" });
-      await load();
     } catch (err) { showToast({ title: "Review failed", description: err instanceof Error ? err.message : "Please try again.", variant: "error" }); }
     finally { setBusyId(null); }
+  };
+
+  const loadReports = useCallback(async () => {
+    setReportsLoading(true);
+    try {
+      const result = await apiClient.get<{ reports: IssueReport[] }>("/admin/beta/issue-reports");
+      setReports(result.reports);
+    } catch (err) { showToast({ title: "Couldn't load issue reports", description: err instanceof Error ? err.message : "Please try again.", variant: "error" }); }
+    finally { setReportsLoading(false); }
+  }, [showToast]);
+
+  useEffect(() => { if (tab === "reports" && isOwner) void loadReports(); }, [tab, isOwner, loadReports]);
+
+  const updateReport = async (report: IssueReport, status: IssueReport["status"]) => {
+    try {
+      await apiClient.patch(`/admin/beta/issue-reports/${encodeURIComponent(report.id)}`, { status, adminNote: report.adminNote || "" });
+      setReports(previous => previous.map(item => item.id === report.id ? { ...item, status } : item));
+      showToast({ title: "Issue report updated", description: `Status changed to ${status.replace("_", " ")}.`, variant: "success" });
+    } catch (err) { showToast({ title: "Couldn't update report", description: err instanceof Error ? err.message : "Please try again.", variant: "error" }); }
+  };
+
+  const copyReport = async (report: IssueReport) => {
+    const { id, source, product, category, severity, title, description, stepsToReproduce, expectedBehaviour, actualBehaviour, conversationId, messageId, userMessage, assistantResponse, errorMessage, pageUrl, model, clientMetadata, createdAt, user } = report;
+    await navigator.clipboard.writeText(JSON.stringify({ reportId: id, source, product, category, severity, title, description, stepsToReproduce, expectedBehaviour, actualBehaviour, conversationId, messageId, userMessage, assistantResponse, errorMessage, pageUrl, model, clientMetadata, submittedAt: createdAt, reporter: user }, null, 2));
+    showToast({ title: "Diagnostic report copied", description: "You can paste this report into a debugging conversation.", variant: "success" });
   };
 
   const publish = async (event: FormEvent) => {
@@ -85,8 +117,9 @@ export default function BetaAdminPage() {
         <Card><CardContent className="flex items-center gap-3 p-5"><Check className="h-5 w-5 text-ink-muted" /><div><p className="text-xs text-ink-muted">Approved testers</p><p className="text-2xl font-semibold text-ink">{data?.counts.approved ?? "—"}</p></div></CardContent></Card>
         <Card><CardContent className="flex items-center gap-3 p-5"><Megaphone className="h-5 w-5 text-ink-muted" /><div><p className="text-xs text-ink-muted">Published announcements</p><p className="text-2xl font-semibold text-ink">{announcements?.announcements.length ?? "—"}</p></div></CardContent></Card>
       </div>
-      <div className="flex gap-2 border-b border-glass-border">
+      <div className="flex flex-wrap gap-2 border-b border-glass-border">
         <button onClick={() => setTab("applications")} className={`border-b-2 px-4 py-3 text-sm font-medium ${tab === "applications" ? "border-ink text-ink" : "border-transparent text-ink-muted"}`}>Applications</button>
+        <button onClick={() => setTab("reports")} className={`border-b-2 px-4 py-3 text-sm font-medium ${tab === "reports" ? "border-ink text-ink" : "border-transparent text-ink-muted"}`}>Issue reports</button>
         <button onClick={() => setTab("announcements")} className={`border-b-2 px-4 py-3 text-sm font-medium ${tab === "announcements" ? "border-ink text-ink" : "border-transparent text-ink-muted"}`}>Announcements</button>
       </div>
       {tab === "applications" ? (
@@ -98,7 +131,33 @@ export default function BetaAdminPage() {
               <div><p className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-muted">Devices</p><div className="flex flex-wrap gap-2">{application.devices.map((item) => <span key={item} className="border border-glass-border px-2.5 py-1 text-xs text-ink">{item}</span>)}</div></div>
               <div><p className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-muted">Products of interest</p><div className="flex flex-wrap gap-2">{application.products.map((item) => <span key={item} className="border border-glass-border px-2.5 py-1 text-xs text-ink">{item}</span>)}</div></div>
               {application.reviewNote && <p className="text-sm text-ink-muted">Review note: {application.reviewNote}</p>}
-              {application.status === "PENDING" && <div className="flex flex-wrap gap-2 border-t border-glass-border pt-4"><Button onClick={() => void review(application, "APPROVED")} disabled={busyId === application.id}><Check className="h-4 w-4" /> Approve</Button><Button variant="secondary" onClick={() => void review(application, "REJECTED")} disabled={busyId === application.id}><X className="h-4 w-4" /> Reject</Button>{busyId === application.id && <span className="self-center text-xs text-ink-muted">Updating…</span>}</div>}
+              {application.status === "PENDING" && <div className="space-y-3 border-t border-glass-border pt-4">
+                {confirming?.id === application.id ? (
+                  <div className="space-y-3 rounded-md border border-glass-border bg-base-raised p-3">
+                    <p className="text-sm font-medium text-ink">{confirming.status === "APPROVED" ? `Approve @${application.user.username} as a global Beta Tester?` : `Reject @${application.user.username}'s application?`}</p>
+                    {confirming.status === "REJECTED" && <label className="block space-y-2"><span className="text-xs font-medium text-ink-muted">Optional note for the applicant</span><textarea value={reviewNote} onChange={event => setReviewNote(event.target.value)} maxLength={1000} rows={2} className="w-full border border-glass-border bg-base px-3 py-2 text-sm text-ink" placeholder="Add a short explanation…" /></label>}
+                    <div className="flex flex-wrap gap-2"><Button onClick={() => void review(application, confirming.status, reviewNote)} disabled={busyId === application.id}>{busyId === application.id ? <><LoaderCircle className="h-4 w-4 animate-spin" /> Updating…</> : confirming.status === "APPROVED" ? "Confirm approval" : "Confirm rejection"}</Button><Button variant="secondary" onClick={() => { setConfirming(null); setReviewNote(""); }} disabled={busyId === application.id}>Cancel</Button></div>
+                  </div>
+                ) : <div className="flex flex-wrap gap-2"><Button onClick={() => setConfirming({ id: application.id, status: "APPROVED" })}><Check className="h-4 w-4" /> Approve</Button><Button variant="secondary" onClick={() => { setConfirming({ id: application.id, status: "REJECTED" }); setReviewNote(""); }}><X className="h-4 w-4" /> Reject</Button></div>}
+              </div>}
+            </CardContent></Card>
+          ))}
+        </section>
+      ) : tab === "reports" ? (
+        <section className="space-y-4">
+          <div className="flex items-end justify-between gap-3"><div><h2 className="text-lg font-semibold text-ink">Issue reports</h2><p className="mt-1 text-sm text-ink-muted">Reports submitted by Beta Testers and MAX WebChat users. Copy a diagnostic bundle to share it for investigation.</p></div><Button variant="secondary" onClick={() => void loadReports()} disabled={reportsLoading}><RefreshCw className={`h-4 w-4 ${reportsLoading ? "animate-spin" : ""}`} /> Refresh</Button></div>
+          {reportsLoading ? <p className="py-10 text-center text-sm text-ink-muted">Loading issue reports…</p> : reports.length === 0 ? <Card><CardContent className="p-8 text-center text-sm text-ink-muted">No issue reports have been submitted.</CardContent></Card> : reports.map(report => (
+            <Card key={report.id}><CardContent className="space-y-4 p-5">
+              <div className="flex flex-wrap items-start justify-between gap-3"><div><div className="flex items-center gap-2"><Bug className="h-4 w-4 text-ink-muted" /><h3 className="font-semibold text-ink">{report.title}</h3></div><p className="mt-1 text-xs text-ink-muted">{report.source === "MAX_WEBCHAT" ? "MAX WebChat" : "Beta Tester portal"} · {report.product} · {report.category} · {report.severity}</p><p className="mt-1 text-xs text-ink-faint">@{report.user.username} · {report.user.email} · {dateLabel(report.createdAt)}</p></div><Button variant="secondary" onClick={() => void copyReport(report)}><ClipboardCopy className="h-4 w-4" /> Copy diagnostic</Button></div>
+              <p className="whitespace-pre-wrap text-sm text-ink">{report.description}</p>
+              {report.userMessage && <div className="space-y-1"><p className="text-xs font-semibold uppercase text-ink-muted">User message</p><p className="whitespace-pre-wrap border border-glass-border bg-base-raised p-3 text-sm text-ink">{report.userMessage}</p></div>}
+              {report.assistantResponse && <div className="space-y-1"><p className="text-xs font-semibold uppercase text-ink-muted">MAX response</p><p className="whitespace-pre-wrap border border-glass-border bg-base-raised p-3 text-sm text-ink">{report.assistantResponse}</p></div>}
+              {report.errorMessage && <div className="space-y-1"><p className="text-xs font-semibold uppercase text-ink-muted">Error</p><pre className="whitespace-pre-wrap border border-danger/30 bg-danger-subtle p-3 text-xs text-danger">{report.errorMessage}</pre></div>}
+              {(report.conversationId || report.messageId || report.model || report.pageUrl) && <p className="break-all text-xs text-ink-faint">Conversation: {report.conversationId || "—"} · Message: {report.messageId || "—"} · Model: {report.model || "—"} · URL: {report.pageUrl || "—"}</p>}
+              {report.stepsToReproduce && <p className="whitespace-pre-wrap text-sm text-ink-muted"><strong className="text-ink">Steps:</strong> {report.stepsToReproduce}</p>}
+              {report.expectedBehaviour && <p className="whitespace-pre-wrap text-sm text-ink-muted"><strong className="text-ink">Expected:</strong> {report.expectedBehaviour}</p>}
+              {report.actualBehaviour && <p className="whitespace-pre-wrap text-sm text-ink-muted"><strong className="text-ink">Actual:</strong> {report.actualBehaviour}</p>}
+              <div className="flex flex-col gap-3 border-t border-glass-border pt-4 sm:flex-row sm:items-end sm:justify-between"><label className="block space-y-2 sm:max-w-xs"><span className="text-xs font-medium text-ink-muted">Admin status</span><select value={report.status} onChange={event => void updateReport(report, event.target.value as IssueReport["status"])} className="h-10 w-full border border-glass-border bg-base px-3 text-sm text-ink"><option value="OPEN">Open</option><option value="TRIAGED">Triaged</option><option value="IN_PROGRESS">In progress</option><option value="RESOLVED">Resolved</option><option value="WONT_FIX">Won't fix</option></select></label><label className="block flex-1 space-y-2"><span className="text-xs font-medium text-ink-muted">Internal admin note</span><input value={report.adminNote || ""} onChange={event => setReports(previous => previous.map(item => item.id === report.id ? { ...item, adminNote: event.target.value } : item))} maxLength={4000} className="h-10 w-full border border-glass-border bg-base px-3 text-sm text-ink" placeholder="Internal investigation notes…" /></label><Button variant="secondary" onClick={() => void updateReport(report, report.status)}>Save note</Button></div>
             </CardContent></Card>
           ))}
         </section>
