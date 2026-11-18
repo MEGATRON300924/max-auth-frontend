@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Activity, AlertTriangle, ArrowUpRight, CheckCircle2, Clock3,
-  LoaderCircle, RefreshCw, Server, ShieldCheck, XCircle,
+  Activity, AlertTriangle, ArrowUpRight, Clock3,
+  LoaderCircle, RefreshCw, Server, XCircle,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth/useAuth";
 import { apiClient } from "@/lib/api/client";
