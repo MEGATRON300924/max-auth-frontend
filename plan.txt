@@ -473,3 +473,10 @@ Use the newly added `public/rQmYn01.svg` MAX AI logo as the animated mark for th
 - Added approved Beta Tester issue-report form with product, category, severity, description, reproduction steps, expected/actual behaviour, and report history/status.
 - Admin report queue UI, copyable diagnostic bundle, report status workflow and browser performance verification: pending.
 - Next.js build/CI and browser INP verification: pending. No merge or production deployment.
+
+
+### Implementation status update — 2026-11-18
+- Beta Tester `/beta` now exposes an issue-report form and a report-history/status list only to approved testers.
+- `/admin/beta` now has an Issue reports tab that loads the unified Beta Portal + MAX WebChat report queue on demand, displays submitted diagnostic context, supports status updates/internal notes, and copies a structured diagnostic JSON bundle.
+- Application review no longer invokes blocking browser `window.confirm()` or `window.prompt()`. It uses inline confirmation and optional rejection-note UI; successful review updates the application row and counters locally without waiting for a second full-page data fetch.
+- CI/build, browser accessibility, real API integration and INP measurement remain pending. No merge or production deployment.
