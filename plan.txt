@@ -432,3 +432,12 @@ Use the newly added `public/rQmYn01.svg` MAX AI logo as the animated mark for th
 - Add the beta application page and admin dashboard entry/announcement composer.
 - Add authenticated tester announcement feed surface/API client contract for future MAX WebChat work, without changing the max-chat repository.
 - Run Next.js production build and CI; no merge or deployment without explicit approval.
+
+
+### Implementation checkpoint
+- Added the signed-in /beta application page with name, device and MAX product selections, current application state, approval state, and resubmission after rejection.
+- Routed the global site navigation Beta link to the MAX Auth application page.
+- Added a Beta Testers item in the MAX Auth admin sidebar visible only to zionopaaje.
+- Added /admin/beta with application review, global approval/rejection, announcement composer, All MAX Products/product-reference dropdown, and announcement history.
+- The composer clearly states that product selection is a descriptive email reference and all approved global testers remain recipients.
+- Next.js build, lint, browser accessibility/responsive QA and API integration tests: pending. No merge or production deployment.
