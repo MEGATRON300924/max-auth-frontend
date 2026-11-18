@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Home, User, ShieldCheck, KeyRound, Laptop, Database, Users, Mic2, Link2, Code2, Building2, ClipboardCheck } from "lucide-react";
+import { Home, User, ShieldCheck, KeyRound, Laptop, Database, Users, Mic2, Link2, Code2, Building2, ClipboardCheck, Activity } from "lucide-react";
 import { MaxLogo } from "./MaxLogo";
 import { useAuth } from "@/lib/auth/useAuth";
 import { apiClient } from "@/lib/api/client";
@@ -60,6 +60,7 @@ export function DashboardSidebar({ className }: { className?: string }) {
   const administrationItems: SidebarItem[] = [
     ...(user?.isAdmin ? [
       { href: "/admin", label: "Admin console", icon: ShieldCheck },
+      { href: "/admin/diagnostics", label: "MAX Diagnostics", icon: Activity },
       ...(user?.username?.toLowerCase() === "zionopaaje" ? [{ href: "/admin/beta", label: "Beta Testers", icon: Users }] : []),
       { href: "/admin/organisations", label: "Organisation review", icon: Building2 },
     ] : []),
