@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { CheckCircle2, Clock3, FlaskConical, LoaderCircle, ShieldCheck } from "lucide-react";
 
-const products = ["MAX AI", "MAX Home", "MAX Music", "MAX Browser", "MAX TV", "MAX Cloud", "MAX Store", "MAX Connect", "MAX Car OS", "MAX Business", "MAX Security", "MAX Pay", "MAX Studio", "MAX Voice", "MAX Spotlight Graph", "MAX Auth"];
+const products = ["MAX AI", "MAX Home", "MAX Music", "MAX Browser", "MAX TV", "MAX Cloud", "MAX Store", "MAX Connect", "MAX Car OS", "MAX Business", "MAX Security", "MAX OS", "MAX Pay", "MAX Studio", "MAX Voice", "MAX Spotlight Graph", "MAX Auth"];
 const devices = ["Android phone", "iPhone", "Android tablet", "iPad", "Windows PC", "Mac", "Linux PC", "Smart TV / MAX TV", "Car system", "Other"];
 
 type Application = { id: string; fullName: string; devices: string[]; products: string[]; status: "PENDING" | "APPROVED" | "REJECTED"; reviewNote?: string | null; createdAt: string };
