@@ -447,3 +447,11 @@ Use the newly added `public/rQmYn01.svg` MAX AI logo as the animated mark for th
 - GitHub Actions CI run #255 (`44281643687`) completed successfully: Next.js application build, critical dependency audit and production high-risk dependency audit all passed.
 - Vercel preview check reports success for the PR head. This is a preview check only; production alias/live browser QA are not confirmed.
 - PR #30 is open and ready for review: https://github.com/MEGATRON300924/max-auth-frontend/pull/30. No merge or production deployment.
+
+
+### Beta Tester programme merge checkpoint — 2026-11-18
+- PR #30 was squash-merged into `main`: https://github.com/MEGATRON300924/max-auth-frontend/pull/30
+- Squash merge commit: `5242ca3052c0df388d699d181a90642e25bc3144`.
+- Latest PR-head GitHub Actions CI run #256 (`44281844795`) completed successfully. Next.js production build, critical dependency audit and high-risk production dependency audit passed.
+- The PR's Vercel preview check reported success; this is not confirmation that the production alias is deployed or that live browser QA passed.
+- Frontend beta application and admin dashboard changes are now on `main`. Production deployment and end-to-end API/browser verification remain pending.
