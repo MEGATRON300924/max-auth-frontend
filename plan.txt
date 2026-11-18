@@ -480,3 +480,9 @@ Use the newly added `public/rQmYn01.svg` MAX AI logo as the animated mark for th
 - `/admin/beta` now has an Issue reports tab that loads the unified Beta Portal + MAX WebChat report queue on demand, displays submitted diagnostic context, supports status updates/internal notes, and copies a structured diagnostic JSON bundle.
 - Application review no longer invokes blocking browser `window.confirm()` or `window.prompt()`. It uses inline confirmation and optional rejection-note UI; successful review updates the application row and counters locally without waiting for a second full-page data fetch.
 - CI/build, browser accessibility, real API integration and INP measurement remain pending. No merge or production deployment.
+
+
+### CI verification update — 2026-11-18
+- GitHub Actions CI run #260 (`44299413326`) passed: dependency installation, Next.js build, critical dependency audit and production high-risk dependency audit.
+- Vercel reported a successful preview check for the PR head. This is not a production deployment and does not verify live browser INP.
+- PR #31 remains open for review; no merge or production deployment.
