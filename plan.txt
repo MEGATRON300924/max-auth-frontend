@@ -463,3 +463,10 @@ Use the newly added `public/rQmYn01.svg` MAX AI logo as the animated mark for th
 - Root cause found in the production dependency: the four Beta tables required by the merged backend were absent from the MAX Auth database.
 - The database schema has now been repaired additively and all four tables verified with RLS enabled.
 - No frontend source changes were needed for this database failure. Re-test `https://api.max-ai.name.ng/admin/beta` after confirming the backend merge commit is deployed; authenticated browser/API verification remains pending.
+
+## MAX Diagnostics Admin UI — 2026-11-18
+- Started the Diagnostics interface on branch feat/max-diagnostics-admin-ui after reading the current root plan.txt and inspecting the existing admin dashboard and sidebar.
+- Add a dedicated /admin/diagnostics page linked only in the existing administrator navigation. Use the MAX Auth admin API; never call internal service endpoints from the browser.
+- Show live probe state separately from historical request telemetry and the manually maintained public service status page. Include request volume, error rate, average latency, recent events and links to existing Beta issue reports.
+- Keep the page compact, responsive and consistent with the existing MAX Auth dashboard components. Do not display IP addresses, user agents, request bodies, tokens, conversation content or raw exception messages.
+- No production deployment. Validate Next.js build, lint/type checks and API contract before PR.
