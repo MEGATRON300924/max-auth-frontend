@@ -463,3 +463,13 @@ Use the newly added `public/rQmYn01.svg` MAX AI logo as the animated mark for th
 - Root cause found in the production dependency: the four Beta tables required by the merged backend were absent from the MAX Auth database.
 - The database schema has now been repaired additively and all four tables verified with RLS enabled.
 - No frontend source changes were needed for this database failure. Re-test `https://api.max-ai.name.ng/admin/beta` after confirming the backend merge commit is deployed; authenticated browser/API verification remains pending.
+
+
+## Beta issue reporting and approval interaction responsiveness — 2026-11-18
+
+### Implemented on branch `feat/beta-issue-reporting-and-admin-inp`
+- Removed blocking `window.confirm()` and `window.prompt()` from approval/rejection. Review confirmation and optional rejection note are inline page UI.
+- Approval/rejection updates the application row and summary counts locally after the API confirms success; it no longer waits for a full applications + announcements reload.
+- Added approved Beta Tester issue-report form with product, category, severity, description, reproduction steps, expected/actual behaviour, and report history/status.
+- Admin report queue UI, copyable diagnostic bundle, report status workflow and browser performance verification: pending.
+- Next.js build/CI and browser INP verification: pending. No merge or production deployment.
