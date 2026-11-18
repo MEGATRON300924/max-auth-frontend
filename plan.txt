@@ -455,3 +455,11 @@ Use the newly added `public/rQmYn01.svg` MAX AI logo as the animated mark for th
 - Latest PR-head GitHub Actions CI run #256 (`44281844795`) completed successfully. Next.js production build, critical dependency audit and high-risk production dependency audit passed.
 - The PR's Vercel preview check reported success; this is not confirmation that the production alias is deployed or that live browser QA passed.
 - Frontend beta application and admin dashboard changes are now on `main`. Production deployment and end-to-end API/browser verification remain pending.
+
+
+### Production admin-page failure investigation — 2026-11-18
+- Investigated the generic error reported on `/admin/beta`.
+- Confirmed the page requests both admin applications and announcement endpoints in parallel; a failure from either request causes the page-level error state.
+- Root cause found in the production dependency: the four Beta tables required by the merged backend were absent from the MAX Auth database.
+- The database schema has now been repaired additively and all four tables verified with RLS enabled.
+- No frontend source changes were needed for this database failure. Re-test `https://api.max-ai.name.ng/admin/beta` after confirming the backend merge commit is deployed; authenticated browser/API verification remains pending.
