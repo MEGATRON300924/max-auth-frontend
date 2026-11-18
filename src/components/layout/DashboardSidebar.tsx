@@ -60,6 +60,7 @@ export function DashboardSidebar({ className }: { className?: string }) {
   const administrationItems: SidebarItem[] = [
     ...(user?.isAdmin ? [
       { href: "/admin", label: "Admin console", icon: ShieldCheck },
+      ...(user?.username?.toLowerCase() === "zionopaaje" ? [{ href: "/admin/beta", label: "Beta Testers", icon: Users }] : []),
       { href: "/admin/organisations", label: "Organisation review", icon: Building2 },
     ] : []),
     ...(canReviewSpotlight ? [{ href: "/spotlight-review", label: "Spotlight review", icon: ClipboardCheck }] : []),
