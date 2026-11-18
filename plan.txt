@@ -470,3 +470,11 @@ Use the newly added `public/rQmYn01.svg` MAX AI logo as the animated mark for th
 - Show live probe state separately from historical request telemetry and the manually maintained public service status page. Include request volume, error rate, average latency, recent events and links to existing Beta issue reports.
 - Keep the page compact, responsive and consistent with the existing MAX Auth dashboard components. Do not display IP addresses, user agents, request bodies, tokens, conversation content or raw exception messages.
 - No production deployment. Validate Next.js build, lint/type checks and API contract before PR.
+
+### MAX Diagnostics Admin UI implementation checkpoint — 2026-11-18
+- Added /admin/diagnostics using the existing MAX Auth API client and dashboard components.
+- Added administrator-only sidebar navigation for MAX Diagnostics.
+- The page separates live readiness probes from request telemetry and displays service health, request volume, failed requests, error rate, average latency, per-service summaries and recent sanitised events.
+- Added time-window selection (1 hour, 24 hours, 7 days), refresh action and a link to the existing Beta tester issue-report queue.
+- The page does not call internal service endpoints directly and does not display IP addresses, user agents, request bodies, tokens, user message content or raw exceptions.
+- Next.js build, lint/type checks, PR review and API contract validation pending. No production deployment.
