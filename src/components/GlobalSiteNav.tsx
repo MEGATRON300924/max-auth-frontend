@@ -8,7 +8,7 @@ const links = [
   { label: "Chat MAX", href: "https://www.max-ai.name.ng/max", path: "/max", icon: "chat" },
   { label: "Status", href: "https://www.max-ai.name.ng/status", path: "/status", icon: "status" },
   { label: "News", href: "https://www.max-ai.name.ng/news", path: "/news", icon: "news" },
-  { label: "Beta", href: "https://www.max-ai.name.ng/beta", path: "/beta", icon: "beta" },
+  { label: "Beta", href: "https://api.max-ai.name.ng/beta", path: "/beta", icon: "beta" },
   { label: "Contact", href: "https://www.max-ai.name.ng/contact", path: "/contact", icon: "contact" },
 ] as const;
 
