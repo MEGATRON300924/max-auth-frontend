@@ -484,3 +484,9 @@ Use the newly added `public/rQmYn01.svg` MAX AI logo as the animated mark for th
 - Vercel's separate preview status returned a deployment rate-limit failure (retry in 24 hours). This is a hosting preview limitation, not a failure of the GitHub Actions production build. No deployment was requested or performed.
 - PR #32 remains open pending review and backend API integration. Live browser QA is not yet possible from the rate-limited Vercel preview.
 - No production deployment.
+
+
+### MAX Diagnostics merge record — 2026-11-18
+- MAX Diagnostics admin dashboard and navigation merged via squash commit 2bdc370ff109582d759f8add70326d103fc879c5. PR #32.
+- Merge order: MAX Auth API, MAX Backend telemetry, then MAX Auth frontend.
+- CI on the PR heads passed before merge. Changes are merged to main; production deployment and live cross-service smoke tests remain pending.
