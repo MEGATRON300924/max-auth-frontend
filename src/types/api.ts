@@ -13,7 +13,8 @@ export interface Session { id: string; deviceId: string | null; device?: Device 
 export interface LoginHistoryEntry { id: string; success: boolean; ipAddress: string | null; userAgent: string | null; reason: string | null; createdAt: string; }
 export interface AuditLogEntry { id: string; action: string; ipAddress: string | null; userAgent: string | null; metadata: Record<string, unknown> | null; createdAt: string; }
 export type ConnectedProvider = "GOOGLE" | "YOUTUBE_MUSIC" | "X" | "INSTAGRAM" | "SPOTIFY" | "DISCORD" | "GITHUB" | "MICROSOFT" | "TIKTOK";
-export interface ConnectedAccount { id: string; provider: ConnectedProvider; providerAccountId: string; scope: string | null; tokenExpiresAt: string | null; linkedAt: string; updatedAt: string; }
+export type ConnectedAccountStatus = "CONNECTED" | "REAUTH_REQUIRED";
+export interface ConnectedAccount { id: string; provider: ConnectedProvider; providerAccountId: string; scope: string | null; tokenExpiresAt: string | null; status: ConnectedAccountStatus; statusReason: string | null; statusUpdatedAt: string | null; linkedAt: string; updatedAt: string; }
 export interface OAuthClient { id: string; clientId: string; name: string; redirectUris: string[]; scopes: string[]; isConfidential: boolean; isActive: boolean; createdAt: string; }
 export interface OAuthClientConfig { applicationType: OAuthApplicationType; authorizedOrigins: string[]; packageName: string | null; bundleId: string | null; certificateFingerprints: string[]; logoUrl?: string | null; displayName?: string | null; websiteUrl?: string | null; manifestUrl?: string | null; verificationStatus?: VerificationStatus; verifiedAt?: string | null; }
 export type OAuthClientConfigUpdate = Pick<OAuthClientConfig, "applicationType" | "authorizedOrigins" | "certificateFingerprints"> & Partial<Pick<OAuthClientConfig, "packageName" | "bundleId" | "logoUrl" | "displayName" | "websiteUrl" | "manifestUrl">>;
