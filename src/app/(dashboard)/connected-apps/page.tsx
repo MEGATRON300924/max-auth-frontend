@@ -271,6 +271,7 @@ export default function ConnectedAppsPage() {
             {google ? (
               <div className="flex flex-wrap items-center gap-2">
                 <ConnectionStatusBadge account={google} />
+                {google.status === "REAUTH_REQUIRED" ? <Button size="sm" onClick={async () => { try { const { authorizationUrl } = await connectedAccountsApi.googleCalendarConnect(); window.location.assign(authorizationUrl); } catch (err) { showToast({ title: "Google reconnection could not start", description: err instanceof ApiError ? err.message : "Please try again.", variant: "error" }); } }} disabled={busy}><RefreshCw className="h-3.5 w-3.5" /> Reconnect Google</Button> : null}
                 {googleCalendarConnected && googleDriveConnected && googleGmailConnected && googleTasksConnected && googleContactsConnected && googleYouTubeConnected ? <Badge variant="success"><CheckCircle2 className="mr-1 h-3.5 w-3.5" />Google services ready</Badge> : <Button size="sm" variant="secondary" onClick={async () => { try { const { authorizationUrl } = await connectedAccountsApi.googleCalendarConnect(); window.location.assign(authorizationUrl); } catch (err) { showToast({ title: "Couldn't start Google connection", description: err instanceof ApiError ? err.message : "Please try again.", variant: "error" }); } }} disabled={busy}><Link2 className="h-3.5 w-3.5" /> Connect Google services</Button>}<Button size="sm" variant="ghost" onClick={() => setUnlinkId(google.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button>
               </div>
             ) : (
@@ -305,7 +306,6 @@ export default function ConnectedAppsPage() {
               <div className="flex flex-wrap gap-2">
                 <ConnectionStatusBadge account={youtubeMusic} />
                 <Button size="sm" variant="secondary" onClick={connectYouTubeMusic} disabled={busy}><RefreshCw className="h-3.5 w-3.5" /> Reconnect</Button>
-                <ConnectionStatusBadge account={youtubeMusic} />
                 <Button size="sm" variant="ghost" onClick={() => setUnlinkId(youtubeMusic.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button>
               </div>
             ) : <Button size="sm" onClick={connectYouTubeMusic}><Link2 className="h-3.5 w-3.5" /> Connect YouTube Music</Button>}
