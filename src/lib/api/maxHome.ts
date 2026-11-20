@@ -18,6 +18,10 @@ export interface MaxHome {
   postal_code?: string | null;
 }
 
+export interface MaxHomeLink extends Pick<MaxHome, "id" | "name" | "role" | "timezone" | "city" | "country"> { linked: boolean; }
+
+export interface MaxHomeLinks { homes: MaxHomeLink[]; linkAll: boolean; }
+
 export interface MaxHomeMember {
   user_id: string;
   role: string;
@@ -50,11 +54,12 @@ export interface MaxHomeDevice {
   room_id?: string | null;
 }
 
-async function request<T>(path: string): Promise<T> {
+async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const token = tokenStore.get();
   if (!token) throw new Error("Your MAX Auth session is still loading. Please try again.");
   const response = await fetch(`${API_URL}${path}`, {
-    headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
+    headers: { Authorization: `Bearer ${token}`, Accept: "application/json", ...(init.body ? { "Content-Type": "application/json" } : {}), ...init.headers },
+    ...init,
     cache: "no-store",
   });
   const payload = await response.json().catch(() => null) as
@@ -69,6 +74,9 @@ async function request<T>(path: string): Promise<T> {
 
 export const maxHomeApi = {
   getHomes: () => request<{ homes: MaxHome[] }>("/homes"),
+  getAccountLinks: () => request<MaxHomeLinks>("/account-links"),
+  updateAccountLinks: (data: { mode: "all" } | { mode: "selected"; homeIds: string[] }) => request<{ mode: "all" | "selected"; linkedCount: number | null }>("/account-links", { method: "PUT", body: JSON.stringify(data) }),
+  unlinkAccountHomes: () => request<{ unlinked: boolean }>("/account-links", { method: "DELETE" }),
   getMembers: (homeId: string) => request<{ members: MaxHomeMember[] }>(`/homes/${encodeURIComponent(homeId)}/members`),
   getRooms: (homeId: string) => request<{ rooms: MaxHomeRoom[] }>(`/homes/${encodeURIComponent(homeId)}/rooms`),
   getDevices: (homeId: string) => request<{ devices: MaxHomeDevice[] }>(`/homes/${encodeURIComponent(homeId)}/devices`),
