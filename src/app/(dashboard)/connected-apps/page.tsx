@@ -13,6 +13,7 @@ import { connectedAccountsApi } from "@/lib/api/security";
 import { ApiError } from "@/lib/api/ApiError";
 import type { ConnectedAccount, ConnectedProvider } from "@/types/api";
 import { GoogleConnectButton } from "@/components/auth/GoogleConnectButton";
+import { MaxHomeConnector } from "@/components/connected-apps/MaxHomeConnector";
 
 const futureProviders: { id: ConnectedProvider; name: string; description: string }[] = [
 
@@ -251,6 +252,8 @@ export default function ConnectedAppsPage() {
   return (
     <div className="space-y-6">
       <PageHeader title="Connected Apps" description="Control third-party services connected to your MAX Account." />
+
+      <MaxHomeConnector />
 
       {notice && <div className="rounded-2xl border border-warning/20 bg-warning/5 p-4 text-sm text-ink-muted">{notice}</div>}
 
