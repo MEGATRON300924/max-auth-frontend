@@ -490,3 +490,12 @@ Use the newly added `public/rQmYn01.svg` MAX AI logo as the animated mark for th
 - MAX Diagnostics admin dashboard and navigation merged via squash commit 2bdc370ff109582d759f8add70326d103fc879c5. PR #32.
 - Merge order: MAX Auth API, MAX Backend telemetry, then MAX Auth frontend.
 - CI on the PR heads passed before merge. Changes are merged to main; production deployment and live cross-service smoke tests remain pending.
+
+
+## MAX Home Connected Apps connector (2026-11-20)
+
+- Added the MAX Home connector to the Connected Apps page using the existing `max_home.png` asset.
+- Users can select individual homes or enable linking for all current and future homes accessible to their MAX Account.
+- Added API client methods for reading, saving and removing MAX Home link preferences.
+- Connector uses the MAX Home backend's authenticated account-links API; no browser-visible service token or duplicate identity system is introduced.
+- Pending: Next.js typecheck/build, browser verification, backend migration deployment and PR review. No production release is claimed.
