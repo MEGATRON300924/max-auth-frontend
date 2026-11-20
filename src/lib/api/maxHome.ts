@@ -58,8 +58,8 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const token = tokenStore.get();
   if (!token) throw new Error("Your MAX Auth session is still loading. Please try again.");
   const response = await fetch(`${API_URL}${path}`, {
-    headers: { Authorization: `Bearer ${token}`, Accept: "application/json", ...(init.body ? { "Content-Type": "application/json" } : {}), ...init.headers },
     ...init,
+    headers: { Authorization: `Bearer ${token}`, Accept: "application/json", ...(init.body ? { "Content-Type": "application/json" } : {}), ...init.headers },
     cache: "no-store",
   });
   const payload = await response.json().catch(() => null) as
