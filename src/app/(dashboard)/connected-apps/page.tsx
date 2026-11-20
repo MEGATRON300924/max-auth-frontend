@@ -11,12 +11,25 @@ import { useAsyncData } from "@/lib/hooks/useAsyncData";
 import { useToast } from "@/lib/hooks/useToast";
 import { connectedAccountsApi } from "@/lib/api/security";
 import { ApiError } from "@/lib/api/ApiError";
-import type { ConnectedProvider } from "@/types/api";
+import type { ConnectedAccount, ConnectedProvider } from "@/types/api";
 import { GoogleConnectButton } from "@/components/auth/GoogleConnectButton";
 
 const futureProviders: { id: ConnectedProvider; name: string; description: string }[] = [
 
 ];
+
+
+function ConnectionStatusBadge({ account }: { account: ConnectedAccount }) {
+  if (account.status === "REAUTH_REQUIRED") {
+    const reason = account.statusReason === "refresh_token_missing"
+      ? "Reconnect to restore secure access"
+      : account.statusReason === "refresh_token_invalid"
+        ? "Provider authorization expired"
+        : "Authorization needs attention";
+    return <Badge variant="warning" title={reason}>Reconnect required</Badge>;
+  }
+  return <Badge variant="success"><CheckCircle2 className="h-3.5 w-3.5" />Connected</Badge>;
+}
 
 function expiryLabel(value: string | null) {
   if (!value) return "Token status unavailable";
@@ -257,8 +270,8 @@ export default function ConnectedAppsPage() {
             </div>
             {google ? (
               <div className="flex flex-wrap items-center gap-2">
-                <Badge variant="success"><CheckCircle2 className="mr-1 h-3.5 w-3.5" />Connected</Badge>
-                {googleCalendarConnected && googleDriveConnected && googleGmailConnected && googleTasksConnected && googleContactsConnected && googleYouTubeConnected ? <Badge variant="success"><CheckCircle2 className="mr-1 h-3.5 w-3.5" />Google services ready</Badge> : <Button size="sm" variant="secondary" onClick={async () => { try { const { authorizationUrl } = await connectedAccountsApi.googleCalendarConnect(); window.location.assign(authorizationUrl); } catch (err) { showToast({ title: "Couldn't start Google connection", description: err instanceof ApiError ? err.message : "Please try again.", variant: "error" }); } }} disabled={busy}><Link2 className="h-3.5 w-3.5" /> Connect Google services</Button>}<Button size="sm" variant="ghost" onClick={() => setUnlinkId(google.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button>
+                <ConnectionStatusBadge account={google} />
+                {google.status === "REAUTH_REQUIRED" ? <Button size="sm" onClick={async () => { try { const { authorizationUrl } = await connectedAccountsApi.googleCalendarConnect(); window.location.assign(authorizationUrl); } catch (err) { showToast({ title: "Google reconnection could not start", description: err instanceof ApiError ? err.message : "Please try again.", variant: "error" }); } }} disabled={busy}><RefreshCw className="h-3.5 w-3.5" /> Reconnect Google</Button> : googleCalendarConnected && googleDriveConnected && googleGmailConnected && googleTasksConnected && googleContactsConnected && googleYouTubeConnected ? <Badge variant="success"><CheckCircle2 className="mr-1 h-3.5 w-3.5" />Google services ready</Badge> : <Button size="sm" variant="secondary" onClick={async () => { try { const { authorizationUrl } = await connectedAccountsApi.googleCalendarConnect(); window.location.assign(authorizationUrl); } catch (err) { showToast({ title: "Couldn't start Google connection", description: err instanceof ApiError ? err.message : "Please try again.", variant: "error" }); } }} disabled={busy}><Link2 className="h-3.5 w-3.5" /> Connect Google services</Button>}<Button size="sm" variant="ghost" onClick={() => setUnlinkId(google.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button>
               </div>
             ) : (
               <GoogleConnectButton onConnected={async () => { await accounts.refetch(); showToast({ title: "Google connected", description: "Your Google identity is now linked to your MAX Account.", variant: "success" }); }} />
@@ -274,7 +287,8 @@ export default function ConnectedAppsPage() {
             </div>
             {spotify ? (
               <div className="flex flex-wrap gap-2">
-                <Button size="sm" variant="secondary" onClick={refreshSpotify} isLoading={busy}><RefreshCw className="h-3.5 w-3.5" /> Refresh</Button>
+                {spotify.status === "REAUTH_REQUIRED" ? <Button size="sm" onClick={connectSpotify} disabled={busy}><RefreshCw className="h-3.5 w-3.5" /> Reconnect Spotify</Button> : <Button size="sm" variant="secondary" onClick={refreshSpotify} isLoading={busy}><RefreshCw className="h-3.5 w-3.5" /> Refresh</Button>}
+                <ConnectionStatusBadge account={spotify} />
                 <Button size="sm" variant="ghost" onClick={() => setUnlinkId(spotify.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button>
               </div>
             ) : <Button size="sm" onClick={connectSpotify}><Link2 className="h-3.5 w-3.5" /> Connect Spotify</Button>}
@@ -289,7 +303,7 @@ export default function ConnectedAppsPage() {
             </div>
             {youtubeMusic ? (
               <div className="flex flex-wrap gap-2">
-                <Badge variant="success"><CheckCircle2 className="mr-1 h-3.5 w-3.5" />Connected</Badge>
+                <ConnectionStatusBadge account={youtubeMusic} />
                 <Button size="sm" variant="secondary" onClick={connectYouTubeMusic} disabled={busy}><RefreshCw className="h-3.5 w-3.5" /> Reconnect</Button>
                 <Button size="sm" variant="ghost" onClick={() => setUnlinkId(youtubeMusic.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button>
               </div>
@@ -306,6 +320,7 @@ export default function ConnectedAppsPage() {
             {discord ? (
               <div className="flex flex-wrap gap-2">
                 <Button size="sm" variant="secondary" onClick={connectDiscord} disabled={busy}><RefreshCw className="h-3.5 w-3.5" /> Reconnect</Button>
+                <ConnectionStatusBadge account={discord} />
                 <Button size="sm" variant="ghost" onClick={() => setUnlinkId(discord.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button>
               </div>
             ) : <Button size="sm" onClick={connectDiscord}><Link2 className="h-3.5 w-3.5" /> Connect Discord</Button>}
@@ -321,6 +336,7 @@ export default function ConnectedAppsPage() {
             {microsoft ? (
               <div className="flex flex-wrap gap-2">
                 <Button size="sm" variant="secondary" onClick={connectMicrosoft} disabled={busy}><RefreshCw className="h-3.5 w-3.5" /> Reconnect</Button>
+                <ConnectionStatusBadge account={microsoft} />
                 <Button size="sm" variant="ghost" onClick={() => setUnlinkId(microsoft.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button>
               </div>
             ) : <Button size="sm" onClick={connectMicrosoft}><Link2 className="h-3.5 w-3.5" /> Connect Microsoft</Button>}
@@ -336,6 +352,7 @@ export default function ConnectedAppsPage() {
             {github ? (
               <div className="flex flex-wrap gap-2">
                 <Button size="sm" variant="secondary" onClick={connectGithub} disabled={busy}><RefreshCw className="h-3.5 w-3.5" /> Reconnect</Button>
+                <ConnectionStatusBadge account={github} />
                 <Button size="sm" variant="ghost" onClick={() => setUnlinkId(github.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button>
               </div>
             ) : <Button size="sm" onClick={connectGithub}><Link2 className="h-3.5 w-3.5" /> Connect GitHub</Button>}
@@ -351,6 +368,7 @@ export default function ConnectedAppsPage() {
             {x ? (
               <div className="flex flex-wrap gap-2">
                 <Button size="sm" variant="secondary" onClick={connectX} disabled={busy}><RefreshCw className="h-3.5 w-3.5" /> Reconnect</Button>
+                <ConnectionStatusBadge account={x} />
                 <Button size="sm" variant="ghost" onClick={() => setUnlinkId(x.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button>
               </div>
             ) : <Button size="sm" onClick={connectX}><Link2 className="h-3.5 w-3.5" /> Connect X</Button>}
@@ -359,12 +377,14 @@ export default function ConnectedAppsPage() {
           <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
             <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-pink-500/10"><img src="/brands/instagram.svg" alt="" className="h-5 w-5" /></div>
             <div className="min-w-0 flex-1"><p className="text-sm font-semibold text-ink">Instagram</p><p className="text-xs text-ink-faint">Connect an Instagram professional account through Instagram Login.</p>{instagram && <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-ink-faint"><span>Linked {new Date(instagram.linkedAt).toLocaleDateString()}</span><Badge variant="success">Profile</Badge></div>}</div>
-            {instagram ? <div className="flex flex-wrap gap-2"><Button size="sm" variant="secondary" onClick={connectInstagram} disabled={busy}><RefreshCw className="h-3.5 w-3.5" /> Reconnect</Button><Button size="sm" variant="ghost" onClick={() => setUnlinkId(instagram.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button></div> : <Button size="sm" onClick={connectInstagram}><Link2 className="h-3.5 w-3.5" /> Connect Instagram</Button>}
+            {instagram ? <div className="flex flex-wrap gap-2"><Button size="sm" variant="secondary" onClick={connectInstagram} disabled={busy}><RefreshCw className="h-3.5 w-3.5" /> Reconnect</Button>
+                <ConnectionStatusBadge account={instagram} /><Button size="sm" variant="ghost" onClick={() => setUnlinkId(instagram.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button></div> : <Button size="sm" onClick={connectInstagram}><Link2 className="h-3.5 w-3.5" /> Connect Instagram</Button>}
           </div>
           <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
             <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-black/10"><img src="/brands/tiktok.svg" alt="" className="h-5 w-5 dark:invert" /></div>
             <div className="min-w-0 flex-1"><p className="text-sm font-semibold text-ink">TikTok</p><p className="text-xs text-ink-faint">Connect TikTok to let MAX use your approved profile and public video permissions.</p>{tiktok && <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-ink-faint"><span>Linked {new Date(tiktok.linkedAt).toLocaleDateString()}</span><Badge variant="success">Profile</Badge><Badge variant="success">Videos</Badge></div>}</div>
-            {tiktok ? <div className="flex flex-wrap gap-2"><Button size="sm" variant="secondary" onClick={refreshTikTok} disabled={busy}><RefreshCw className="h-3.5 w-3.5" /> Refresh</Button><Button size="sm" variant="secondary" onClick={connectTikTok} disabled={busy}><RefreshCw className="h-3.5 w-3.5" /> Reconnect</Button><Button size="sm" variant="ghost" onClick={() => setUnlinkId(tiktok.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button></div> : <Button size="sm" onClick={connectTikTok}><Link2 className="h-3.5 w-3.5" /> Connect TikTok</Button>}
+            {tiktok ? <div className="flex flex-wrap gap-2"><Button size="sm" variant="secondary" onClick={refreshTikTok} disabled={busy}><RefreshCw className="h-3.5 w-3.5" /> Refresh</Button><Button size="sm" variant="secondary" onClick={connectTikTok} disabled={busy}><RefreshCw className="h-3.5 w-3.5" /> Reconnect</Button>
+                <ConnectionStatusBadge account={tiktok} /><Button size="sm" variant="ghost" onClick={() => setUnlinkId(tiktok.id)} disabled={busy}><Unlink className="h-3.5 w-3.5" /> Unlink</Button></div> : <Button size="sm" onClick={connectTikTok}><Link2 className="h-3.5 w-3.5" /> Connect TikTok</Button>}
           </div>
 
           {futureProviders.map((p) => (
