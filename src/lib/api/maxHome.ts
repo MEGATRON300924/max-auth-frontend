@@ -1,5 +1,6 @@
 "use client";
 
+import { apiClient } from "@/lib/api/client";
 import { tokenStore } from "@/lib/api/tokenStore";
 
 const API_URL = process.env.NEXT_PUBLIC_MAX_HOME_API_URL || "https://max-home-backend.onrender.com/api/v1";
@@ -54,20 +55,47 @@ export interface MaxHomeDevice {
   room_id?: string | null;
 }
 
+type MaxHomeResponse<T> =
+  | { success: true; data: T }
+  | { success: false; error?: { message?: string } };
+
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const token = tokenStore.get();
-  if (!token) throw new Error("Your MAX Auth session is still loading. Please try again.");
-  const response = await fetch(`${API_URL}${path}`, {
+  // Access tokens are intentionally memory-only, so a page reload clears
+  // tokenStore. Restore the MAX Auth session before calling MAX Home.
+  let token = tokenStore.get() || await apiClient.silentRefresh();
+  if (!token) {
+    throw new Error("Your MAX Account session could not be restored. Please sign in again.");
+  }
+
+  const send = (accessToken: string) => fetch(`${API_URL}${path}`, {
     ...init,
-    headers: { Authorization: `Bearer ${token}`, Accept: "application/json", ...(init.body ? { "Content-Type": "application/json" } : {}), ...init.headers },
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      Accept: "application/json",
+      ...(init.body ? { "Content-Type": "application/json" } : {}),
+      ...init.headers,
+    },
     cache: "no-store",
   });
-  const payload = await response.json().catch(() => null) as
-    | { success: true; data: T }
-    | { success: false; error?: { message?: string } }
-    | null;
+
+  let response = await send(token);
+
+  // MAX Home validates every access token against MAX Auth userinfo. If the
+  // access token expired between page bootstrap and this request, rotate it
+  // once through MAX Auth and retry rather than showing a false sign-in error.
+  if (response.status === 401) {
+    const refreshedToken = await apiClient.silentRefresh();
+    if (refreshedToken && refreshedToken !== token) {
+      token = refreshedToken;
+      response = await send(token);
+    }
+  }
+
+  const payload = await response.json().catch(() => null) as MaxHomeResponse<T> | null;
   if (!response.ok || !payload || !payload.success) {
-    throw new Error(payload && !payload.success ? payload.error?.message || "MAX Home could not be reached." : `MAX Home request failed (${response.status}).`);
+    throw new Error(payload && !payload.success
+      ? payload.error?.message || "MAX Home could not be reached."
+      : `MAX Home request failed (${response.status}).`);
   }
   return payload.data;
 }
