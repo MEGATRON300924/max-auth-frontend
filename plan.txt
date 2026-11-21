@@ -499,3 +499,30 @@ Use the newly added `public/rQmYn01.svg` MAX AI logo as the animated mark for th
 - Added API client methods for reading, saving and removing MAX Home link preferences.
 - Connector uses the MAX Home backend's authenticated account-links API; no browser-visible service token or duplicate identity system is introduced.
 - Pending: Next.js typecheck/build, browser verification, backend migration deployment and PR review. No production release is claimed.
+
+
+## Official MAX Auth logo rollout — 2026-11-21
+
+### Request
+Replace MAX Auth's old page logo and browser icon with the official `public/max_auth.jpg` asset across all pages.
+
+### Implementation
+- Updated the root Next.js metadata so browser icon, shortcut icon and Apple touch icon all use `/max_auth.jpg`.
+- Updated Open Graph and Twitter preview images and the Organization structured-data logo to the same official asset.
+- Updated the shared `MaxLogo` component, which supplies the public header, dashboard header/sidebar, auth layout and footer branding.
+- Replaced direct old-logo references on the sign-in screen, OAuth authorization/consent screen (including invalid-request state), parental-approval pending screen and MAX identity illustration.
+- Updated README and folder-structure documentation to identify `public/max_auth.jpg` as the official MAX Auth logo.
+- Kept the separate MAX AI ecosystem favicon referenced by the parental-approval recommendation card unchanged; it belongs to the MAX AI website, not MAX Auth.
+
+### Commits
+- Root metadata and social/browser icon references: `d9b93e2f9836dddeebbe2f23305fe8ad58d7d33e`.
+- Shared logo component: `dfe080c0ae941e05eb447eae0667401021c5f9b1`.
+- Sign-in, parental approval and OAuth pages, identity graphic, and documentation: recorded in the corresponding commits on `main`.
+
+### Verification
+- Confirmed `public/max_auth.jpg` exists on the repository's main branch.
+- Source updates committed directly to `main`; GitHub Actions build and live browser verification are pending.
+- Vercel production deployment status for this logo update has not yet been confirmed.
+
+### Next steps
+- Check CI/build status and confirm the connected Vercel production deployment serves the new logo and favicon on representative routes.
