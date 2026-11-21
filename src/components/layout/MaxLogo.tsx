@@ -12,7 +12,7 @@ interface MaxLogoProps {
 export function MaxLogo({ size = 32, showWordmark = true, href = "/", className }: MaxLogoProps) {
   const content = (
     <span className={cn("inline-flex items-center gap-2.5", className)}>
-      <Image src="/logo.png" alt="MAX AI" width={size} height={size} className="rounded-full" priority />
+      <Image src="/max_auth.jpg" alt="MAX AI" width={size} height={size} className="rounded-full" priority />
       {showWordmark && (
         <span className="font-display text-lg font-bold tracking-tight text-ink">
           MAX <span className="text-brand-600 dark:text-brand-400">Auth</span>
