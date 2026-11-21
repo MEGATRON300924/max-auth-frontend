@@ -4,8 +4,7 @@ The complete frontend for MAX Auth, the identity platform for The MAX AI Ecosyst
 Next.js 16 (App Router), TypeScript, and Tailwind CSS. Connects to the existing MAX Auth backend
 — no backend code here.
 
-The official MAX AI logo is in place at `public/logo.png` / `public/favicon.png`, used in the
-header, sidebar, auth pages, and browser favicon via `src/components/layout/MaxLogo.tsx`.
+The official MAX Auth logo is `public/max_auth.jpg`, used across the shared header, sidebar, auth pages, OAuth screens, and browser favicon.
 
 ---
 
