@@ -88,7 +88,7 @@ export default function ParentalApprovalPage() {
     <main className="min-h-screen bg-base px-4 py-8 text-ink sm:px-6 sm:py-12">
       <div className="mx-auto flex w-full max-w-xl flex-col items-center">
         <Link href="/" className="mb-8 inline-flex items-center gap-3" aria-label="MAX Auth home">
-          <img src="/logo.png" alt="MAX Auth" width={42} height={42} className="rounded-xl" />
+          <img src="/max_auth.jpg" alt="MAX Auth" width={42} height={42} className="rounded-xl" />
           <span className="text-sm font-semibold tracking-tight">MAX Auth <span className="font-normal text-ink-muted">· Family approval</span></span>
         </Link>
 
