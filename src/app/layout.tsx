@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   creator: "Zion Opaaje",
   publisher: "The Tron Forge Limited",
   alternates: { canonical: "https://auth.max-ai.name.ng" },
-  icons: { icon: "/favicon.png", shortcut: "/favicon.png", apple: "/favicon.png" },
+  icons: { icon: "/max_auth.jpg", shortcut: "/max_auth.jpg", apple: "/max_auth.jpg" },
   openGraph: {
     title: "MAX Auth - Your MAX AI Account",
     description: "One secure identity for The MAX AI Ecosystem.",
@@ -26,9 +26,9 @@ export const metadata: Metadata = {
     siteName: "MAX Auth",
     locale: "en_US",
     type: "website",
-    images: [{ url: "/logo.png", width: 512, height: 512, alt: "MAX Auth Logo" }],
+    images: [{ url: "/max_auth.jpg", width: 512, height: 512, alt: "MAX Auth Logo" }],
   },
-  twitter: { card: "summary_large_image", title: "MAX Auth - Your MAX AI Account", description: "Sign in with your MAX AI Account and access The MAX AI Ecosystem.", images: ["/logo.png"] },
+  twitter: { card: "summary_large_image", title: "MAX Auth - Your MAX AI Account", description: "Sign in with your MAX AI Account and access The MAX AI Ecosystem.", images: ["/max_auth.jpg"] },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
 };
 
@@ -42,7 +42,7 @@ function StructuredData() {
   const schema = {
     "@context": "https://schema.org",
     "@graph": [
-      { "@type": "Organization", name: "The Tron Forge Limited", url: "https://max-ai.name.ng", logo: "https://auth.max-ai.name.ng/logo.png" },
+      { "@type": "Organization", name: "The Tron Forge Limited", url: "https://max-ai.name.ng", logo: "https://auth.max-ai.name.ng/max_auth.jpg" },
       { "@type": "SoftwareApplication", name: "MAX Auth", applicationCategory: "SecurityApplication", operatingSystem: "Web", url: "https://auth.max-ai.name.ng", description: "MAX Auth provides secure identity management for The MAX AI Ecosystem.", creator: { "@type": "Organization", name: "The Tron Forge Limited" } },
     ],
   };
