@@ -113,7 +113,7 @@ function AuthorizeContent() {
     return (
       <main className="grid min-h-screen place-items-center bg-[#f7f8fa] px-4 py-10 text-[#252b36] dark:bg-[#17191d] dark:text-[#e5e7eb]">
         <section className="w-full max-w-lg rounded-3xl border border-[#e3e7ed] bg-white p-7 shadow-sm dark:border-[#373b44] dark:bg-[#202329] sm:p-9">
-          <div className="mb-6 flex items-center gap-3"><img src="/logo.png" alt="MAX" className="h-9 w-9 rounded-xl object-contain" /><span className="text-sm font-semibold text-[#667085] dark:text-[#a2a8b3]">MAX</span></div>
+          <div className="mb-6 flex items-center gap-3"><img src="/max_auth.jpg" alt="MAX" className="h-9 w-9 rounded-xl object-contain" /><span className="text-sm font-semibold text-[#667085] dark:text-[#a2a8b3]">MAX</span></div>
           <h1 className="text-2xl font-semibold tracking-tight">We couldn't verify this request</h1>
           <p className="mt-3 text-sm leading-6 text-[#667085] dark:text-[#a2a8b3]">{validationError || "This authorization request is invalid or has expired. No access has been granted."}</p>
           <p className="mt-4 text-sm leading-6 text-[#667085] dark:text-[#a2a8b3]">If you're the developer, review the requested scopes and registered redirect URI in MAX for Developers or MAX Auth. Ask only for the permissions the app needs.</p>
@@ -139,7 +139,7 @@ function AuthorizeContent() {
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-[520px] items-center justify-center">
         <section className="w-full rounded-[24px] border border-[#e3e7ed] bg-white p-6 shadow-sm dark:border-[#373b44] dark:bg-[#202329] sm:p-9">
           <div className="mb-7 flex items-center gap-3">
-            <img src="/logo.png" alt="MAX" className="h-9 w-9 rounded-xl object-contain" />
+            <img src="/max_auth.jpg" alt="MAX" className="h-9 w-9 rounded-xl object-contain" />
             <span className="text-sm font-semibold text-[#667085] dark:text-[#a2a8b3]">MAX</span>
           </div>
 
