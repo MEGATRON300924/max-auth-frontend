@@ -526,3 +526,7 @@ Replace MAX Auth's old page logo and browser icon with the official `public/max_
 
 ### Next steps
 - Check CI/build status and confirm the connected Vercel production deployment serves the new logo and favicon on representative routes.
+
+
+### Parental approval page coverage correction
+- Final route audit found one additional direct MAX Auth logo reference on `/parental-approval`; it now uses `/max_auth.jpg` as well.
