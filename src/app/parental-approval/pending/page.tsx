@@ -5,7 +5,7 @@ export default function ParentalApprovalPendingPage() {
   return (
     <main className="min-h-screen bg-base px-4 py-10 text-ink sm:px-6">
       <div className="mx-auto flex min-h-[80vh] w-full max-w-lg flex-col items-center justify-center">
-        <img src="/logo.png" alt="MAX Auth" width={52} height={52} className="mb-6 rounded-2xl" />
+        <img src="/max_auth.jpg" alt="MAX Auth" width={52} height={52} className="mb-6 rounded-2xl" />
         <section className="w-full rounded-3xl border border-glass-border bg-base-raised p-7 text-center shadow-sm sm:p-9">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500/10 text-brand-500"><Mail className="h-7 w-7" /></div>
           <h1 className="mt-5 text-2xl font-semibold tracking-tight sm:text-3xl">Your parent or guardian has been notified</h1>
