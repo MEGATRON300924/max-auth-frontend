@@ -39,7 +39,7 @@ export function MaxIdentityGraphic({ className = "" }: { className?: string }) {
         <circle cx="320" cy="260" r="68" fill="white" fillOpacity="0.96" />
         <circle cx="320" cy="260" r="60" fill="white" />
         <image
-          href="/logo.png"
+          href="/max_auth.jpg"
           x="260"
           y="200"
           width="120"
