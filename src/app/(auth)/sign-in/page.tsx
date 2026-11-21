@@ -187,7 +187,7 @@ export default function SignInPage() {
       <div className="mx-auto flex min-h-[calc(100vh-2.5rem)] w-full max-w-[450px] min-w-0 flex-col items-center justify-center sm:min-h-[calc(100vh-5rem)] lg:mx-0 lg:min-h-0 lg:max-w-[560px] lg:items-stretch lg:justify-start">
         <section className="w-full border border-glass-border bg-base-raised px-4 py-6 shadow-sm sm:px-10 sm:py-10 lg:rounded-none lg:border-0 lg:bg-transparent lg:px-0 lg:py-0 lg:shadow-none">
           <div className="text-center">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center overflow-hidden rounded-[26px] border border-glass-border bg-base-raised shadow-none sm:h-24 sm:w-24"><img src="/logo.png" alt="MAX AI logo" className="h-16 w-16 object-contain sm:h-20 sm:w-20" /></div>
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center overflow-hidden rounded-[26px] border border-glass-border bg-base-raised shadow-none sm:h-24 sm:w-24"><img src="/max_auth.jpg" alt="MAX AI logo" className="h-16 w-16 object-contain sm:h-20 sm:w-20" /></div>
             <h1 className="mt-4 text-[30px] font-bold tracking-[-0.04em] text-ink sm:text-[36px] lg:mt-0">{step === "choose" ? signInTitle : mfaRequired ? "Verify it’s you" : "Enter your password"}</h1>
             {step === "choose" && clientName && <p className="mt-2 break-words text-lg font-semibold text-ink">{clientName}</p>}
             <p className="mt-2 text-[14px] leading-6 text-ink-muted sm:text-base">
