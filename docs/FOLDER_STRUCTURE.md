@@ -3,7 +3,7 @@
 ```
 max-auth-frontend/
 ├── public/
-│   ├── logo.png / favicon.png     — official MAX AI logo
+│   ├── max_auth.jpg               — official MAX Auth logo and browser icon
 │
 ├── src/
 │   ├── app/                        — Next.js App Router: one folder = one route
