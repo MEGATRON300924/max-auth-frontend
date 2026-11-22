@@ -541,6 +541,6 @@ Replace MAX Auth's old page logo and browser icon with the official `public/max_
 - Added sidebar links for Admin Management, Broadcast Centre and Notifications.
 
 ### Verification / remaining
-- Next.js production build, lint, responsive visual QA and API integration tests: pending.
+- GitHub Actions CI run #? completed successfully for the frontend feature commit: Next.js production build and both dependency vulnerability gates passed.\n- Lint, responsive visual QA and production API integration tests: pending.
 - Backend permission responses and frontend route visibility require end-to-end validation.
 - No merge or production deployment.
