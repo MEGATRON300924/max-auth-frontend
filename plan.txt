@@ -530,3 +530,17 @@ Replace MAX Auth's old page logo and browser icon with the official `public/max_
 
 ### Parental approval page coverage correction
 - Final route audit found one additional direct MAX Auth logo reference on `/parental-approval`; it now uses `/max_auth.jpg` as well.
+ 
+
+## Current task: Delegated administrator management, broadcast centre and notifications (2026-11-22)
+
+### Implemented on branch `feat/admin-management-broadcast-centre`
+- Added Admin Management page with username-based administrator assignment, Support / Operations / Custom presets, permission selection, optional full access for full-access grantors, administrator listing and revocation.
+- Added Broadcast Centre page with all-active-users or selected-username audiences, confirmation before sending, in-app + email delivery status and recent broadcast history.
+- Added a user Notifications inbox page with unread indicators and mark-as-read actions.
+- Added sidebar links for Admin Management, Broadcast Centre and Notifications.
+
+### Verification / remaining
+- Next.js production build, lint, responsive visual QA and API integration tests: pending.
+- Backend permission responses and frontend route visibility require end-to-end validation.
+- No merge or production deployment.
