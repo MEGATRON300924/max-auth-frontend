@@ -545,3 +545,11 @@ Replace MAX Auth's old page logo and browser icon with the official `public/max_
 - Lint, responsive visual QA and production API integration tests: pending.
 - Backend permission responses and frontend route visibility require end-to-end validation.
 - No merge or production deployment.
+
+
+## MAX Auth social preview cards — 2026-11-23
+- Confirmed both requested image assets already exist in `public/`: `max_auth.png` and `max_connected_preview.png`; no image files needed to be replaced or duplicated.
+- Updated the root Next.js metadata so the default Open Graph and Twitter large-image preview use `/max_auth.png` instead of the previous `/max_auth.jpg`.
+- Added route-specific metadata at `src/app/(dashboard)/connected-apps/layout.tsx` for `https://api.max-ai.name.ng/connected-apps`, using the absolute preview image URL `https://api.max-ai.name.ng/max_connected_preview.png`.
+- Connected Apps metadata includes a dedicated title, description, canonical URL, Open Graph image and Twitter large-image card. The route layout wrapper preserves the existing client page implementation.
+- Pending: run Vercel/GitHub CI and verify social crawler metadata on both the default MAX Auth page and Connected Apps URL. Social platforms may cache old previews; refresh their URL debugger/cache after deployment if needed.

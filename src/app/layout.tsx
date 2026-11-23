@@ -26,9 +26,9 @@ export const metadata: Metadata = {
     siteName: "MAX Auth",
     locale: "en_US",
     type: "website",
-    images: [{ url: "/max_auth.jpg", width: 512, height: 512, alt: "MAX Auth Logo" }],
+    images: [{ url: "/max_auth.png", alt: "MAX Auth preview" }],
   },
-  twitter: { card: "summary_large_image", title: "MAX Auth - Your MAX AI Account", description: "Sign in with your MAX AI Account and access The MAX AI Ecosystem.", images: ["/max_auth.jpg"] },
+  twitter: { card: "summary_large_image", title: "MAX Auth - Your MAX AI Account", description: "Sign in with your MAX AI Account and access The MAX AI Ecosystem.", images: ["/max_auth.png"] },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
 };
 
